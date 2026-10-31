@@ -24,15 +24,15 @@ class UserDirectoryMigrationTests(unittest.TestCase):
         file.chmod(0o600)
         return directory
 
-    def test_cider_wins_over_older_macoblox_and_keeps_permissions(self):
+    def test_quinta_leaves_other_launchers_data_in_place(self):
         cider = self.directory('ciderhq', 'current settings')
         older = self.directory('macoblox', 'older settings')
         with patch.dict(os.environ, XDG_CONFIG_HOME=str(self.base)):
             target = paths.user_directory('CONFIG')
-        self.assertEqual(target, self.base / 'quadrahq')
-        self.assertEqual((target / 'settings.json').read_text(), 'current settings')
-        self.assertEqual((target / 'settings.json').stat().st_mode & 0o777, 0o600)
-        self.assertFalse(cider.exists())
+        self.assertEqual(target, self.base / 'quinta')
+        self.assertFalse(target.exists())
+        self.assertEqual((cider / 'settings.json').read_text(), 'current settings')
+        self.assertEqual((cider / 'settings.json').stat().st_mode & 0o777, 0o600)
         self.assertEqual((older / 'settings.json').read_text(), 'older settings')
 
     def test_existing_quadra_data_is_never_replaced(self):

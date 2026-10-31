@@ -8,6 +8,10 @@
 /modifications/
 /mods_backup/
 *.dylib
+/experimental/macos-studio/*.app/
+/experimental/macos-studio/*.zip
+/experimental/macos-studio/*.log
+/experimental/macos-studio/*.core
 __pycache__/
 
 # Local experiments and history

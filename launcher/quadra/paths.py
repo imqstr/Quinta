@@ -51,4 +51,5 @@ def user_directory(kind):
     defaults = {"CONFIG": Path.home() / ".config", "CACHE": Path.home() / ".cache",
                 "DATA": Path.home() / ".local" / "share"}
     base = Path(os.environ.get(f"XDG_{kind}_HOME", defaults[kind]))
-    return migrate_directories(base / "quadrahq", base / "ciderhq", base / "macoblox")
+    # A fork must not move or overwrite another launcher's settings or caches.
+    return base / "quinta"

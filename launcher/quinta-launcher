@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+"""Quinta entry point; retain the upstream package and runtime ABI names."""
+import runpy
+import sys
+from pathlib import Path
+
+directory = Path(__file__).resolve().parent
+sys.path.insert(0, str(directory))
+
+if sys.argv[1:2] == ["--dump-gradient-shaders"]:
+    from quadra.shader_diagnostics import main
+    sys.exit(main(sys.argv[2:]))
+
+if sys.argv[1:2] == ["--macos-studio"]:
+    experiment = directory.parent / "experimental/macos-studio/run.py"
+    sys.argv = [str(experiment), *sys.argv[2:]]
+    runpy.run_path(str(experiment), run_name="__main__")
+    sys.exit(0)
+
+runpy.run_path(str(directory / "quadrahq-launcher"), run_name="__main__")

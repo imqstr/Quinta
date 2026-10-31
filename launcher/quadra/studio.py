@@ -800,7 +800,7 @@ def run(arguments=(), settings=None, update=True):
 def spawn(arguments=()):
     """Starts `quadrahq --studio` as a process of its own, so that Studio's
     GameMode, presence and settings backup outlive the launcher window."""
-    entry = Path(__file__).resolve().parents[1] / "quadrahq-launcher"
+    entry = Path(__file__).resolve().parents[1] / "quinta-launcher"
     return subprocess.Popen([sys.executable, str(entry), "--studio", "--no-update", *arguments],
                             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                             start_new_session=True)

@@ -86,9 +86,7 @@ SETTINGS_FILE = CONFIG_DIR / "settings.json"
 WEB_DATA_DIR = CONFIG_DIR / "web"
 
 DARLING_HOME = DARLING_PREFIX / "Users" / os.environ.get("USER", "user")
-SESSION_DIR = migrate_directories(DARLING_HOME / "Library" / "QuadraHQ",
-                                  DARLING_HOME / "Library" / "CiderHQ",
-                                  DARLING_HOME / "Library" / "MacOBlox")
+SESSION_DIR = DARLING_HOME / "Library" / "Quinta"
 SESSION_FILES = [
     SESSION_DIR / "Cookies.plist",
     SESSION_DIR / "Keychain",
@@ -349,9 +347,9 @@ def latest_version(channel="", required_log=None):
     return _validated_deployment(data)
 
 
-REPO_URL = "https://github.com/QuadraHQ/Quadra.git"
-RELEASES_URL = "https://github.com/QuadraHQ/Quadra/releases/latest"
-LAUNCHER_RELEASE_URL = "https://api.github.com/repos/QuadraHQ/Quadra/releases/latest"
+REPO_URL = "https://github.com/imqstr/Quinta.git"
+RELEASES_URL = "https://github.com/imqstr/Quinta/releases"
+LAUNCHER_RELEASE_URL = "https://api.github.com/repos/imqstr/Quinta/releases/latest"
 # Keep these patterns aligned with install.sh. Hosting files stay on main,
 # while partial app fetches only materialize blobs selected by this checkout.
 LAUNCHER_SPARSE_PATTERNS = """/*
@@ -372,8 +370,14 @@ def check_launcher_update():
     Returns (has_update, latest_version_string, release_url); raises when
     GitHub cannot be reached, so a failed check is not reported as up to date."""
     req = urllib.request.Request(LAUNCHER_RELEASE_URL, headers={"User-Agent": "Quadra"})
-    with urllib.request.urlopen(req, timeout=6) as response:
-        data = json.loads(response.read().decode())
+    try:
+        with urllib.request.urlopen(req, timeout=6) as response:
+            data = json.loads(response.read().decode())
+    except urllib.error.HTTPError as error:
+        if error.code == 404:
+            # A new fork has no published releases yet.
+            return False, "", RELEASES_URL
+        raise
     tag = str(data.get("tag_name") or "").lstrip("v")
     html_url = data.get("html_url") or RELEASES_URL
     has_update = bool(tag) and parse_version_tuple(tag) > parse_version_tuple(__version__)
@@ -431,7 +435,7 @@ def update_launcher(progress=None):
 
     if progress:
         progress(0.9, _("Updating launcher shortcuts…"))
-    install_script = PROJECT / "launcher" / "install.sh"
+    install_script = PROJECT / "launcher" / "install-quinta.sh"
     if install_script.exists():
         subprocess.run([str(install_script)], cwd=str(PROJECT), check=True,
                        capture_output=True)
@@ -445,11 +449,11 @@ def update_launcher(progress=None):
 # A shortcut to Settings -> CiderDarling while CiderDarling is installed; the
 # same entry as packaging/org.quadrahq.Quadra.CiderDarling.desktop and the one
 # launcher/install.sh writes. The marker line identifies a copy we may remove.
-CIDERDARLING_SHORTCUT = "org.quadrahq.Quadra.CiderDarling.desktop"
-SHORTCUT_MARKER = "X-QuadraHQ-Managed=true"
+CIDERDARLING_SHORTCUT = "io.github.imqstr.Quinta.CiderDarling.desktop"
+SHORTCUT_MARKER = "X-Quinta-Managed=true"
 CIDERDARLING_DESKTOP = """[Desktop Entry]
 Type=Application
-Name=CiderDarling Settings
+Name=CiderDarling Settings (Quinta)
 Name[ru]=Настройки CiderDarling
 Comment=Graphics card, runtime and diagnostics settings for CiderDarling
 Comment[ru]=Видеокарта, среда и диагностика для CiderDarling
@@ -467,8 +471,8 @@ def _desktop_command():
     """How desktop entries start this launcher: the packages' wrapper (it sets
     the prebuilt shim path), or this checkout's script as a quoted argument."""
     if PREBUILT_SHIM:
-        return "quadrahq"
-    text = str(PROJECT / "launcher" / "quadrahq-launcher").replace("\\", "\\\\\\\\")
+        return "quinta"
+    text = str(PROJECT / "launcher" / "quinta-launcher").replace("\\", "\\\\\\\\")
     for character in '"`$':
         text = text.replace(character, "\\\\" + character)
     return '"' + text.replace("%", "%%") + '"'

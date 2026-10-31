@@ -70,6 +70,19 @@ RELEASES = (Release(
                "9d13523b7b5076b2949bad827db313204a074e27720e978332227721e261b4bd",
                (2568,), (0x52C, 0x54B)),
     ),
+), Release(
+    # Official 0.745.0.7451137 Intel MacPlayer, version-b09c93298b5d4cd1.
+    # Identical affected GLSL sources; only table indices/offsets changed.
+    4569049,
+    "ead6fceac21e494cb3925ec4cc697ef7ea8773bff4617dffd4f9812cebcfa777",
+    (
+        Source(0x39FFE1, 21402,
+               "9f113af818c8b2df6a584edc16f323326878cf9d20ef5e034790c9a69d2573df",
+               (2569, 2570, 2571), (0x52C, 0x54B)),
+        Source(0x3A537B, 21572,
+               "9d13523b7b5076b2949bad827db313204a074e27720e978332227721e261b4bd",
+               (2572,), (0x52C, 0x54B)),
+    ),
 ))
 
 

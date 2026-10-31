@@ -193,7 +193,8 @@ class SessionHousekeepingTests(unittest.TestCase):
             self.assertIsNone(session._create_trace_file(log))
             self.assertIn("trace unavailable", session.notes[-1])
         session, _variables = self.ciderdarling("regular", cider_trace=True)
-        self.assertIsNone(session._create_trace_file(self.base / "launch-20261012-120001.log"))
+        with patch.object(core, "DARLING_RUNTIME", dict(core.DARLING_RUNTIME, runtime="regular")):
+            self.assertIsNone(session._create_trace_file(self.base / "launch-20261012-120001.log"))
 
     def test_server_from_another_installation_is_found(self):
         root = Path(self.temporary.name)
@@ -327,7 +328,7 @@ class SessionHousekeepingTests(unittest.TestCase):
             entry.unlink()
             with patch.object(core, "PREBUILT_SHIM", "/usr/lib/quadrahq/shim"):
                 core.sync_ciderdarling_shortcut(True, applications)
-            self.assertIn("Exec=quadrahq --ciderdarling-settings\n", entry.read_text())
+            self.assertIn("Exec=quinta --ciderdarling-settings\n", entry.read_text())
         packaged = (core.PROJECT / "packaging" / core.CIDERDARLING_SHORTCUT).read_text()
         self.assertEqual(packaged, entry.read_text())
         with patch.dict(os.environ, {"FLATPAK_ID": "org.quadrahq.Quadra"}):

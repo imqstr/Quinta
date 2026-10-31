@@ -565,7 +565,7 @@ class SupervisorTests(StudioFixture):
             studio.spawn(['roblox-studio:1'])
         command = popen.call_args.args[0]
         self.assertEqual(command[2:5], ['--studio', '--no-update', 'roblox-studio:1'])
-        self.assertTrue(command[1].endswith('quadrahq-launcher'))
+        self.assertTrue(command[1].endswith('quinta-launcher'))
         self.assertTrue(popen.call_args.kwargs['start_new_session'])
 
 

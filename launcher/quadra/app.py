@@ -20,7 +20,7 @@ from . import __version__, author, core, discord, dns, gpus, i18n, mods, runtime
 from .i18n import _  # noqa: E402
 from .setup import SetupWizard  # noqa: E402
 
-APP_ID = "org.quadrahq.Quadra"
+APP_ID = "io.github.imqstr.Quinta"
 
 # Common fast flags. Roblox only honours flags on its client allowlist, so
 # some of these may have no effect in a given client version.
@@ -74,7 +74,7 @@ def _restart_launcher():
     # Start the normal entry point without replaying an original Roblox URI.
     # A fresh process loads the selected client, sysroot and prefix together.
     environment = dict(os.environ, QUADRA_PAGE="settings")
-    entry = core.PROJECT / "launcher/quadrahq-launcher"
+    entry = core.PROJECT / "launcher/quinta-launcher"
     if not entry.is_file():
         raise FileNotFoundError(_("Quadra's launcher files are missing. Reinstall Quadra before restarting."))
     os.execve(sys.executable, [sys.executable, str(entry)], environment)
@@ -1826,7 +1826,7 @@ class SettingsPage(Adw.Bin):
         # 1. Environment page (Darling, Interface, Game, DNS, Diagnostics)
         self.env_page = Adw.PreferencesPage()
 
-        launcher_group = Adw.PreferencesGroup(title="Quadra")
+        launcher_group = Adw.PreferencesGroup(title="Quinta")
         self.launcher_version_row = Adw.ActionRow(
             title=_("Launcher version"),
             subtitle=f"v{__version__}"
@@ -3112,7 +3112,7 @@ class SettingsPage(Adw.Bin):
         self._in_thread(core.restart_darling, done)
 
 
-ABOUT = ("Quadra runs the real Roblox client for macOS on Linux through Darling. "
+ABOUT = ("Quinta is imqstr's fork of Quadra. It runs the Roblox client for macOS on Linux through Darling. "
          "It is not made by Roblox and is not affiliated with it.")
 
 
@@ -3171,7 +3171,7 @@ class InfoPage(Adw.PreferencesPage):
         super().__init__(title=_("Info"), icon_name="help-about-symbolic")
         self.window = window
 
-        about = Adw.PreferencesGroup(title="Quadra", description=_(ABOUT))
+        about = Adw.PreferencesGroup(title="Quinta", description=_(ABOUT))
         self.add(about)
 
         community = Adw.PreferencesGroup(title=_("Community"))
@@ -3503,7 +3503,7 @@ class ModsPage(Adw.Bin):
 
 class LauncherWindow(Adw.ApplicationWindow):
     def __init__(self, app, page=None):
-        super().__init__(application=app, title="Quadra")
+        super().__init__(application=app, title="Quinta")
         self.set_default_size(760, 580)
         self.set_resizable(True)
         self.settings = core.load_settings()
@@ -3683,7 +3683,7 @@ class LauncherWindow(Adw.ApplicationWindow):
         sidebar_toolbar = Adw.ToolbarView()
         self.sidebar_toolbar = sidebar_toolbar
         sidebar_header = Adw.HeaderBar(show_end_title_buttons=False, show_start_title_buttons=False)
-        self.brand_label = Gtk.Label(label="Quadra", css_classes=["heading"])
+        self.brand_label = Gtk.Label(label="Quinta", css_classes=["heading"])
         sidebar_header.set_title_widget(self.brand_label)
         sidebar_version = Gtk.Label(label=f"v{__version__}", css_classes=["dim-label", "caption"], margin_end=6)
         sidebar_header.pack_end(sidebar_version)
