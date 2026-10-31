@@ -28,13 +28,13 @@ static QuadraSurfaceSettings quadra_scaled_surface_settings(id self, SEL cmd) {
     quadra_input_scale_set(changed > 0 ? (double)settings.scale / before : 1.0);
     if (!allowed) {
         if (!__atomic_exchange_n(&quadra_surface_scale_override_warned, 1, __ATOMIC_RELAXED))
-            write_str("[Quadra] UI scale skipped: client DebugOverrideDPIScale is enabled\n");
+            write_str("[Quinta] UI scale skipped: client DebugOverrideDPIScale is enabled\n");
     } else if (changed < 0) {
         if (!__atomic_exchange_n(&quadra_surface_scale_invalid_warned, 1, __ATOMIC_RELAXED))
-            write_str("[Quadra] UI scale: invalid original surface scale preserved\n");
+            write_str("[Quinta] UI scale: invalid original surface scale preserved\n");
     } else if (changed > 0 &&
                !__atomic_exchange_n(&quadra_surface_scale_applied_logged, 1, __ATOMIC_RELAXED)) {
-        write_str("[Quadra] Roblox UI scale and mouse position compensation applied\n");
+        write_str("[Quinta] Roblox UI scale and mouse position compensation applied\n");
     }
     return settings;
 }
@@ -71,7 +71,7 @@ static void quadra_install_surface_scale_hook(void) {
     IMP original = method && quadra_surface_settings_abi_matches(method_getTypeEncoding(method))
         ? method_getImplementation(method) : 0;
     if (!original || original == (IMP)quadra_scaled_surface_settings) {
-        write_str("[Quadra] UI scale skipped: unsupported client surface-settings method\n");
+        write_str("[Quinta] UI scale skipped: unsupported client surface-settings method\n");
         __atomic_store_n(&quadra_surface_scale_install_state, 2, __ATOMIC_RELEASE);
         return;
     }
@@ -79,8 +79,8 @@ static void quadra_install_surface_scale_hook(void) {
     if (input_hooks <= 0) {
         if (input_hooks < 0)
             write_str(input_hooks == -2
-                ? "[Quadra] UI scale skipped: client mouse text protection unavailable\n"
-                : "[Quadra] UI scale skipped: unsupported client mouse input ABI\n");
+                ? "[Quinta] UI scale skipped: client mouse text protection unavailable\n"
+                : "[Quinta] UI scale skipped: unsupported client mouse input ABI\n");
         __atomic_store_n(&quadra_surface_scale_install_state,
                          input_hooks == 0 ? 0 : 2, __ATOMIC_RELEASE);
         return;
@@ -90,6 +90,6 @@ static void quadra_install_surface_scale_hook(void) {
                      (QuadraSurfaceSettings (*)(id, SEL))original, __ATOMIC_RELEASE);
     method_setImplementation(method, (IMP)quadra_scaled_surface_settings);
     __atomic_store_n(&quadra_surface_scale_install_state, 2, __ATOMIC_RELEASE);
-    write_str("[Quadra] UI scale: guarded client mouse adapters installed\n");
+    write_str("[Quinta] UI scale: guarded client mouse adapters installed\n");
 }
 #endif

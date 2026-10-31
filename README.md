@@ -1,12 +1,11 @@
 # Quinta
 
-Quinta is [imqstr](https://github.com/imqstr)'s experimental fork of
-[Quadra](https://github.com/QuadraHQ/Quadra), a launcher for running the
+Quinta is [imqstr](https://github.com/imqstr)'s experimental launcher for running the
 macOS Roblox client on Linux through Darling/CiderDarling.
 
 ## Development checkout
 
-On a machine with Quadra's dependencies and CiderDarling already installed:
+On a machine with Quinta's dependencies and CiderDarling already installed:
 
 ```sh
 git clone https://github.com/imqstr/Quinta.git
@@ -16,7 +15,7 @@ quinta
 ```
 
 Quinta uses its own app ID and `~/.config/quinta` / `~/.cache/quinta`
-folders. It does not automatically move Quadra's settings or take over Roblox
+folders. It does not automatically move Quinta's settings or take over Roblox
 protocol links. Choose a runtime in Quinta's settings, or copy a known working
 `runtime.json` into `~/.config/quinta`. A selected Darling prefix is still
 shared with any other launcher selecting that prefix; do not run both at once.
@@ -72,5 +71,5 @@ describe the current blocker.
 
 ## License and credits
 
-GPL-3.0; see [LICENSE](LICENSE). Quinta builds on Quadra and its contributors;
+GPL-3.0; see [LICENSE](LICENSE). Quinta builds on the [upstream project](https://github.com/QuadraHQ/Quadra) and its contributors;
 upstream code, copyright notices and attribution are retained.

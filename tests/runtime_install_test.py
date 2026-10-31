@@ -19,7 +19,7 @@ class RuntimeInstallationTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        self.project = self.root / "Quadra % $() ' space"
+        self.project = self.root / "Quinta % $() ' space"
         self.project.mkdir()
         self.installer = self.project / "install.sh"
         self.installer.write_text("exit 0\n")

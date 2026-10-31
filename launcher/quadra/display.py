@@ -65,7 +65,7 @@ class WaylandProbeWindow:
         value = get_api()
         # Check only the ABI header before reading newly added function slots.
         if not value or ctypes.cast(value, ctypes.POINTER(uint)).contents.value != 4:
-            raise RuntimeError("Wayland helper failed to initialize or is outdated. Rebuild Quadra before using Wayland.")
+            raise RuntimeError("Wayland helper failed to initialize or is outdated. Rebuild Quinta before using Wayland.")
         self.api = value.contents
         self.native = self.api.display()
         self.children = set()

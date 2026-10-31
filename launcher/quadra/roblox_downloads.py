@@ -1,4 +1,4 @@
-"""Public Roblox deployments: official alternate origins, then Quadra's mirror.
+"""Public Roblox deployments: official alternate origins, then Quinta's mirror.
 
 Account, game and login requests must never pass through the mirror.
 """
@@ -43,7 +43,7 @@ def open_public(url, *, timeout=30, on_fallback=None):
     unavailable, lagging or overloaded alternate must not block the mirror.
     Authentication errors still propagate without trying another source.
     """
-    headers = {'User-Agent': f'Quadra/{__version__}'}
+    headers = {'User-Agent': f'Quinta/{__version__}'}
     try:
         return urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=timeout)
     except urllib.error.HTTPError as error:
@@ -63,7 +63,7 @@ def open_public(url, *, timeout=30, on_fallback=None):
             error.close()
         except (urllib.error.URLError, TimeoutError):
             continue
-    logging.getLogger(__name__).warning('Official download alternates unavailable; trying the Quadra download mirror')
+    logging.getLogger(__name__).warning('Official download alternates unavailable; trying the Quinta download mirror')
     # A cold archive cache must finish fetching and validating the upstream
     # download before it can return a complete, length-checked response.
     mirror_timeout = 120 if ARCHIVE_PATH.fullmatch(urllib.parse.urlsplit(url).path) else 40

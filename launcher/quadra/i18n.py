@@ -83,8 +83,8 @@ RU = {
         "Экспорт флагов Studio",
     "Copy the flags to the clipboard.":
         "Скопировать флаги в буфер обмена.",
-    "The Windows version of Studio, run through Wine. Quadra keeps Wine and Studio up to date when you start it.":
-        "Windows-версия Studio, запущенная через Wine. Quadra обновляет Wine и Studio при запуске.",
+    "The Windows version of Studio, run through Wine. Quinta keeps Wine and Studio up to date when you start it.":
+        "Windows-версия Studio, запущенная через Wine. Quinta обновляет Wine и Studio при запуске.",
     "Behavior":
         "Поведение",
     "Files":
@@ -132,11 +132,11 @@ RU = {
     "may break Studio":
         "может сломать Studio",
     "Prepare client shader libraries": "Подготовка библиотек шейдеров клиента",
-    "Quadra M2VK: prepare installed shader libraries before playing, including the first launch.":
-        "Quadra M2VK: подготовка установленных библиотек шейдеров перед игрой, включая первый запуск.",
+    "Quinta M2VK: prepare installed shader libraries before playing, including the first launch.":
+        "Quinta M2VK: подготовка установленных библиотек шейдеров перед игрой, включая первый запуск.",
     "Preload local textures and fonts": "Предзагрузка локальных текстур и шрифтов",
-    "Quadra M2VK: warm bundled resources before playing. Downloaded world assets still load in game.":
-        "Quadra M2VK: предзагрузка ресурсов клиента. Ресурсы игрового мира по-прежнему загружаются в игре.",
+    "Quinta M2VK: warm bundled resources before playing. Downloaded world assets still load in game.":
+        "Quinta M2VK: предзагрузка ресурсов клиента. Ресурсы игрового мира по-прежнему загружаются в игре.",
     "Preparing Roblox": "Подготовка Roblox",
     "Preparing shaders and local resources. You can skip and start playing.":
         "Подготовка шейдеров и локальных ресурсов. Можно пропустить и начать игру.",
@@ -145,9 +145,9 @@ RU = {
     "Warming local textures and fonts": "Предзагрузка текстур и шрифтов",
     "{done} of {total} items": "{done} из {total} элементов",
     "Shader preloading": "Предзагрузка шейдеров",
-    "Quadra M2VK: prepare learned shaders before playing. New shaders may still compile during play.":
-        "Quadra M2VK: подготовка известных шейдеров перед игрой. Новые шейдеры могут компилироваться во время игры.",
-    "Quadra M2VK performance diagnostics": "Диагностика производительности Quadra M2VK",
+    "Quinta M2VK: prepare learned shaders before playing. New shaders may still compile during play.":
+        "Quinta M2VK: подготовка известных шейдеров перед игрой. Новые шейдеры могут компилироваться во время игры.",
+    "Quinta M2VK performance diagnostics": "Диагностика производительности Quinta M2VK",
     "Record compilation, encoding, GPU timing and memory use for performance reports.":
         "Запись времени компиляции, кодирования, работы GPU и использования памяти для отчётов.",
     "Preloading shaders": "Предзагрузка шейдеров",
@@ -185,8 +185,8 @@ RU = {
     "Uses {runtime}. Start it and connect the headset before playing.":
         "Используется {runtime}. Запустите её и подключите шлем перед игрой.",
     "Roblox update broke game compatibility": "Обновление Roblox нарушило совместимость с играми",
-    "Roblox is no longer using RakNet. The latest Roblox update has broken game connection compatibility with Quadra. Games might not work or may show Error 256.\n\nCheck for a Quadra update. If a fix is not available yet, wait for a Quadra compatibility patch.":
-        "Roblox больше не использует RakNet. Последнее обновление Roblox нарушило совместимость игровых подключений с Quadra. Игры могут не работать или выдавать ошибку 256.\n\nПроверьте обновления Quadra. Если исправление ещё не доступно, дождитесь патча совместимости для Quadra.",
+    "Roblox is no longer using RakNet. The latest Roblox update has broken game connection compatibility with Quinta. Games might not work or may show Error 256.\n\nCheck for a Quinta update. If a fix is not available yet, wait for a Quinta compatibility patch.":
+        "Roblox больше не использует RakNet. Последнее обновление Roblox нарушило совместимость игровых подключений с Quinta. Игры могут не работать или выдавать ошибку 256.\n\nПроверьте обновления Quinta. Если исправление ещё не доступно, дождитесь патча совместимости для Quinta.",
     "View log": "Посмотреть журнал",
     "Check for CiderDarling updates": "Проверить обновления CiderDarling",
     "Check for CiderDarling updates automatically": "Автоматически проверять обновления CiderDarling",
@@ -220,36 +220,36 @@ RU = {
         "CiderDarling установлена. Примените выбор среды, чтобы переключиться.",
     "Darling runtime": "Среда Darling",
     "DarlingHQ's Darling": "Darling от DarlingHQ",
-    "QuadraHQ's CiderDarling": "CiderDarling от QuadraHQ",
+    "CiderDarling": "CiderDarling",
     "Each runtime keeps its own Roblox sign-in.": "Каждая среда сохраняет свой вход в Roblox.",
     "{runtime} (not installed)": "{runtime} (не установлена)",
     "Active runtime": "Активная среда",
-    "Apply and restart Quadra": "Применить и перезапустить Quadra",
+    "Apply and restart Quinta": "Применить и перезапустить Quinta",
     "Refresh installed runtimes": "Обновить список установленных сред",
     "Flatpak uses its bundled Darling runtime.": "Flatpak использует встроенную среду Darling.",
-    "Install this runtime with Quadra's installer before switching.":
-        "Перед переключением установите эту среду через установщик Quadra.",
+    "Install this runtime with Quinta's installer before switching.":
+        "Перед переключением установите эту среду через установщик Quinta.",
     "Could not inspect installed runtimes": "Не удалось проверить установленные среды",
-    "Runtime saved. Close and reopen Quadra to apply it.": "Среда сохранена. Закройте и снова откройте Quadra, чтобы применить её.",
+    "Runtime saved. Close and reopen Quinta to apply it.": "Среда сохранена. Закройте и снова откройте Quinta, чтобы применить её.",
     "Could not switch Darling runtime": "Не удалось переключить среду Darling",
-    "Quadra's launcher files are missing. Reinstall Quadra before restarting.":
-        "Файлы лаунчера Quadra отсутствуют. Перед перезапуском установите Quadra заново.",
+    "Quinta's launcher files are missing. Reinstall Quinta before restarting.":
+        "Файлы лаунчера Quinta отсутствуют. Перед перезапуском установите Quinta заново.",
     "MangoHud overlay": "Оверлей MangoHud",
     "Show FPS, frametimes and CPU/GPU usage. Requires MangoHud; applies on next launch.":
         "FPS, время кадра и загрузка CPU/GPU. Требуется MangoHud; применяется при следующем запуске.",
     "Renderer": "Рендерер",
     "OpenGL": "OpenGL",
     "Vulkan (Zink, experimental)": "Vulkan (Zink, экспериментальный)",
-    "Quadra M2VK (experimental)": "Quadra M2VK (экспериментальный)",
-    "Applies on next launch. Zink uses Roblox's OpenGL renderer; Quadra M2VK uses its Metal renderer on Vulkan. VR uses OpenGL or Zink.":
-        "Применяется при следующем запуске. Zink использует OpenGL-рендерер Roblox; Quadra M2VK запускает его Metal-рендерер через Vulkan. VR использует OpenGL или Zink.",
-    "Quadra M2VK is unavailable": "Quadra M2VK недоступен",
-    "Quadra M2VK needs: {items}. Install them or select another renderer.":
-        "Для Quadra M2VK нужны: {items}. Установите их или выберите другой рендерер.",
-    "Could not build Quadra M2VK:\n{output}": "Не удалось собрать Quadra M2VK:\n{output}",
-    "Quadra M2VK needs Rust (cargo) 1.98 or newer to build. Install Rust or select another renderer.":
-        "Для сборки Quadra M2VK нужен Rust (cargo) 1.98 или новее. Установите Rust или выберите другой рендерер.",
-    "Quadra M2VK is not part of this package": "Quadra M2VK не входит в этот пакет",
+    "Quinta M2VK (experimental)": "Quinta M2VK (экспериментальный)",
+    "Applies on next launch. Zink uses Roblox's OpenGL renderer; Quinta M2VK uses its Metal renderer on Vulkan. VR uses OpenGL or Zink.":
+        "Применяется при следующем запуске. Zink использует OpenGL-рендерер Roblox; Quinta M2VK запускает его Metal-рендерер через Vulkan. VR использует OpenGL или Zink.",
+    "Quinta M2VK is unavailable": "Quinta M2VK недоступен",
+    "Quinta M2VK needs: {items}. Install them or select another renderer.":
+        "Для Quinta M2VK нужны: {items}. Установите их или выберите другой рендерер.",
+    "Could not build Quinta M2VK:\n{output}": "Не удалось собрать Quinta M2VK:\n{output}",
+    "Quinta M2VK needs Rust (cargo) 1.98 or newer to build. Install Rust or select another renderer.":
+        "Для сборки Quinta M2VK нужен Rust (cargo) 1.98 или новее. Установите Rust или выберите другой рендерер.",
+    "Quinta M2VK is not part of this package": "Quinta M2VK не входит в этот пакет",
     "Installing Vulkan dependencies… Authorize the administrator prompt to continue.":
         "Устанавливаются зависимости Vulkan… Подтвердите запрос администратора для продолжения.",
     "Could not install Vulkan dependencies": "Не удалось установить зависимости Vulkan",
@@ -303,20 +303,20 @@ RU = {
     "press play": "нажмите «Играть»",
     # Launcher update
     "Update available": "Доступно обновление",
-    "A new version of Quadra ({version}) is available. Update now?":
-        "Доступна новая версия Quadra ({version}). Обновить сейчас?",
+    "A new version of Quinta ({version}) is available. Update now?":
+        "Доступна новая версия Quinta ({version}). Обновить сейчас?",
     "Later": "Позже",
     "Update": "Обновить",
     "Launcher version": "Версия лаунчера",
     "Force update": "Принудительное обновление",
-    "Quadra is up to date": "Установлена последняя версия Quadra",
+    "Quinta is up to date": "Установлена последняя версия Quinta",
     "Update {version} available": "Доступно обновление {version}",
     "Pulling latest version…": "Загрузка последней версии…",
     "Building shim…": "Сборка шима…",
     "Updating launcher shortcuts…": "Обновление ярлыков лаунчера…",
-    "Quadra updated successfully": "Quadra успешно обновлён",
-    "Quadra updated. Restart it to use the new version.":
-        "Quadra обновлён. Перезапусти его, чтобы открыть новую версию.",
+    "Quinta updated successfully": "Quinta успешно обновлён",
+    "Quinta updated. Restart it to use the new version.":
+        "Quinta обновлён. Перезапусти его, чтобы открыть новую версию.",
     "Could not update the files in {path}:\n{output}": "Не удалось обновить файлы в {path}:\n{output}",
     # Play page
     "Roblox {version}": "Roblox {version}",
@@ -354,9 +354,9 @@ RU = {
     "Roblox Studio": "Roblox Studio",
     "Roblox Studio is already running": "Roblox Studio уже запущен",
     "Install Roblox Studio?": "Установить Roblox Studio?",
-    "Studio runs in its Windows version through Wine. Quadra downloads Wine, "
+    "Studio runs in its Windows version through Wine. Quinta downloads Wine, "
     "DXVK, Microsoft's WebView2 and Studio, about 800 MB.":
-        "Studio запускается в Windows-версии через Wine. Quadra скачает Wine, "
+        "Studio запускается в Windows-версии через Wine. Quinta скачает Wine, "
         "DXVK, Microsoft WebView2 и Studio, это около 800 МБ.",
     "Install": "Установить",
     "Could not start Roblox Studio": "Не удалось запустить Roblox Studio",
@@ -433,8 +433,8 @@ RU = {
     "Display the title and creator of the place you are playing":
         "Отображать название и создателя плейса, в который вы играете",
     "Show experience thumbnail in Discord": "Показывать иконку плейса в Discord",
-    "Replace the Quadra icon with the game's icon":
-        "Заменять иконку Quadra на обложку игры",
+    "Replace the Quinta icon with the game's icon":
+        "Заменять иконку Quinta на обложку игры",
     "Show elapsed time in Discord": "Показывать прошедшее время в Discord",
     "Display how long you have been playing in your status":
         "Отображать время, прошедшее с момента запуска игры",
@@ -445,7 +445,7 @@ RU = {
     "In Game": "В игре",
     "In Main Menu": "В главном меню",
     "by {creator}": "от {creator}",
-    "Get Quadra": "Скачать Quadra",
+    "Get Quinta": "Скачать Quinta",
     "Game page": "Страница игры",
     "Hide the macOS menu bar": "Скрывать полоску меню macOS",
     "The Roblox, Edit, Window… strip at the top of the game window":
@@ -486,8 +486,8 @@ RU = {
     "Roblox installed": "Roblox установлен",
     "Downloading {done} of {total} MB": "Загрузка {done} из {total} МБ",
     "Unpacking": "Распаковка",
-    "Roblox returned 403; trying Quadra's download server":
-        "Roblox вернул 403; пробуем сервер загрузок Quadra",
+    "Roblox returned 403; trying Quinta's download server":
+        "Roblox вернул 403; пробуем сервер загрузок Quinta",
     "Done": "Готово",
     "The download is not a zip archive": "Скачанный файл не является zip-архивом",
     "The archive has no RobloxPlayer.app": "В архиве нет RobloxPlayer.app",
@@ -634,9 +634,9 @@ RU = {
     "Anisotropic filtering (16x)": "Анизотропная фильтрация (16x)",
     "Force maximum texture resolution": "Принудительное максимальное разрешение текстур",
     # Info
-    "Quadra runs the real Roblox client for macOS on Linux through Darling. "
+    "Quinta runs the real Roblox client for macOS on Linux through Darling. "
     "It is not made by Roblox and is not affiliated with it.":
-        "Quadra запускает настоящий клиент Roblox для macOS на Linux через Darling. "
+        "Quinta запускает настоящий клиент Roblox для macOS на Linux через Darling. "
         "Его делает не Roblox, и с Roblox он никак не связан.",
     "Community": "Сообщество",
     "Authors": "Авторы",
@@ -651,23 +651,23 @@ RU = {
     "Graphics card, watchdog, tracing and diagnostics": "Видеокарта, сторожевой таймер, трассировка и диагностика",
     "Update CiderDarling": "Обновить CiderDarling",
     "Update in terminal": "Обновить в терминале",
-    "Installed {installed}, Quadra uses {pinned}. Opens a separate terminal for the build and sudo prompts.":
-        "Установлена {installed}, Quadra использует {pinned}. Откроет отдельный терминал для сборки и запросов sudo.",
+    "Installed {installed}, Quinta uses {pinned}. Opens a separate terminal for the build and sudo prompts.":
+        "Установлена {installed}, Quinta использует {pinned}. Откроет отдельный терминал для сборки и запросов sudo.",
     "These settings apply while CiderDarling is the active runtime. The renderer "
     "and graphics card are shared with Environment → Game.":
         "Эти настройки действуют, пока CiderDarling — активная среда. Рендерер и видеокарта "
         "общие с разделом «Окружение → Игра».",
     "Installed revision": "Установленная ревизия",
-    "{installed}; Quadra uses {pinned}": "{installed}; Quadra использует {pinned}",
+    "{installed}; Quinta uses {pinned}": "{installed}; Quinta использует {pinned}",
     "unknown": "неизвестно",
     "{runtime}. Switch in Environment → Darling to use these settings.":
         "{runtime}. Переключите среду в разделе «Окружение → Darling», чтобы применить эти настройки.",
     "Graphics": "Графика",
     "Threads": "Потоки",
     "Watchdog thread kicks": "Пробуждение зависших потоков",
-    "QUADRA_KICK. Interrupts threads stuck in long waits. Off by default: "
+    "Interrupts threads stuck in long waits. Off by default: "
     "each kick costs time. Applies on next launch.":
-        "QUADRA_KICK. Прерывает потоки, надолго застрявшие в ожидании. По умолчанию выключено: "
+        "Прерывает потоки, надолго застрявшие в ожидании. По умолчанию выключено: "
         "каждое прерывание стоит времени. Применяется при следующем запуске.",
     "Record runtime trace": "Записывать трассировку среды",
     "CIDER_TRACE_FILE. Numeric timings, no game text, in a private file in the logs "
@@ -682,14 +682,14 @@ RU = {
     "Could not open the prefix folder: {error}": "Не удалось открыть папку префикса: {error}",
     "CiderDarling is not installed": "CiderDarling не установлена",
     "End of the build log:": "Конец лога сборки:",
-    "CiderDarling updated. Apply and restart Quadra to use it.":
-        "CiderDarling обновлена. Примените выбор и перезапустите Quadra, чтобы использовать её.",
+    "CiderDarling updated. Apply and restart Quinta to use it.":
+        "CiderDarling обновлена. Примените выбор и перезапустите Quinta, чтобы использовать её.",
     # Diagnostics archive
     "Collect diagnostics": "Собрать диагностику",
     "Allow freeze diagnostics": "Разрешить диагностику зависаний",
-    "QUADRA_ALLOW_DEBUGGER. Lets Collect diagnostics read the game's thread stacks; "
+    "Lets Collect diagnostics read the game's thread stacks; "
     "turn on before starting the game.":
-        "QUADRA_ALLOW_DEBUGGER. Позволяет сбору диагностики читать стеки потоков игры; "
+        "Позволяет сбору диагностики читать стеки потоков игры; "
         "включите до запуска игры.",
     "Diagnostics are being collected…": "Диагностика уже собирается…",
     "Collecting diagnostics… This can take up to a minute.": "Сбор диагностики… Это может занять до минуты.",
@@ -749,7 +749,7 @@ ZH_CN = {
     "Import Studio flags": "导入 Studio 标志",
     "Export Studio flags": "导出 Studio 标志",
     "Copy the flags to the clipboard.": "将标志复制到剪贴板。",
-    "The Windows version of Studio, run through Wine. Quadra keeps Wine and Studio up to date when you start it.": "通过 Wine 运行的 Windows 版 Studio。启动时，Quadra 会让 Wine 和 Studio 保持最新。",
+    "The Windows version of Studio, run through Wine. Quinta keeps Wine and Studio up to date when you start it.": "通过 Wine 运行的 Windows 版 Studio。启动时，Quinta 会让 Wine 和 Studio 保持最新。",
     "Behavior": "行为",
     "Files": "文件",
     "Overlay folder": "覆盖层文件夹",
@@ -774,9 +774,9 @@ ZH_CN = {
     "Could not open the folder": "无法打开文件夹",
     "may break Studio": "可能导致 Studio 无法使用",
     "Prepare client shader libraries": "准备客户端着色器库",
-    "Quadra M2VK: prepare installed shader libraries before playing, including the first launch.": "Quadra M2VK：在游戏前准备已安装的着色器库，包括首次启动。",
+    "Quinta M2VK: prepare installed shader libraries before playing, including the first launch.": "Quinta M2VK：在游戏前准备已安装的着色器库，包括首次启动。",
     "Preload local textures and fonts": "预加载本地纹理和字体",
-    "Quadra M2VK: warm bundled resources before playing. Downloaded world assets still load in game.": "Quadra M2VK：在游戏前预热内置资源。下载的世界资产仍会在游戏中加载。",
+    "Quinta M2VK: warm bundled resources before playing. Downloaded world assets still load in game.": "Quinta M2VK：在游戏前预热内置资源。下载的世界资产仍会在游戏中加载。",
     "Preparing Roblox": "正在准备 Roblox",
     "Preparing shaders and local resources. You can skip and start playing.": "正在准备着色器和本地资源。您可以跳过并直接开始游戏。",
     "Preparing shader libraries": "正在准备着色器库",
@@ -784,8 +784,8 @@ ZH_CN = {
     "Warming local textures and fonts": "正在预热本地纹理和字体",
     "{done} of {total} items": "{done} / {total} 个项目",
     "Shader preloading": "着色器预加载",
-    "Quadra M2VK: prepare learned shaders before playing. New shaders may still compile during play.": "Quadra M2VK：在游戏前准备已知的着色器。新的着色器仍可能在游戏过程中编译。",
-    "Quadra M2VK performance diagnostics": "Quadra M2VK 性能诊断",
+    "Quinta M2VK: prepare learned shaders before playing. New shaders may still compile during play.": "Quinta M2VK：在游戏前准备已知的着色器。新的着色器仍可能在游戏过程中编译。",
+    "Quinta M2VK performance diagnostics": "Quinta M2VK 性能诊断",
     "Record compilation, encoding, GPU timing and memory use for performance reports.": "记录编译、编码、GPU 耗时和内存使用情况，用于性能报告。",
     "Preloading shaders": "预加载着色器",
     "Preparing shaders learned from earlier sessions. You can skip and start playing.": "正在准备之前会话中学习到的着色器。您可以跳过并直接开始游戏。",
@@ -813,7 +813,7 @@ ZH_CN = {
     "No OpenXR runtime found. Install and start WiVRn or Monado.": "未找到 OpenXR 运行时。请安装并启动 WiVRn 或 Monado。",
     "Uses {runtime}. Start it and connect the headset before playing.": "使用 {runtime}。请在游玩前启动它并连接头显。",
     "Roblox update broke game compatibility": "Roblox 更新破坏了游戏兼容性",
-    "Roblox is no longer using RakNet. The latest Roblox update has broken game connection compatibility with Quadra. Games might not work or may show Error 256.\n\nCheck for a Quadra update. If a fix is not available yet, wait for a Quadra compatibility patch.": "Roblox 不再使用 RakNet。最新的 Roblox 更新破坏了与 Quadra 的游戏连接兼容性。游戏可能无法运行或显示错误 256。\n\n请检查 Quadra 更新。如果暂无修复，请等待 Quadra 兼容性补丁。",
+    "Roblox is no longer using RakNet. The latest Roblox update has broken game connection compatibility with Quinta. Games might not work or may show Error 256.\n\nCheck for a Quinta update. If a fix is not available yet, wait for a Quinta compatibility patch.": "Roblox 不再使用 RakNet。最新的 Roblox 更新破坏了与 Quinta 的游戏连接兼容性。游戏可能无法运行或显示错误 256。\n\n请检查 Quinta 更新。如果暂无修复，请等待 Quinta 兼容性补丁。",
     "View log": "查看日志",
     "Check for CiderDarling updates": "检查 CiderDarling 更新",
     "Check for CiderDarling updates automatically": "自动检查 CiderDarling 更新",
@@ -838,30 +838,30 @@ ZH_CN = {
     "CiderDarling installed. Apply the runtime choice to switch.": "CiderDarling 已安装。应用运行时选择以切换。",
     "Darling runtime": "Darling 运行时",
     "DarlingHQ's Darling": "DarlingHQ 的 Darling",
-    "QuadraHQ's CiderDarling": "QuadraHQ 的 CiderDarling",
+    "CiderDarling": "CiderDarling",
     "Each runtime keeps its own Roblox sign-in.": "每个运行时都保留自己的 Roblox 登录状态。",
     "{runtime} (not installed)": "{runtime}（未安装）",
     "Active runtime": "当前运行时",
-    "Apply and restart Quadra": "应用并重启 Quadra",
+    "Apply and restart Quinta": "应用并重启 Quinta",
     "Refresh installed runtimes": "刷新已安装的运行时",
     "Flatpak uses its bundled Darling runtime.": "Flatpak 使用其自带的 Darling 运行时。",
-    "Install this runtime with Quadra's installer before switching.": "切换前请使用 Quadra 的安装程序安装此运行时。",
+    "Install this runtime with Quinta's installer before switching.": "切换前请使用 Quinta 的安装程序安装此运行时。",
     "Could not inspect installed runtimes": "无法检查已安装的运行时",
-    "Runtime saved. Close and reopen Quadra to apply it.": "运行时已保存。关闭并重新打开 Quadra 以应用。",
+    "Runtime saved. Close and reopen Quinta to apply it.": "运行时已保存。关闭并重新打开 Quinta 以应用。",
     "Could not switch Darling runtime": "无法切换 Darling 运行时",
-    "Quadra's launcher files are missing. Reinstall Quadra before restarting.": "Quadra 的启动器文件丢失。请在重启前重新安装 Quadra。",
+    "Quinta's launcher files are missing. Reinstall Quinta before restarting.": "Quinta 的启动器文件丢失。请在重启前重新安装 Quinta。",
     "MangoHud overlay": "MangoHud 覆盖层",
     "Show FPS, frametimes and CPU/GPU usage. Requires MangoHud; applies on next launch.": "显示 FPS、帧生成时间和 CPU/GPU 使用率。需要安装 MangoHud；下次启动时生效。",
     "Renderer": "渲染器",
     "OpenGL": "OpenGL",
     "Vulkan (Zink, experimental)": "Vulkan (Zink, 实验性)",
-    "Quadra M2VK (experimental)": "Quadra M2VK (实验性)",
-    "Applies on next launch. Zink uses Roblox's OpenGL renderer; Quadra M2VK uses its Metal renderer on Vulkan. VR uses OpenGL or Zink.": "下次启动时生效。Zink 使用 Roblox 的 OpenGL 渲染器；Quadra M2VK 在 Vulkan 上使用其 Metal 渲染器。VR 使用 OpenGL 或 Zink。",
-    "Quadra M2VK is unavailable": "Quadra M2VK 不可用",
-    "Quadra M2VK needs: {items}. Install them or select another renderer.": "Quadra M2VK 需要：{items}。请安装它们或选择其他渲染器。",
-    "Could not build Quadra M2VK:\n{output}": "无法构建 Quadra M2VK：\n{output}",
-    "Quadra M2VK needs Rust (cargo) 1.98 or newer to build. Install Rust or select another renderer.": "构建 Quadra M2VK 需要 Rust (cargo) 1.98 或更高版本。请安装 Rust 或选择其他渲染器。",
-    "Quadra M2VK is not part of this package": "Quadra M2VK 不包含在此包中",
+    "Quinta M2VK (experimental)": "Quinta M2VK (实验性)",
+    "Applies on next launch. Zink uses Roblox's OpenGL renderer; Quinta M2VK uses its Metal renderer on Vulkan. VR uses OpenGL or Zink.": "下次启动时生效。Zink 使用 Roblox 的 OpenGL 渲染器；Quinta M2VK 在 Vulkan 上使用其 Metal 渲染器。VR 使用 OpenGL 或 Zink。",
+    "Quinta M2VK is unavailable": "Quinta M2VK 不可用",
+    "Quinta M2VK needs: {items}. Install them or select another renderer.": "Quinta M2VK 需要：{items}。请安装它们或选择其他渲染器。",
+    "Could not build Quinta M2VK:\n{output}": "无法构建 Quinta M2VK：\n{output}",
+    "Quinta M2VK needs Rust (cargo) 1.98 or newer to build. Install Rust or select another renderer.": "构建 Quinta M2VK 需要 Rust (cargo) 1.98 或更高版本。请安装 Rust 或选择其他渲染器。",
+    "Quinta M2VK is not part of this package": "Quinta M2VK 不包含在此包中",
     "Installing Vulkan dependencies… Authorize the administrator prompt to continue.": "正在安装 Vulkan 依赖项… 请授权管理员提示以继续。",
     "Could not install Vulkan dependencies": "无法安装 Vulkan 依赖项",
     "Vulkan dependencies installed": "Vulkan 依赖项已安装",
@@ -908,18 +908,18 @@ ZH_CN = {
     "press install roblox": "按下安装 Roblox",
     "press play": "按下开始游戏",
     "Update available": "有可用更新",
-    "A new version of Quadra ({version}) is available. Update now?": "有新版本的 Quadra ({version}) 可用。立即更新？",
+    "A new version of Quinta ({version}) is available. Update now?": "有新版本的 Quinta ({version}) 可用。立即更新？",
     "Later": "稍后",
     "Update": "更新",
     "Launcher version": "启动器版本",
     "Force update": "强制更新",
-    "Quadra is up to date": "Quadra 已是最新版本",
+    "Quinta is up to date": "Quinta 已是最新版本",
     "Update {version} available": "有可用更新 {version}",
     "Pulling latest version…": "正在拉取最新版本…",
     "Building shim…": "正在构建 shim…",
     "Updating launcher shortcuts…": "正在更新启动器快捷方式…",
-    "Quadra updated successfully": "Quadra 更新成功",
-    "Quadra updated. Restart it to use the new version.": "Quadra 已更新。请重启以使用新版本。",
+    "Quinta updated successfully": "Quinta 更新成功",
+    "Quinta updated. Restart it to use the new version.": "Quinta 已更新。请重启以使用新版本。",
     "Could not update the files in {path}:\n{output}": "无法更新 {path} 中的文件：\n{output}",
     "Roblox {version}": "Roblox {version}",
     "Roblox not found": "未找到 Roblox",
@@ -1010,7 +1010,7 @@ ZH_CN = {
     "Show experience name in Discord": "在 Discord 中显示体验名称",
     "Display the title and creator of the place you are playing": "显示您正在游玩的地点的标题和创作者",
     "Show experience thumbnail in Discord": "在 Discord 中显示体验缩略图",
-    "Replace the Quadra icon with the game's icon": "用游戏图标替换 Quadra 图标",
+    "Replace the Quinta icon with the game's icon": "用游戏图标替换 Quinta 图标",
     "Show elapsed time in Discord": "在 Discord 中显示已用时间",
     "Display how long you have been playing in your status": "在状态中显示您已游玩的时间",
     "Show playtime": "显示游玩时间",
@@ -1020,7 +1020,7 @@ ZH_CN = {
     "In Game": "游戏中",
     "In Main Menu": "主菜单中",
     "by {creator}": "作者：{creator}",
-    "Get Quadra": "获取 Quadra",
+    "Get Quinta": "获取 Quinta",
     "Game page": "游戏页面",
     "Hide the macOS menu bar": "隐藏 macOS 菜单栏",
     "The Roblox, Edit, Window… strip at the top of the game window": "游戏窗口顶部的 Roblox、编辑、窗口… 栏",
@@ -1051,7 +1051,7 @@ ZH_CN = {
     "Roblox installed": "Roblox 已安装",
     "Downloading {done} of {total} MB": "正在下载 {done} / {total} MB",
     "Unpacking": "解压中",
-    "Roblox returned 403; trying Quadra's download server": "Roblox 返回 403；正在尝试 Quadra 的下载服务器",
+    "Roblox returned 403; trying Quinta's download server": "Roblox 返回 403；正在尝试 Quinta 的下载服务器",
     "Done": "完成",
     "The download is not a zip archive": "下载的文件不是 zip 压缩包",
     "The archive has no RobloxPlayer.app": "压缩包中没有 RobloxPlayer.app",
@@ -1184,15 +1184,15 @@ ZH_CN = {
     "Graphics card, watchdog, tracing and diagnostics": "显卡、看门狗、追踪和诊断",
     "Update CiderDarling": "更新 CiderDarling",
     "Update in terminal": "在终端中更新",
-    "Installed {installed}, Quadra uses {pinned}. Opens a separate terminal for the build and sudo prompts.": "已安装 {installed}，Quadra 使用 {pinned}。将打开单独的终端进行构建和 sudo 提权。",
+    "Installed {installed}, Quinta uses {pinned}. Opens a separate terminal for the build and sudo prompts.": "已安装 {installed}，Quinta 使用 {pinned}。将打开单独的终端进行构建和 sudo 提权。",
     "Installed revision": "已安装版本",
-    "{installed}; Quadra uses {pinned}": "{installed}；Quadra 使用 {pinned}",
+    "{installed}; Quinta uses {pinned}": "{installed}；Quinta 使用 {pinned}",
     "unknown": "未知",
     "{runtime}. Switch in Environment → Darling to use these settings.": "{runtime}。在 环境 → Darling 中切换以使用这些设置。",
     "Graphics": "图形",
     "Threads": "线程",
     "Watchdog thread kicks": "看门狗线程踢出",
-    "QUADRA_KICK. Interrupts threads stuck in long waits. Off by default: each kick costs time. Applies on next launch.": "QUADRA_KICK。中断陷入长时间等待的线程。默认关闭：每次踢出都会消耗时间。下次启动时生效。",
+    "Interrupts threads stuck in long waits. Off by default: each kick costs time. Applies on next launch.": "中断陷入长时间等待的线程。默认关闭：每次踢出都会消耗时间。下次启动时生效。",
     "Record runtime trace": "记录运行时追踪",
     "CIDER_TRACE_FILE. Numeric timings, no game text, in a private file in the logs folder (up to 32 MB per launch). Applies on next launch.": "CIDER_TRACE_FILE。日志文件夹中私人文件中的数字计时，无游戏文本（每次启动最多 32 MB）。下次启动时生效。",
     "Verbose darlingserver log": "详细 darlingserver 日志",
@@ -1201,10 +1201,10 @@ ZH_CN = {
     "Could not open the prefix folder: {error}": "无法打开前缀文件夹：{error}",
     "CiderDarling is not installed": "CiderDarling 未安装",
     "End of the build log:": "构建日志结束：",
-    "CiderDarling updated. Apply and restart Quadra to use it.": "CiderDarling 已更新。应用并重启 Quadra 以使用它。",
+    "CiderDarling updated. Apply and restart Quinta to use it.": "CiderDarling 已更新。应用并重启 Quinta 以使用它。",
     "Collect diagnostics": "收集诊断信息",
     "Allow freeze diagnostics": "允许冻结诊断",
-    "QUADRA_ALLOW_DEBUGGER. Lets Collect diagnostics read the game's thread stacks; turn on before starting the game.": "QUADRA_ALLOW_DEBUGGER。允许收集诊断信息读取游戏的线程堆栈；在开始游戏前开启。",
+    "Lets Collect diagnostics read the game's thread stacks; turn on before starting the game.": "允许收集诊断信息读取游戏的线程堆栈；在开始游戏前开启。",
     "Diagnostics are being collected…": "正在收集诊断信息…",
     "Collecting diagnostics… This can take up to a minute.": "正在收集诊断信息… 这可能需要一分钟。",
     "Could not collect diagnostics": "无法收集诊断信息",
@@ -1216,7 +1216,7 @@ ZH_CN = {
     "Sends the game server's IP address to RoValra (apis.rovalra.com) while you play": "在您游玩时将游戏服务器的 IP 地址发送给 RoValra (apis.rovalra.com)",
     "Only Roblox uses this server, the rest of the system keeps its own DNS. Helps when some Roblox images or servers do not load.": "只有 Roblox 使用此服务器，系统其余部分保留自己的 DNS。当某些 Roblox 图片或服务器无法加载时会有帮助。",
     "Crash diagnostics": "崩溃诊断",
-    "QUADRA_ALLOW_DEBUGGER. Lets Collect diagnostics read the game's thread stacks; keeps the crash handler available. Turn on before starting the game.": "QUADRA_ALLOW_DEBUGGER。允许收集诊断信息读取游戏的线程堆栈；保持崩溃处理程序可用。在启动游戏前开启。",
+    "Lets Collect diagnostics read the game's thread stacks; keeps the crash handler available. Turn on before starting the game.": "允许收集诊断信息读取游戏的线程堆栈；保持崩溃处理程序可用。在启动游戏前开启。",
     "Accuracy": "精确度",
     "Fast uses the device's own maths and texture decoders. Textures decodes BC textures as Metal does: try it if textures look wrong. Exact is slowest, for diagnosing wrong colors or shapes.":
         "快速：使用设备自身的数学计算和纹理解码，按 Metal 的方式解码 BC 纹理：如果纹理看起来不对劲，请试试这个。精确：最慢，用于诊断颜色或形状错误。",
@@ -1239,7 +1239,7 @@ ZH_CN = {
     "Learned shaders kept ready": "保持就绪的已编译着色器",
     "Up to this many, within a quarter of free memory. More smooths areas you have visited before.":
         "在四分之一空闲内存范围内，最多保留此数量。保留更多可使您之前访问过的区域更流畅。",
-    "Fall back to OpenGL if Quadra M2VK cannot start": "如果 Quadra M2VK 无法启动，回退到 OpenGL",
+    "Fall back to OpenGL if Quinta M2VK cannot start": "如果 Quinta M2VK 无法启动，回退到 OpenGL",
     "Play with OpenGL this time instead of stopping, when no working GPU driver is found.":
         "当找不到可用的 GPU 驱动程序时，这次使用 OpenGL 游玩，而不是直接停止。",
     "Prepare learned shaders before playing. New shaders may still compile during play.": "在游戏前准备已知的着色器。新的着色器仍可能在游戏过程中编译。",
@@ -1247,12 +1247,12 @@ ZH_CN = {
     "Warm bundled resources before playing. Downloaded world assets still load in game.": "在游戏前预热内置资源。下载的世界资产仍会在游戏中加载。",
     "Graphics card": "显卡",
     "Applies on next launch. Automatic keeps your desktop or terminal's GPU selection.": "下次启动时生效。“自动”会保持您的桌面或终端的 GPU 选择。",
-    "Applies on next launch, and only while the renderer is Quadra M2VK. The defaults suit most computers.": "下次启动时生效，且仅在渲染器为 Quadra M2VK 时适用。默认值适合大多数计算机。",
+    "Applies on next launch, and only while the renderer is Quinta M2VK. The defaults suit most computers.": "下次启动时生效，且仅在渲染器为 Quinta M2VK 时适用。默认值适合大多数计算机。",
     "100–400%. Keeps the display resolution. Applies on next launch.": "100–400%。保持显示分辨率。下次启动时生效。",
     "Window backend": "窗口后端",
     "Applies on next launch.": "下次启动时生效。",
     "Collect hardware report": "收集硬件报告",
-    "Reset Quadra M2VK settings": "重置 Quadra M2VK 设置",
+    "Reset Quinta M2VK settings": "重置 Quinta M2VK 设置",
     "These settings apply while CiderDarling is the active runtime. The renderer and graphics card are shared with Environment → Game.":
     "这些设置仅在 CiderDarling 为当前运行时生效。渲染器和显卡与 环境 → 游戏 中的设置共享。",
     "Trace text input": "追踪文本输入",

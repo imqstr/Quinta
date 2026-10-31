@@ -32,7 +32,7 @@ def is_live(channel):
 
 
 def _request(url, headers=None):
-    return urllib.request.Request(url, headers={"User-Agent": f"Quadra/{__version__}", **(headers or {})})
+    return urllib.request.Request(url, headers={"User-Agent": f"Quinta/{__version__}", **(headers or {})})
 
 
 def _json(url, headers=None, opener=urllib.request.urlopen, timeout=15):

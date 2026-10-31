@@ -1,9 +1,11 @@
+> This setup guide is inherited and adapted for Quinta. Historical upstream notices are preserved in [the licensing archive](../LICENSES/upstream/README.md).
+
 <p align="center">
-  <img src="branding/quadrahq.webp" alt="Quadra logo" width="160">
+  <img src="branding/quadrahq.webp" alt="Quinta logo" width="160">
 </p>
 
 <h1 align="center">
- Quadra, by QuadraHQ.
+ Quinta, maintained by imqstr.
 </h1>
 
  <p align="center">
@@ -15,14 +17,14 @@
  <p align="center">
   The Roblox client meant for MacOS, running on Linux through <a href="https://www.darlinghq.org">Darling</a>, a compatability layer for using MacOS applications on Linux.
 
-  improved by aubree.wtf and QuadraHQ maintainers. with patches and more, Mac O' Blox, now Quadra was originally created by narezy. Credits of the base to Quadra go to narezy.
+  improved by aubree.wtf and Quinta maintainers. with patches and more, Mac O' Blox, now Quinta was originally created by narezy. Credits of the base to Quinta go to narezy.
 </p>
 
 <h1 align="center">
-A.I. Disclaimer, do not use Quadra if against the usage of A.I.
+A.I. Disclaimer, do not use Quinta if against the usage of A.I.
 </h1>
 
-###   Quadra uses **Generative A.I.** for the maintaining and addition of features for Quadra. Please do NOT complain in the QuadraHQ [Discord server](https://discord.gg/jCjHYYNq48) if you are aginst the usage of Generative A.I.
+###   Quinta uses **Generative A.I.** for the maintaining and addition of features for Quinta. Please do NOT complain in the Quinta [Discord server](https://discord.gg/jCjHYYNq48) if you are aginst the usage of Generative A.I.
 
 <h1 align="center">
   Description
@@ -30,15 +32,15 @@ A.I. Disclaimer, do not use Quadra if against the usage of A.I.
 
 Full graphics* with antialiasing, sound, camera and mouse lock, a session that
 survives restarts, and a small launcher with fast flags. Roblox Studio too, in
-its Windows version through Wine. English and Russian. Quadra is under the GPL v3 license. Do not make Quadra proprietary, nor may any derivatives be closed source.
+its Windows version through Wine. English and Russian. Quinta is under the GPL v3 license. Do not make Quinta proprietary, nor may any derivatives be closed source.
 Any derivatives must be also under the GPL v3 license, and cannot remove any copyright notices.
 * What we mean by "Full graphics" is that the game is running and largely playable. Due to the nature of OpenGL, we cannot provide maxiumum graphics.
 
 <h1 align="center">
-  Migration from Cider / Mac O' Blox to Quadra
+  Migration from Cider / Mac O' Blox to Quinta
 </h1>
 
-Quadra is the new name for Cider, maintained by **QuadraHQ**. The terminal
+Quinta is maintained by **imqstr** and builds on an existing Linux launcher. The terminal
 command and native package name are **`quadrahq`**, the desktop ID is
 `org.quadrahq.Quadra`, and the website is
 [quadrahq.org](https://quadrahq.org). The logo stays the same.
@@ -47,13 +49,13 @@ The source installer moves `~/.local/share/CiderHQ` (or the older
 `~/.local/share/MacOBlox`) to `~/.local/share/QuadraHQ`. Settings and cache move
 from `ciderhq` (or `macoblox`) to `quadrahq`, and Darling session files move
 from `Library/CiderHQ` (or `Library/MacOBlox`) to `Library/QuadraHQ`. Existing
-Quadra data is never replaced; Cider data takes precedence over MacOBlox data.
+Quinta data is never replaced; Cider data takes precedence over MacOBlox data.
 
 The launcher's Python package is `quadra`, the shim is `libQuadraShims.dylib`
 and its settings are `QUADRA_*` variables. Names that the Darling runtime and
-Quadra M2VK read (`CIDER_*`, `MACOBLOX_METAL_*`, CiderDarling's runtime
+Quinta M2VK read (`CIDER_*`, `MACOBLOX_METAL_*`, CiderDarling's runtime
 identifiers) keep their compatibility names until those projects are renamed.
-The source lives at [QuadraHQ/Quadra](https://github.com/QuadraHQ/Quadra) (formerly
+The source lives at [Quinta](https://github.com/imqstr/Quinta) (formerly
 CiderHQ-org/Cider; the old address redirects) and the Darling runtime at
 [QuadraHQ/CiderDarling](https://github.com/QuadraHQ/CiderDarling).
 
@@ -67,7 +69,7 @@ this version instead of the source installer below.
 Every **Latest** version is a source release. Use the installer below to install or update.
 
 If Roblox's public version or client download endpoint returns HTTP 403,
-Quadra retries the same channel/upload through alternate official Roblox
+Quinta retries the same channel/upload through alternate official Roblox
 servers, then its public download cache on `vps.korona.lat`. Login and game
 traffic continue to go directly to Roblox.
 
@@ -76,7 +78,7 @@ curl -fsSL https://quadrahq.org/install.sh | bash
 ```
 
 The installer welcomes you and explains the packages, destination and setup
-steps before you begin. It prepares Darling and adds **Quadra** to the
+steps before you begin. It prepares Darling and adds **Quinta** to the
 app menu. Open it for a first-time guide that downloads Roblox, prepares its
 app environment, and explains how to sign in. Existing Roblox installations
 open the launcher directly; **Setup guide** in its menu reopens the guide.
@@ -88,7 +90,7 @@ aubree.lat** (pure black, grey outlines, Archivo/JetBrains Mono and a topology
 backdrop). The choice is saved and can be changed while Roblox is running.
 
 Setup offers **Regular Darling** (the default on first install) or
-**QuadraHQ's CiderDarling**, our Darling variant with threading, CPU detection
+**Quinta's CiderDarling**, our Darling variant with threading, CPU detection
 and OpenGL fixes. Updates keep your choice. You can also choose explicitly:
 
 ```bash
@@ -119,26 +121,26 @@ succeeds. Restart the launcher after switching. Flatpak continues to use its
 bundled runtime.
 
 Installed runtimes can also be switched in **Settings → Environment → Darling**.
-Choose **DarlingHQ's Darling** or **QuadraHQ's CiderDarling**, then press
-**Apply and restart Quadra**. Close Roblox and wait for launcher operations to
-finish first. The refresh button detects runtimes installed while Quadra was
+Choose **DarlingHQ's Darling** or **Quinta's CiderDarling**, then press
+**Apply and restart Quinta**. Close Roblox and wait for launcher operations to
+finish first. The refresh button detects runtimes installed while Quinta was
 open. If CiderDarling is missing, select it and click **Install in terminal**.
 The separate terminal runs the pinned runtime installer, shows build progress
 and handles confirmation and sudo prompts. It stays open when the build
-finishes; Quadra refreshes the choices and you can apply the switch when ready.
+finishes; Quinta refreshes the choices and you can apply the switch when ready.
 Installing this way keeps the current runtime selection and launcher files.
 Custom prefixes are remembered for both choices. Flatpak keeps this selector
 read-only because its runtime is bundled.
 
-Quadra 0.23 checks for CiderDarling updates automatically at startup and hourly.
+Quinta 0.23 checks for CiderDarling updates automatically at startup and hourly.
 When a complete CI binary release is ready, **Settings → CiderDarling** offers
 **Update in terminal**. The refresh button checks immediately, and automatic
 checks can be disabled in that page. Downloads verify the published checksums;
-the update keeps the prefix and sign-in, and applies after restarting Quadra.
+the update keeps the prefix and sign-in, and applies after restarting Quinta.
 Each runtime release appears through this update feed without a separate
-Quadra release or manual announcement.
+Quinta release or manual announcement.
 
-Quadra uses the complete published runtime release, with the revision pinned
+Quinta uses the complete published runtime release, with the revision pinned
 in its installer (`CIDER_DARLING_REVISION` in `install.sh`) as the fallback
 when no update feed is available. The new version is saved for CiderDarling
 with its prefix unchanged, and the active runtime switches to it only if
@@ -199,7 +201,7 @@ sudo pacman -S clang lld unzip pipewire-audio python-gobject gtk4 libadwaita web
 
 Debian, Ubuntu, Mint: download `debs_20260608.zip` from the
 [Darling release v0.1.20260608](https://github.com/darlinghq/darling/releases/tag/v0.1.20260608)
-(the one Quadra is tested with), then:
+(the one Quinta is tested with), then:
 
 ```bash
 unzip debs_*.zip -d darling-debs
@@ -214,11 +216,11 @@ Fedora and others: build Darling with the
 sudo dnf install clang lld unzip pipewire-utils python3-gobject gtk4 libadwaita webkitgtk6.0
 ```
 
-**2. Quadra**
+**2. Quinta**
 
 ```bash
 git clone --filter=blob:none --no-checkout --depth 1 --single-branch --branch main \
-  https://github.com/QuadraHQ/Quadra ~/.local/share/QuadraHQ
+  https://github.com/imqstr/Quinta ~/.local/share/QuadraHQ
 git -C ~/.local/share/QuadraHQ sparse-checkout set --no-cone --stdin <<'PATTERNS'
 /*
 !/website/
@@ -239,19 +241,19 @@ git -C ~/.local/share/QuadraHQ reset --hard HEAD
 <details>
 <summary>Hey, this sounds like Gracejuice!</summary>
 
-Grapejuice and Quadra are inherently similar because Grapejuice used Wine to run the Windows version of the Roblox client on Linux, while Quadra uses Darling with along with added libraries to use the MacOS version of the Roblox client on Linux. Ergo, Grapejuice and Quadra use the same methods, though use different versions of the Roblox client.
+Grapejuice and Quinta are inherently similar because Grapejuice used Wine to run the Windows version of the Roblox client on Linux, while Quinta uses Darling with along with added libraries to use the MacOS version of the Roblox client on Linux. Ergo, Grapejuice and Quinta use the same methods, though use different versions of the Roblox client.
 </details>
 
 <details>
 <summary>Is my account safe?</summary>
 
-You sign in inside the Roblox client itself, the launcher and we at QuadraHQ **NEVER** see your password since the
+You sign in inside the Roblox client itself, the launcher and we at Quinta **NEVER** see your password since the
 session is stored locally, only on your computer, and not on a server. The cookie is located in
 `~/.darling/Users/$USER/Library/QuadraHQ`. Do not share that folder, it works
-like a fancy keycard to your account. We at QuadraHQ will never ask for this folder, and anyone asking for this is a phishing attempt and should be reported, not only to the service you're on, but also ping (Don't DM) anyone with the "Cool and awesome" role in the [Discord](https://discord.gg/jCjHYYNq48) and above, so we can "take care (ban)" them from the server, or make a PSA in the [Discord](https://discord.gg/jCjHYYNq48) to make sure they don't get another persons account.
+like a fancy keycard to your account. We at Quinta will never ask for this folder, and anyone asking for this is a phishing attempt and should be reported, not only to the service you're on, but also ping (Don't DM) anyone with the "Cool and awesome" role in the [Discord](https://discord.gg/jCjHYYNq48) and above, so we can "take care (ban)" them from the server, or make a PSA in the [Discord](https://discord.gg/jCjHYYNq48) to make sure they don't get another persons account.
 **Sign out** in the settings to delete it.
 
-Quadra is ***NOT*** affiliated nor endorsed by the Roblox Corporation, nor any siblings of Roblox. We are not liable for any suspensions of your account by using Quadra.
+Quinta is ***NOT*** affiliated nor endorsed by the Roblox Corporation, nor any siblings of Roblox. We are not liable for any suspensions of your account by using Quinta.
 </details>
 
 <details>
@@ -275,7 +277,7 @@ Go to your browser or something like S[REDACTED]r and click the gear on the top 
 <details>
 <summary>Images or servers do not load</summary>
 
-Some providers make some of Roblox's addresses inaccessible. In Quadra's settings, go to DNS, and choose from the dropdown. Your current options are Google (8.8.8.8), Cloudflare (1.1.1.1), Quad9 (9.9.9.9), and your currrent system-wide DNS. Only Quadra uses it, The rest of your computer keeps it's current DNS.
+Some providers make some of Roblox's addresses inaccessible. In Quinta's settings, go to DNS, and choose from the dropdown. Your current options are Google (8.8.8.8), Cloudflare (1.1.1.1), Quad9 (9.9.9.9), and your currrent system-wide DNS. Only Quinta uses it, The rest of your computer keeps it's current DNS.
 
 </details>
 
@@ -283,7 +285,7 @@ Some providers make some of Roblox's addresses inaccessible. In Quadra's setting
 <summary>OpenGL and Vulkan rendering</summary>
 
 **OpenGL** is the default and uses Roblox's own OpenGL renderer with the host
-OpenGL driver. Quadra hides the Metal device so Roblox selects this path.
+OpenGL driver. Quinta hides the Metal device so Roblox selects this path.
 Client startup was verified on NVIDIA OpenGL 4.1 using the client's GLSL shader
 pack.
 
@@ -307,9 +309,9 @@ and the MangoHud Vulkan overlay have been tested on an RTX 3060 Ti, with GL
 tracing disabled. Heavy gameplay and other GPUs still need testing. This uses
 the macOS client's OpenGL renderer.
 
-**Quadra M2VK (experimental)** is available in the same menu in Quadra 0.35.
+**Quinta M2VK (experimental)** is available in the same menu in Quinta 0.35.
 This runs Roblox's Metal renderer through the pinned
-[QuadraM2VK](https://github.com/QuadraHQ/QuadraM2VK) fork of metal2vulkan. Existing
+[Quinta M2VK](https://github.com/QuadraHQ/QuadraM2VK) fork of metal2vulkan. Existing
 Metal selections automatically use this entry. Native Wayland
 login, home and Write a Letter have been verified on an RTX 3060 Ti.
 Native packages include the prebuilt bridge and its Vulkan/LLVM runtime dependencies; the first launch upgrades the shader cache. Building from source
@@ -324,7 +326,7 @@ offers **Skip and play**. **Prepare client shader libraries** also prepares inst
 libraries on the first launch, while **Preload local textures and fonts** warms bounded
 bundled resources. The helper stops on memory pressure, stalled progress, timeout or Skip.
 New shaders and downloaded world assets can still cause work during play. Optional
-**Quadra M2VK performance diagnostics** records bounded timing, memory and cache observations;
+**Quinta M2VK performance diagnostics** records bounded timing, memory and cache observations;
 it is off by default. The integrated bridge passed authored software Vulkan and RTX 3060 Ti
 checks, including native Wayland and pipeline reuse. Gameplay reports describe the preceding
 presentation and retention fixes; the new launcher stages have no controlled game FPS result.
@@ -376,7 +378,7 @@ original relative deltas.
 <details>
 <summary>Error 256 or an unknown connection error when joining a server</summary>
 
-Update Quadra and restart Roblox. The launcher applies verified RakNet
+Update Quinta and restart Roblox. The launcher applies verified RakNet
 compatibility patches for Roblox **0.741.0.7411056**, **0.742.0.7421053**,
 **0.743.0.7431129**, **0.743.0.7431134** and **0.744.0.7441080**. Roblox updates
 can relocate these patches; saved transport flags alone do not prevent the
@@ -386,10 +388,10 @@ If compatibility says **unsupported client**, share those lines and the full
 launch log so that deployment can be inspected. Unsupported executables are
 left unchanged.
 
-Quadra also monitors Roblox's actual transport selection during each launch.
-If Roblox selects a transport other than RakNet, Quadra brings the launcher
+Quinta also monitors Roblox's actual transport selection during each launch.
+If Roblox selects a transport other than RakNet, Quinta brings the launcher
 forward and warns that games might not work or may show Error 256. The warning
-offers **View log** and **Check for updates**; if no Quadra fix is available yet,
+offers **View log** and **Check for updates**; if no Quinta fix is available yet,
 wait for a compatibility patch. It appears once per launch, including when
 Discord presence is disabled. An unsupported-client header alone does not
 trigger it.
@@ -437,7 +439,7 @@ and after a leave the work they must do next only got noticed when one of them w
 `kevent_poll_ms` (default `100`) makes only the game's `RBX IoEvLoop` threads look at their queues every that many
 milliseconds. With it, the game ran at full speed again 2 s after each leave in three of three trials, where it took
 18 s in nine of nine without it, and Play worked 2.8 s after the first leave against 18.2 s. Idle CPU did not rise.
-`"kevent_poll_ms": 0` in `settings.json` turns it off. Close Quadra first, then edit the file: the launcher reads
+`"kevent_poll_ms": 0` in `settings.json` turns it off. Close Quinta first, then edit the file: the launcher reads
 the file when it starts and writes its own copy back when it quits. The game log says `kevent waits without UDP
 watches poll every 100 ms` when it is active. It is a workaround for Darling's kqueue emulation, not a repair of it.
 
@@ -471,7 +473,7 @@ what happened and how to reproduce it. The form verifies both **Crash
 diagnostics** and **Allow freeze diagnostics** in the archive. Enable them
 before starting the failing run; collect during a freeze or after a crash.
 Keep the archive compressed and check its timestamps. Reports are stored on
-the Quadra VPS and delivered with the log and archive to the Discord report
+the Quinta VPS and delivered with the log and archive to the Discord report
 channel. Review your files before sharing them. Maintainers can find hosting
 and storage details in [Website hosting](docs/WEBSITE_HOSTING.md).
 
@@ -481,7 +483,7 @@ that machine, then try again. If the module is missing after a kernel update,
 reboot into the installed kernel. A custom kernel needs `CONFIG_OVERLAY_FS`
 enabled, built in or as an installed module matching the running kernel.
 The following `Cannot open mnt namespace file` is a consequence of the failed
-startup. Quadra now stops at this known warmup failure and shows these steps.
+startup. Quinta now stops at this known warmup failure and shows these steps.
 
 If the log says `app_closed_for_update`, Roblox intentionally closed for a
 required client update. Use **Update Roblox** in the launcher's recovery dialog.
@@ -498,7 +500,7 @@ configuration value does not change Roblox's account enrollment.
 <summary>No sound with older PipeWire</summary>
 
 PipeWire 1.0.5's `pw-cat` cannot play the launcher's raw audio stream.
-Quadra uses `pacat` through PipeWire's PulseAudio compatibility server on
+Quinta uses `pacat` through PipeWire's PulseAudio compatibility server on
 these versions. On Mint/Ubuntu/Debian, install it with
 `sudo apt install pulseaudio-utils`, then restart Roblox. The source installer
 includes this package. The launch log records the playback helper and its
@@ -534,10 +536,10 @@ the launch log, without recording typed content. It is disabled by default.
 <summary>Wayland</summary>
 
 **Settings → Environment → Game → Window backend** defaults to **X11 / Xwayland**.
-Select **Wayland** to use native windows with OpenGL or Vulkan/Zink. Quadra 0.24
+Select **Wayland** to use native windows with OpenGL or Vulkan/Zink. Quinta 0.24
 repairs startup and game-join freezes, aligns mouse clicks with the cursor, and
 keeps the outer window size in sync with the game. Backend changes apply on the
-next launch. Quadra 0.25 also applies fullscreen requests made before the native
+next launch. Quinta 0.25 also applies fullscreen requests made before the native
 window exists, fixing a mismatch where Roblox reported fullscreen while the
 window stayed decorated. Initial fullscreen and repeated toggles are checked
 under KWin at 100% and 150% scaling.
@@ -546,7 +548,7 @@ under KWin at 100% and 150% scaling.
 <details>
 <summary>VR headsets (experimental)</summary>
 
-Roblox's macOS client still contains Roblox's VR mode; Quadra supplies the
+Roblox's macOS client still contains Roblox's VR mode; Quinta supplies the
 OpenXR device the Mac build leaves out. Turn on **Settings → VR →
 VR headset (OpenXR)**, start your OpenXR runtime with the headset connected,
 then play. Meta Quest headsets work through [WiVRn](https://github.com/WiVRn/WiVRn);
@@ -572,7 +574,7 @@ Studio and installs it first; without a connection it starts what is installed.
 
 Studio draws its sign-in, Toolbox and Creator Hub pages with WebView2, so you can sign
 in inside Studio. **Login via Browser** works too: when the browser asks how to open the
-`roblox-studio-auth` link, choose **Roblox Studio (Quadra)**.
+`roblox-studio-auth` link, choose **Roblox Studio (Quinta)**.
 
 The section has four tabs:
 
@@ -601,7 +603,7 @@ The Flatpak brings Darling along and runs it without root (see
 [flatpak/darling-noroot.c](flatpak/darling-noroot.c)), so nothing has to be
 installed on the system. Version 0.22Patch1 does not include a Flatpak bundle, as the Flatpak is temporarily discontinued to focus on better function on the native version.
 The last testing bundle is available in
-[release 0.19](https://github.com/QuadraHQ/Quadra/releases/tag/v0.19):
+[release 0.19](https://github.com/imqstr/Quinta/releases/tag/v0.19):
 
 ```bash
 flatpak install --user MacOBlox-0.19-x86_64.flatpak
@@ -626,7 +628,7 @@ flatpak run --env=FLATPAK_USER_DIR=$HOME/.local/share/flatpak --command=flatpak-
 <summary>How does it work?</summary>
 
 Darling runs macOS programs on Linux. Roblox needs a few things Darling does not
-have yet, so Quadra adds a small library to the game: it connects the mouse,
+have yet, so Quinta adds a small library to the game: it connects the mouse,
 sound, OpenGL (or Vulkan via Zink) and network to Linux and fixes bugs along the way. Details are in
 [docs/NOTES.md](docs/NOTES.md).
 </details>
@@ -634,9 +636,9 @@ sound, OpenGL (or Vulkan via Zink) and network to Linux and fixes bugs along the
 ## Credits
 
 Made by [Narezy](https://github.com/narezy). This version is maintained by
-[aubree.wtf](https://aubree.wtf) and maintainers at QuadraHQ, with stability + performance fixes, and added features.
+[aubree.wtf](https://aubree.wtf) and maintainers at Quinta, with stability + performance fixes, and added features.
 
-Quadra is licensed under the [GNU GPL v3](LICENSE). Mac O' Blox, the original code it
+Quinta is licensed under the [GNU GPL v3](LICENSE). Mac O' Blox, the original code it
 is based on, was released by Narezy under the MIT License; that notice is kept in
 [LICENSES/MIT-MacOBlox.txt](LICENSES/MIT-MacOBlox.txt).
 
@@ -646,6 +648,4 @@ is based on, was released by Narezy under the MIT License; that notice is kept i
 [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) fonts in the launcher (SIL OFL) ·
 icons from [Simple Icons](https://simpleicons.org)
 
-<h2 align="center">
-  Quadra© 2026 is under QuadraHQ via the GNU General Public License, and Roblox® is a registered trademarked of Roblox Corporation. Quadra and QuadraHQ is not affiliated with, nor endorsed by Roblox Corporation, and any relatives or Roblox Corporation
-</h2>
+See [original upstream notices](../LICENSES/upstream/README.md) for project history and attribution.

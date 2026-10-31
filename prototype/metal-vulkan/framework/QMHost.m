@@ -30,7 +30,7 @@ NSError *qm_error(const char *what) {
     char text[1200];
     const char *detail = qm ? qm->last_error() : "the Vulkan host library is not loaded";
     snprintf(text, sizeof text, "%s: %s", what, detail && *detail ? detail : "unknown error");
-    qm_log("[Quadra Metal] %s", text);
+    qm_log("[Quinta Metal] %s", text);
     NSString *message = [NSString stringWithUTF8String:text];
     NSDictionary *info = [NSDictionary dictionaryWithObject:message forKey:NSLocalizedDescriptionKey];
     return [NSError errorWithDomain:[NSString stringWithUTF8String:"MTLLibraryErrorDomain"] code:3 userInfo:info];
@@ -52,17 +52,17 @@ int qm_load_host(void) {
         const char *path = getenv("MACOBLOX_METAL_HOST_LIBRARY");
         struct qm_elf_calls **table = dlsym(QM_RTLD_DEFAULT, "_elfcalls");
         if (!path || !*path) {
-            qm_log("[Quadra Metal] MACOBLOX_METAL_HOST_LIBRARY is not set; Metal stays off");
+            qm_log("[Quinta Metal] MACOBLOX_METAL_HOST_LIBRARY is not set; Metal stays off");
         } else if (!table || !*table) {
-            qm_log("[Quadra Metal] Darling's ELF loader is unavailable; Metal stays off");
+            qm_log("[Quinta Metal] Darling's ELF loader is unavailable; Metal stays off");
         } else {
             void *library = (*table)->open(path, 2 /* RTLD_NOW */);
             qm_api_entry entry = library ? (qm_api_entry)(*table)->symbol(library, QM_API_SYMBOL) : 0;
             const qm_api *api = entry ? entry(QM_API_VERSION) : 0;
             if (!library)
-                qm_log("[Quadra Metal] could not load %s", path);
+                qm_log("[Quinta Metal] could not load %s", path);
             else if (!api || api->size < sizeof(qm_api))
-                qm_log("[Quadra Metal] %s is from another version of Quadra", path);
+                qm_log("[Quinta Metal] %s is from another version of Quinta", path);
             else {
                 qm = api;
                 state = 1;
@@ -102,7 +102,7 @@ void *qm_handle(id object) {
     if (signature)
         return signature;
     char text[300];
-    snprintf(text, sizeof text, "[Quadra Metal] missing -[%s %s]", class_getName(object_getClass(self)),
+    snprintf(text, sizeof text, "[Quinta Metal] missing -[%s %s]", class_getName(object_getClass(self)),
              sel_getName(selector));
     if (qm)
         qm->log_once(text);
@@ -127,7 +127,7 @@ id MTLCreateSystemDefaultDevice(void) {
             qm_device->handle = device;
             qm_install_layer();
         } else {
-            qm_log("[Quadra Metal] %s", qm->last_error());
+            qm_log("[Quinta Metal] %s", qm->last_error());
         }
     }
     pthread_mutex_unlock(&lock);

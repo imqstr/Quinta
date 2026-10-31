@@ -83,7 +83,7 @@ with context:
     page = window.settings_page
     assert page.runtime_row.get_title() == "Darling runtime"
     assert page.runtime_row.get_model().get_string(0) == "DarlingHQ's Darling"
-    assert page.runtime_row.get_model().get_string(1) == "QuadraHQ's CiderDarling"
+    assert page.runtime_row.get_model().get_string(1) == "Quinta's CiderDarling"
     assert page.runtime_row.get_selected() == 1 and not page.runtime_apply_button.get_sensitive()
     before = selection_file.read_bytes()
     page.runtime_row.set_selected(0)

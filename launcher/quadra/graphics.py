@@ -1,8 +1,8 @@
-"""Renderers other than OpenGL: Mesa Zink, and Quadra M2VK.
+"""Renderers other than OpenGL: Mesa Zink, and Quinta M2VK.
 
 - "vulkan": Roblox keeps its macOS OpenGL renderer; Mesa Zink runs it on
   Vulkan.
-- "metal": Roblox runs its Metal renderer. Quadra's Metal.framework
+- "metal": Roblox runs its Metal renderer. Quinta's Metal.framework
   (prototype/metal-vulkan/framework) replaces Darling's and runs each call on the host's
   Vulkan driver through metal2vulkan (prototype/metal-vulkan/host). Roblox's macOS client has
   no Vulkan backend of its own (its device factory makes OpenGL and Metal
@@ -73,7 +73,7 @@ def _authenticated_install_command(command):
     run0 = _system_program("run0")
     if run0:
         # Default interactive polkit authentication enables the desktop prompt.
-        return [run0, "--description=Install Quadra Vulkan dependencies", "--", *command], {}
+        return [run0, "--description=Install Quinta Vulkan dependencies", "--", *command], {}
     pkexec = _system_program("pkexec")
     if pkexec:
         return [pkexec, *command], {}
@@ -192,7 +192,7 @@ def _whole(value, low, high):
 
 
 def metal_tuning_environment(settings):
-    """Quadra M2VK tuning variables the host library reads (bridge host/src/tuning.rs).
+    """Quinta M2VK tuning variables the host library reads (bridge host/src/tuning.rs).
 
     Only a setting that differs from its default sets a variable, and a stored value that is
     not one of the choices is the default: a damaged settings file never changes how a game runs.
@@ -255,7 +255,7 @@ def _run_metal_probe(environment, host_library):
         result = subprocess.run([sys.executable, str(Path(__file__)), "--metal-probe", str(host_library)],
                                 env=probe_environment, capture_output=True, text=True, timeout=30)
     except (OSError, subprocess.TimeoutExpired) as error:
-        raise RuntimeError("Quadra M2VK could not open a Vulkan device. Select OpenGL in Settings.") from error
+        raise RuntimeError("Quinta M2VK could not open a Vulkan device. Select OpenGL in Settings.") from error
     try:
         data = json.loads(result.stdout.strip().splitlines()[-1])
     except (ValueError, IndexError):
@@ -275,9 +275,9 @@ def validate_metal(environment, host_library):
     name = data.get("device", "")
     if code or not name:
         reason = data.get("error") or stderr or f"probe exited with code {code}"
-        raise RuntimeError(f"Quadra M2VK is unavailable: {reason.rstrip('. ')}. Select OpenGL in Settings.")
+        raise RuntimeError(f"Quinta M2VK is unavailable: {reason.rstrip('. ')}. Select OpenGL in Settings.")
     if _is_software(name, data.get("identity")):
-        raise RuntimeError(f"Quadra M2VK found only a software Vulkan device ({name}). Install your GPU's Vulkan driver or select OpenGL.")
+        raise RuntimeError(f"Quinta M2VK found only a software Vulkan device ({name}). Install your GPU's Vulkan driver or select OpenGL.")
     return name
 
 
@@ -306,7 +306,7 @@ def _metal_probe(library):
     entry.restype, entry.argtypes = ctypes.c_void_p, (ctypes.c_uint32,)
     api = entry(2)
     if not api:
-        raise RuntimeError("the Metal host library is from another version of Quadra")
+        raise RuntimeError("the Metal host library is from another version of Quinta")
     pointer = ctypes.c_void_p
     words = ctypes.cast(api + 8, ctypes.POINTER(pointer))  # after version and size
     last_error = ctypes.CFUNCTYPE(ctypes.c_char_p)(words[0])
@@ -646,7 +646,7 @@ def _probe():
                 if shared:
                     destroy_context(display, shared)
 
-        thread = threading.Thread(target=worker, name="Quadra EGL probe")
+        thread = threading.Thread(target=worker, name="Quinta EGL probe")
         thread.start()
         thread.join()  # the parent subprocess timeout covers driver hangs
         if failures:

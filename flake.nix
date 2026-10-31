@@ -1,5 +1,5 @@
 {
-  description = "Quadra Roblox launcher with a bundled Darling runtime";
+  description = "Quinta Roblox launcher with a bundled Darling runtime";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -14,7 +14,7 @@
         program = "${
           pkgs.callPackage ./packaging/nix/check-runtime.nix { quadrahq = package; }
         }/bin/quadrahq-runtime-check";
-        meta.description = "Check Quadra's ${package.runtime} runtime in a disposable prefix";
+        meta.description = "Check Quinta's ${package.runtime} runtime in a disposable prefix";
       };
     in
     {

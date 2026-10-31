@@ -1,4 +1,4 @@
-"""Discord Rich Presence for Quadra over Discord IPC Unix sockets."""
+"""Discord Rich Presence for Quinta over Discord IPC Unix sockets."""
 
 from __future__ import annotations
 
@@ -18,13 +18,13 @@ from . import core
 
 log = logging.getLogger("quadra.discord")
 
-# QuadraHQ's Discord application.
+# Quinta's Discord application.
 CLIENT_ID = "1559277724160233553"
-WEBSITE_URL = "https://quadrahq.org"
+WEBSITE_URL = "https://github.com/imqstr/Quinta"
 # The application's own "ciderhq" image asset is still the old Cider logo and only its owner can replace it in
 # the developer portal, so the presence shows the current logo from the website (the same file as
 # branding/icons/quadrahq-512.png) instead.
-LOGO = f"{WEBSITE_URL}/assets/quadrahq-512.png"
+LOGO = "https://raw.githubusercontent.com/imqstr/Quinta/main/branding/icons/quadrahq-512.png"
 
 CACHE_FILE = core.DATA_DIR / "game_cache.json"
 
@@ -578,7 +578,7 @@ class DiscordRPC:
         state: str | None = None,
         start_time: float | None = None,
         large_image: str = LOGO,
-        large_text: str = "Quadra",
+        large_text: str = "Quinta",
         small_image: str | None = None,
         small_text: str | None = None,
         buttons: list[tuple[str, str]] | None = None,

@@ -68,7 +68,7 @@ class MarkerTests(unittest.TestCase):
             "2026-10-24T04:40:35.352Z,70.3,9d915d80,6 [FLog::SingleSurfaceApp] returnToLuaApp: (stage:UGCGame).",
             "2026-10-24T04:40:35.353Z,70.3,9d915d80,6 [FLog::SingleSurfaceApp] leaveUGCGameInternal",
             "2026-10-24T04:39:25.840Z,0.8,9d915d80,6 [FLog::SingleSurfaceApp] returnToLuaApp: (stage:InitializedLuaApp).",
-            "[Quadra Metal] no timestamp",
+            "[Quinta Metal] no timestamp",
         ]
         with tempfile.TemporaryDirectory() as directory:
             log = Path(directory) / "launch.log"

@@ -1,54 +1,54 @@
 quadrahq (0.37.p4-1) unstable; urgency=medium
 
-  * Fix VR controllers never vibrating: Roblox only passes vibration to the controllers while the headset reports a focused session with controllers able to vibrate, and Quadra reported neither. VRService.VRSessionState now follows the headset.
+  * Fix VR controllers never vibrating: Roblox only passes vibration to the controllers while the headset reports a focused session with controllers able to vibrate, and Quinta reported neither. VRService.VRSessionState now follows the headset.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Mon, 26 Oct 2026 23:47:00 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Mon, 26 Oct 2026 23:47:00 -0500
 
 quadrahq (0.37.p3-1) unstable; urgency=medium
 
   * Fix the middle and extra mouse buttons, which did nothing in game, and keys outside the main block (Insert, Right Alt, Menu, F13 to F20, keypad =, the ISO key), which were sent as the A key on X11 and dropped on native Wayland.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Sun, 25 Oct 2026 22:20:00 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Sun, 25 Oct 2026 22:20:00 -0500
 
 quadrahq (0.37.p2-1) unstable; urgency=medium
 
-  * Fix the Grid and Monochrome looks: a long subtitle no longer squeezes the chosen value of a dropdown to an ellipsis, and disabled buttons are no longer dimmed twice, which left Apply and restart Quadra nearly unreadable.
+  * Fix the Grid and Monochrome looks: a long subtitle no longer squeezes the chosen value of a dropdown to an ellipsis, and disabled buttons are no longer dimmed twice, which left Apply and restart Quinta nearly unreadable.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Sun, 25 Oct 2026 13:26:00 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Sun, 25 Oct 2026 13:26:00 -0500
 
 quadrahq (0.37.p1-1) unstable; urgency=medium
 
   * Build the Roblox Studio Vulkan layer into the Arch, Debian and Fedora packages: the 0.37 packages lacked it, so Studio's Vulkan renderer reported that its fix was not built. The package recipes now require the Vulkan headers and the release build checks that the layer is packaged.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Sun, 25 Oct 2026 12:43:22 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Sun, 25 Oct 2026 12:43:22 -0500
 
 quadrahq (0.37-1) unstable; urgency=medium
 
   * Give Roblox Studio a section of its own in the launcher, running on Kombucha (Vinegar's Wine build) with Microsoft's WebView2, so Studio's sign-in, Toolbox and Creator Hub pages work again.
   * Choose Studio's renderer (DXVK, DXVK-Sarek, Wine's Direct3D, Vulkan) and graphics card, with GameMode, Discord presence, a sign-in backup, a Studio version or channel to stay on and Studio fast flags.
-  * Move to QuadraHQ/Quadra and finish the Quadra rename in the code; add a Simplified Chinese translation.
+  * Move to QuadraHQ/Quadra and finish the Quinta rename in the code; add a Simplified Chinese translation.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Sun, 25 Oct 2026 12:30:00 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Sun, 25 Oct 2026 12:30:00 -0500
 
 quadrahq (0.36.p1-1) unstable; urgency=medium
 
   * Fix the camera continuing to turn after releasing the right mouse button when the left button was clicked during a right-button drag.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Sat, 24 Oct 2026 14:27:11 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Sat, 24 Oct 2026 14:27:11 -0500
 
 quadrahq (0.36-1) unstable; urgency=medium
 
   * Remove the menu freeze after leaving a game by polling the game's idle I/O loops.
-  * Update Quadra M2VK and add a stall watcher and richer hardware report.
+  * Update Quinta M2VK and add a stall watcher and richer hardware report.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Sat, 24 Oct 2026 10:19:13 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Sat, 24 Oct 2026 10:19:13 -0500
 
 quadrahq (0.35.p2-1) unstable; urgency=medium
 
   * Recover public Roblox downloads when alternate origins are unavailable.
   * Add the website report guide and required diagnostics archive issue form.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Fri, 23 Oct 2026 21:42:31 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Fri, 23 Oct 2026 21:42:31 -0500
 
 quadrahq (0.35.p1-1) unstable; urgency=medium
 
@@ -58,7 +58,7 @@ quadrahq (0.35.p1-1) unstable; urgency=medium
   * Explain unavailable OverlayFS support before attempting to start Roblox.
   * Include NixOS packaging and the live Darling status in the launcher.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Fri, 23 Oct 2026 18:49:52 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Fri, 23 Oct 2026 18:49:52 -0500
 
 quadrahq (0.35-1) unstable; urgency=medium
 
@@ -67,44 +67,44 @@ quadrahq (0.35-1) unstable; urgency=medium
   * Fix Shift Lock centering and interrupted camera capture after switching windows.
   * Bound integrated GPU graphics budgets by device memory and shared RAM headroom.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Thu, 22 Oct 2026 18:25:00 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Thu, 22 Oct 2026 18:25:00 -0500
 
 quadrahq (0.34-1) unstable; urgency=medium
 
-  * Release Quadra M2VK as the selectable Metal-to-Vulkan renderer.
+  * Release Quinta M2VK as the selectable Metal-to-Vulkan renderer.
   * Include staged shader and resource preloading with memory limits and Skip.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Thu, 22 Oct 2026 00:15:00 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Thu, 22 Oct 2026 00:15:00 -0500
 
 quadrahq (0.33-1) unstable; urgency=medium
 
-  * Integrate Quadra M2VK with bounded shader and resource preloading.
+  * Integrate Quinta M2VK with bounded shader and resource preloading.
   * Improve Metal presentation, pipeline reuse, resource safety and diagnostics.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Wed, 21 Oct 2026 23:55:00 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Wed, 21 Oct 2026 23:55:00 -0500
 
 quadrahq (0.32-1) unstable; urgency=medium
 
   * Ship the experimental Metal on Vulkan bridge in native packages.
   * Fix the Metal layer compositor crash and clear renderer state on switching.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Mon, 19 Oct 2026 18:20:00 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Mon, 19 Oct 2026 18:20:00 -0500
 
 quadrahq (0.31-1) unstable; urgency=medium
 
-  * Release the Quadra / QuadraHQ rebrand with migrated Cider user data.
-  * Retry public Roblox download HTTP 403s through the Quadra cache.
+  * Release the Quinta / Quinta rebrand with migrated Cider user data.
+  * Retry public Roblox download HTTP 403s through the Quinta cache.
   * Preserve captured right-drag motion with both mouse buttons held.
   * Record severe FPS drops for diagnosis; the intermittent FPS issue remains open.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Mon, 19 Oct 2026 17:30:00 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Mon, 19 Oct 2026 17:30:00 -0500
 
 quadrahq (0.30-1) unstable; urgency=medium
 
-  * Rebrand to Quadra / QuadraHQ at quadrahq.org; retain the existing logo.
+  * Rebrand to Quinta / Quinta at quadrahq.org; retain the existing logo.
   * Migrate settings, cache and sign-in from Cider and MacOBlox.
 
- -- Quadra maintainers <noreply@aubree.wtf>  Sat, 17 Oct 2026 23:30:00 -0500
+ -- Quinta maintainers <noreply@aubree.wtf>  Sat, 17 Oct 2026 23:30:00 -0500
 
 ciderhq (0.30-1) unstable; urgency=medium
 

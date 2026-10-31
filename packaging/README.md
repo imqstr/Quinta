@@ -1,6 +1,6 @@
 # Native distro packages
 
-These are package recipes for Quadra. Each package
+These are package recipes for Quinta. Each package
 builds the shim, native Wayland helper and Metal framework during packaging, installs desktop
 and link handlers, and downloads Roblox on first setup. Personal settings and
 sign-in are stored in the user's directories. The website and user logs are
@@ -23,7 +23,7 @@ repositories or the AUR.
 The `noreply@aubree.wtf` maintainer address is a placeholder: set the real
 packaging contact before submitting to a distro.
 
-Quadra 0.37.p4 uses the `quadrahq` package name. The release workflow pins the
+Quinta 0.37.p4 uses the `quadrahq` package name. The release workflow pins the
 source archive checksum and stable AUR recipe after publication. The frozen
 Cider 0.30 AUR recipe remains in `aur/ciderhq/`. Use `--local` to package
 unreleased source changes.
@@ -39,7 +39,7 @@ to the Arch, Debian and RPM recipes.
 - A **full Darling sysroot**, including GUI frameworks and stubs, in the
   build environment. CI stages a verified sysroot; local builds can set
   `DARLING_SYSROOT=/path/to/libexec/darling`. At runtime users choose regular
-  Darling or CiderDarling in the launcher. Quadra's package does not force an
+  Darling or CiderDarling in the launcher. Quinta's package does not force an
   additional regular Darling installation alongside CiderDarling.
 - GTK 4.14+, libadwaita 1.5+, WebKitGTK API 6.0, Python/PyGObject/Cairo,
   SDL2 and Wayland. Debian 12 and Ubuntu 22.04's original UI libraries are
@@ -71,13 +71,13 @@ This produces a source archive, Debian and RPM inputs, and a `quadrahq`
 PKGBUILD with that archive's checksum. It never installs to the host.
 
 
-From the Quadra checkout:
+From the Quinta checkout:
 
 ```bash
 ./packaging/prepare-source.sh "$PWD/work/native-packages"
 ```
 
-This downloads the checksum-verified Quadra release and places the Debian
+This downloads the checksum-verified Quinta release and places the Debian
 overlay and RPM inputs in a new output directory. It requires `curl`, `tar`
 and `sha256sum`. To use an already downloaded release archive:
 

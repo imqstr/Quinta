@@ -1,4 +1,4 @@
-/* Quadra's Metal on Vulkan: the ABI between the guest Metal.framework
+/* Quinta's Metal on Vulkan: the ABI between the guest Metal.framework
  * (metal/framework, Mach-O inside Darling) and the host library
  * (metal/host, an ELF built on metal2vulkan-runtime).
  *

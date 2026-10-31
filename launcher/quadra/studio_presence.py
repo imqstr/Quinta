@@ -87,7 +87,7 @@ class StudioPresence:
             if activity == self.sent:
                 return
             self.sent = activity
-        self.rpc.queue_presence(large_text="Quadra Studio", **activity)
+        self.rpc.queue_presence(large_text="Quinta Studio", **activity)
 
     def close(self, wait=12.0):
         """Clear the presence and give the connection's worker time to do it."""

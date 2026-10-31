@@ -28,7 +28,7 @@ function updateSubmit() {
   const missingLaunch = validation && launchRequired && !validation.has_launch_log;
   submit.disabled = sending || !validation || validatedFile !== fileInput.files[0] || !category.value || missingLaunch;
   if (missingLaunch) archiveStatus.textContent = 'This archive has no launch log. Reproduce the problem, then collect a new archive.';
-  else if (validation) archiveStatus.textContent = `Archive verified · Quadra ${validation.version}. Both saved diagnostics settings are enabled.`;
+  else if (validation) archiveStatus.textContent = `Archive verified · Quinta ${validation.version}. Both saved diagnostics settings are enabled.`;
 }
 
 fileInput.addEventListener('change', async () => {
@@ -80,7 +80,7 @@ form.addEventListener('submit', async event => {
       return;
     }
     fields.disabled = true;
-    reportStatus.textContent = `Report ${result.id} saved on the Quadra server. ${result.status === 'sent' ? 'It has been delivered to Discord.' : 'Discord delivery is queued; the server keeps your files if delivery needs to retry.'} Thank you.`;
+    reportStatus.textContent = `Report ${result.id} saved on the Quinta server. ${result.status === 'sent' ? 'It has been delivered to Discord.' : 'Discord delivery is queued; the server keeps your files if delivery needs to retry.'} Thank you.`;
     reportStatus.tabIndex = -1;
     reportStatus.focus();
   } catch {

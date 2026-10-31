@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prepare Quadra sources and Arch/Debian/RPM inputs without installing them.
+# Prepare Quinta sources and Arch/Debian/RPM inputs without installing them.
 set -euo pipefail
 if [[ $# -lt 1 || $# -gt 2 ]]; then
   printf 'Usage: %s OUTPUT_DIR [--local|RELEASE_ARCHIVE]\n' "$0" >&2
@@ -18,7 +18,7 @@ version=${release[0]}
 checksum=${release[1]:-}
 [[ $version =~ ^[0-9][0-9A-Za-z.]*$ ]] || { printf '%s\n' 'Invalid release version.' >&2; exit 1; }
 if [[ ${2:-} != --local && ! $checksum =~ ^[0-9a-f]{64}$ ]]; then
-  printf '%s\n' 'The Quadra release archive is not pinned yet. Use --local before publication.' >&2
+  printf '%s\n' 'The Quinta release archive is not pinned yet. Use --local before publication.' >&2
   exit 1
 fi
 output=$(realpath -m -- "$1")
@@ -57,7 +57,7 @@ def metadata(info):
 with output.open('wb') as raw, gzip.GzipFile(filename='', mode='wb', fileobj=raw, mtime=0) as zipped:
     with tarfile.open(fileobj=zipped, mode='w') as archive:
         for path in sorted(paths):
-            archive.add(root / path, arcname=f'Quadra-{version}/{path}', recursive=False, filter=metadata)
+            archive.add(root / path, arcname=f'Quinta-{version}/{path}', recursive=False, filter=metadata)
 PY
   checksum=$(sha256sum -- "$archive")
   checksum=${checksum%% *}
@@ -65,7 +65,7 @@ elif [[ $# == 2 ]]; then
   cp -- "$2" "$archive"
 else
   curl --fail --location --retry 3 \
-    "https://github.com/QuadraHQ/Quadra/releases/download/v$version/quadrahq-$version-source.tar.gz" --output "$archive"
+    "https://github.com/imqstr/Quinta/releases/download/v$version/quadrahq-$version-source.tar.gz" --output "$archive"
 fi
 printf '%s  %s\n' "$checksum" "$archive" | sha256sum --check --status
 tar -xzf "$archive" -C "$staging"

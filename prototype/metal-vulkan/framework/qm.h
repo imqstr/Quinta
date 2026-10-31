@@ -1,4 +1,4 @@
-/* Quadra's Metal.framework: shared declarations.
+/* Quinta's Metal.framework: shared declarations.
  *
  * Built without SDK headers (Darling's runtime sysroot has none), like the
  * shim: the Foundation and AppKit methods used here are declared below, and

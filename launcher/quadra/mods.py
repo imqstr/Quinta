@@ -1,4 +1,4 @@
-"""Mods and resource patching system for Quadra.
+"""Mods and resource patching system for Quinta.
 
 Allows custom fonts, classic sound presets (OOF, old movement), cursor presets,
 and user-defined file overlays onto RobloxPlayer.app/Contents/Resources/content.

@@ -50,10 +50,10 @@ class Installation:
                 raise ValueError('Release metadata only applies to CiderDarling')
             runtime_updates.validate(release)
             if not runtime_updates.supported(release):
-                raise ValueError('This runtime update requires a newer Quadra')
+                raise ValueError('This runtime update requires a newer Quinta')
         installer = Path(project).resolve() / "install.sh"
         if not installer.is_file():
-            raise FileNotFoundError("Quadra's installer is missing. Update or reinstall Quadra first.")
+            raise FileNotFoundError("Quinta's installer is missing. Update or reinstall Quinta first.")
         folder = Path(cache) / "installer"
         folder.mkdir(parents=True, exist_ok=True)
         directory = tempfile.mkdtemp(prefix="runtime-", dir=folder)

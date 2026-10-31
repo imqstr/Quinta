@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs the Quadra launcher for the current user: menu entry, icons
+# Installs the Quinta launcher for the current user: menu entry, icons
 # and a `quadrahq` command. Run again after moving the project folder.
 set -euo pipefail
 launcher_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
@@ -9,7 +9,7 @@ config_home=${XDG_CONFIG_HOME:-$HOME/.config}
 
 if [[ ( $project_dir == "$data_home/CiderHQ" || $project_dir == "$data_home/MacOBlox" ) && ! -e $data_home/QuadraHQ ]]; then
   mv -T --no-clobber -- "$project_dir" "$data_home/QuadraHQ"
-  [[ ! -e $project_dir ]] || { printf '%s\n' 'Quadra migration destination is occupied.' >&2; exit 1; }
+  [[ ! -e $project_dir ]] || { printf '%s\n' 'Quinta migration destination is occupied.' >&2; exit 1; }
   project_dir=$data_home/QuadraHQ
   launcher_dir=$project_dir/launcher
 fi
@@ -41,7 +41,7 @@ install -d "$data_home/applications"
 cat > "$data_home/applications/org.quadrahq.Quadra.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
-Name=Quadra
+Name=Quinta
 Comment=Run the macOS Roblox client on Linux through Darling
 Comment[ru]=Запуск клиента Roblox для macOS на Linux через Darling
 GenericName=Roblox launcher
@@ -60,8 +60,8 @@ DESKTOP
 cat > "$data_home/applications/org.quadrahq.Quadra.URI.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
-Name=Quadra Roblox Link Handler
-Comment=Open Roblox links in Quadra
+Name=Quinta Roblox Link Handler
+Comment=Open Roblox links in Quinta
 Exec=$exec_path %u
 Icon=quadrahq
 Terminal=false
@@ -74,7 +74,7 @@ DESKTOP
 cat > "$data_home/applications/org.quadrahq.Quadra.Studio.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
-Name=Roblox Studio (Quadra)
+Name=Roblox Studio (Quinta)
 Comment=Roblox Studio through Wine
 Comment[ru]=Roblox Studio через Wine
 Exec=$exec_path --studio %u
@@ -100,7 +100,7 @@ except Exception:
 sys.exit(0 if installed else 1)' 2>/dev/null || ciderdarling_state=$?
 ciderdarling_ours=''
 if [[ ! -e $ciderdarling_entry && ! -L $ciderdarling_entry ]] ||
-    { [[ ! -L $ciderdarling_entry ]] && grep -qsx 'X-QuadraHQ-Managed=true' "$ciderdarling_entry"; }; then
+    { [[ ! -L $ciderdarling_entry ]] && grep -qsx 'X-Quinta-Managed=true' "$ciderdarling_entry"; }; then
   ciderdarling_ours=1  # absent, or ours: a user's own entry of that name stays
 fi
 if [[ $ciderdarling_state == 0 && -n $ciderdarling_ours ]]; then
@@ -117,7 +117,7 @@ Terminal=false
 Categories=Game;
 Keywords=ciderdarling;darling;gpu;
 StartupNotify=true
-X-QuadraHQ-Managed=true
+X-Quinta-Managed=true
 DESKTOP
 elif [[ $ciderdarling_state == 1 && -n $ciderdarling_ours && -e $ciderdarling_entry ]]; then
   rm -f -- "$ciderdarling_entry"
@@ -169,7 +169,7 @@ fi
 cat > "$data_home/applications/quadrahq-roblox-window.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
-Name=Roblox (Quadra)
+Name=Roblox (Quinta)
 Exec=$exec_path
 Icon=quadrahq
 NoDisplay=true
@@ -179,4 +179,4 @@ DESKTOP
 update-desktop-database "$data_home/applications" 2>/dev/null || true
 # No gtk-update-icon-cache: with -t it wrote a cache into the user's icon
 # folder that other apps do not update, which can hide their icons.
-echo "Quadra installed: find it in the app menu or run: quadrahq"
+echo "Quinta installed: find it in the app menu or run: quadrahq"

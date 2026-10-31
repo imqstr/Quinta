@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Roblox Studio (Quadra)
+Name=Roblox Studio (Quinta)
 Comment=Roblox Studio through Wine
 Comment[ru]=Roblox Studio через Wine
 Exec=quadrahq --studio %u

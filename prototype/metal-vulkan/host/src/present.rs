@@ -574,7 +574,7 @@ impl Surface {
             .map_err(|error| format!("presenter thread: {error}"))?;
         *surface.presenter.lock().unwrap() = Some(sender);
         log_once(&format!(
-            "[Quadra Metal] presenting through {}",
+            "[Quinta Metal] presenting through {}",
             if target.kind == 1 {
                 "an X11 child window"
             } else {
@@ -784,7 +784,7 @@ impl Surface {
             textures.push(texture);
         }
         log_once(&format!(
-            "[Quadra Metal] swapchain {}x{} format {}, {} images, present mode {}",
+            "[Quinta Metal] swapchain {}x{} format {}, {} images, present mode {}",
             extent.width,
             extent.height,
             format.as_raw(),
@@ -984,7 +984,7 @@ impl Surface {
                     .fetch_add(1, std::sync::atomic::Ordering::Relaxed)
                     + 1;
                 if matches!(count, 1 | 60 | 600) {
-                    log_once(&format!("[Quadra Metal] presented {count} Vulkan frames"));
+                    log_once(&format!("[Quinta Metal] presented {count} Vulkan frames"));
                 }
             }
             Ok(true) | Err(vk::Result::ERROR_OUT_OF_DATE_KHR) => {
@@ -1007,7 +1007,7 @@ impl Surface {
                 if let Some(statistics) = &self.statistics {
                     statistics.present_errors.fetch_add(1, Ordering::Relaxed);
                 }
-                log_once(&format!("[Quadra Metal] vkQueuePresentKHR: {error}"));
+                log_once(&format!("[Quinta Metal] vkQueuePresentKHR: {error}"));
             }
         }
     }
@@ -1128,7 +1128,7 @@ fn timeout_line(
 ) -> String {
     let since = since_present_ms.map_or("never".to_owned(), |ms| format!("{ms} ms ago"));
     format!(
-        "[Quadra Metal] nextDrawable timed out after {waited_ms} ms: {images} images, {held} held by the game, {unpresented} queued for the presenter, swapchain {chain_age_ms} ms old, last present returned {since}, {presented} presented so far"
+        "[Quinta Metal] nextDrawable timed out after {waited_ms} ms: {images} images, {held} held by the game, {unpresented} queued for the presenter, swapchain {chain_age_ms} ms old, last present returned {since}, {presented} presented so far"
     )
 }
 

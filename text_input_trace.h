@@ -115,7 +115,7 @@ static void quadra_text_trace(id self, const char* phase,
         return;
     unsigned long sequence = __sync_add_and_fetch(&quadra_text_trace_sequence, 1);
     if (sequence > 2048) {
-        if (sequence == 2049) write_str("[Quadra Text] trace limit reached\n");
+        if (sequence == 2049) write_str("[Quinta Text] trace limit reached\n");
         return;
     }
     /* Diagnostic getters must not introduce or replace an application exception. */
@@ -131,7 +131,7 @@ static void quadra_text_trace(id self, const char* phase,
         SEL clear_selector = sel_registerName("processingClearComposition");
         if (class_getInstanceMethod(object_getClass(self), clear_selector))
             clearing = ((unsigned char (*)(id, SEL))objc_msgSend)(self, clear_selector) != 0;
-        write_str("[Quadra Text] seq="); print_num((long long)sequence);
+        write_str("[Quinta Text] seq="); print_num((long long)sequence);
         write_str(" event="); print_num((long long)quadra_text_current_event);
         write_str(" "); write_str(phase);
         write_str(" utf16="); print_num(quadra_text_length(storage));
@@ -278,7 +278,7 @@ static void quadra_install_text_input_hooks(void) {
                                                 &quadra_text_selection_original);
         trace_hooks += hooked;
         if (hooked && quadra_text_selection_origin_offset >= 0)
-            write_str("[Quadra] InputMethodHandler collapsed selection anchor repair enabled\n");
+            write_str("[Quinta] InputMethodHandler collapsed selection anchor repair enabled\n");
     }
     if (!tracing) return;
     trace_hooks += quadra_text_hook("keyDown:", "@:@", (IMP)quadra_text_key_down, &quadra_text_key_down_original);
@@ -288,7 +288,7 @@ static void quadra_install_text_input_hooks(void) {
     trace_hooks += quadra_text_hook("commitCompositionRBXEvent", "@:", (IMP)quadra_text_commit, &quadra_text_commit_original);
     trace_hooks += quadra_text_hook("clearCompositionAsync", "@:", (IMP)quadra_text_clear, &quadra_text_clear_original);
     trace_hooks += quadra_text_hook("updateInputMethodRBXEvent", "@:", (IMP)quadra_text_update, &quadra_text_update_original);
-    write_str("[Quadra Text] range tracing enabled; hooks="); print_num(trace_hooks);
+    write_str("[Quinta Text] range tracing enabled; hooks="); print_num(trace_hooks);
     write_str("/8, limit=2048, no text content\n");
 }
 

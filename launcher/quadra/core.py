@@ -1,4 +1,4 @@
-"""Backend of the Quadra launcher: paths, settings, fast flags, Roblox
+"""Backend of the Quinta launcher: paths, settings, fast flags, Roblox
 updates and running the macOS client through Darling. No GTK here."""
 
 import csv
@@ -47,7 +47,7 @@ SHIM = SHIM_DIR / "libQuadraShims.dylib"
 # Frameworks RobloxPlayer links that Darling lacks; stubs from frameworks/.
 FRAMEWORKS = ["CoreML", "CoreHaptics", "DeviceCheck"]
 FRAMEWORKS_BUILD = SHIM_DIR / "frameworks"
-# Quadra M2VK (renderer "metal"): Metal.framework and the host library,
+# Quinta M2VK (renderer "metal"): Metal.framework and the host library,
 # built by prototype/metal-vulkan/build.sh the first time the renderer is used.
 METAL_DIR = SHIM_DIR / "metal"
 METAL_HOST_LIBRARY = METAL_DIR / "libquadra_metal_host.so"
@@ -110,14 +110,14 @@ DEFAULT_SETTINGS = {
     "metal_library_preload": True,
     "metal_resource_preload": True,
     "metal_diagnostics": False,
-    # Quadra M2VK tuning (graphics.metal_tuning_environment); the values are the defaults.
+    # Quinta M2VK tuning (graphics.metal_tuning_environment); the values are the defaults.
     "metal_accuracy": "fast",
     "metal_present_mode": "auto",
     "metal_memory_priority": True,
     "metal_compile_threads": 0,
     "metal_warm_states": 256,
     "metal_vram_limit_gib": 0,
-    # Play with OpenGL this once, rather than not at all, when Quadra M2VK cannot start.
+    # Play with OpenGL this once, rather than not at all, when Quinta M2VK cannot start.
     "metal_fallback": True,
     "gpu": "auto",
     "roblox_channel": "",
@@ -366,10 +366,10 @@ def parse_version_tuple(ver):
 
 
 def check_launcher_update():
-    """Checks GitHub for a newer release of Quadra.
+    """Checks GitHub for a newer release of Quinta.
     Returns (has_update, latest_version_string, release_url); raises when
     GitHub cannot be reached, so a failed check is not reported as up to date."""
-    req = urllib.request.Request(LAUNCHER_RELEASE_URL, headers={"User-Agent": "Quadra"})
+    req = urllib.request.Request(LAUNCHER_RELEASE_URL, headers={"User-Agent": "Quinta"})
     try:
         with urllib.request.urlopen(req, timeout=6) as response:
             data = json.loads(response.read().decode())
@@ -390,7 +390,7 @@ def _git(*args, input=None):
 
 
 def update_launcher(progress=None):
-    """Updates Quadra the way install.sh does: pulls the checkout
+    """Updates Quinta the way install.sh does: pulls the checkout
     (fast-forward only, so a failed update never leaves a half merge),
     rebuilds the shim and reinstalls the menu entries. Returns (True,
     message), or (False, release page) when this is not a git checkout
@@ -441,9 +441,9 @@ def update_launcher(progress=None):
                        capture_output=True)
 
     if progress:
-        progress(1.0, _("Quadra updated successfully"))
+        progress(1.0, _("Quinta updated successfully"))
     # This process keeps running the code it started with.
-    return True, _("Quadra updated. Restart it to use the new version.")
+    return True, _("Quinta updated. Restart it to use the new version.")
 
 
 # A shortcut to Settings -> CiderDarling while CiderDarling is installed; the
@@ -1503,7 +1503,7 @@ def _metal_sources_hash():
     root = PROJECT / "prototype" / "metal-vulkan"
     sources = [root / "quadra_metal.h", METAL_BUILD_SCRIPT, *(root / "framework").glob("*"),
                root / "host" / "Cargo.toml", root / "host" / "Cargo.lock", *(root / "host" / "src").rglob("*.rs")]
-    # Cargo.toml and Cargo.lock pin the immutable Quadra M2VK dependency.
+    # Cargo.toml and Cargo.lock pin the immutable Quinta M2VK dependency.
     for path in sorted(sources):
         try:
             digest.update(str(path.relative_to(PROJECT)).encode() + b"\0" + path.read_bytes())
@@ -1527,9 +1527,9 @@ def build_metal():
     """prototype/metal-vulkan/build.sh: the framework needs clang and lld, the host library
     Rust 1.98 or newer (its first build downloads its crates)."""
     if PREBUILT_SHIM:
-        return metal_built(), _("Quadra M2VK is not part of this package")
+        return metal_built(), _("Quinta M2VK is not part of this package")
     if not shutil.which("cargo"):
-        return False, _("Quadra M2VK needs Rust (cargo) 1.98 or newer to build. Install Rust or select another renderer.")
+        return False, _("Quinta M2VK needs Rust (cargo) 1.98 or newer to build. Install Rust or select another renderer.")
     stamp = _metal_sources_hash()
     result = subprocess.run([str(METAL_BUILD_SCRIPT)], capture_output=True, text=True,
                             env=dict(os.environ, QUADRA_BUILD_DIR=str(BUILD_DIR),
@@ -1603,7 +1603,7 @@ def prepare_prefix(env):
     unknown = _unknown_prefix_overrides()
     if not unknown:
         return []
-    note = ("Prefix libraries not made by Quadra hide the selected runtime's own and were left "
+    note = ("Prefix libraries not made by Quinta hide the selected runtime's own and were left "
             f"unchanged (remove them if they came from an older Darling): {', '.join(unknown)}")
     logging.getLogger("quadra").warning(note)
     return [note]
@@ -2151,7 +2151,7 @@ class HostAudio:
     keeps the FIFO open read/write for the whole session, so pw-cat never
     sees end of file and the game can reopen it any time."""
 
-    NAME = "Roblox (Quadra)"
+    NAME = "Roblox (Quinta)"
 
     def __init__(self, fifo, keep=None, player=None):
         self.fifo, self.keep, self.player = fifo, keep, player
@@ -2227,12 +2227,12 @@ class HostAudio:
             return ["pw-cat", "--record", "--raw", "--format", "f32", "--rate", str(rate),
                     "--channels", str(channels), "--latency", "20ms", "--media-role", "Communication",
                     "-P", '{ application.name = "Roblox" application.icon-name = "quadrahq" '
-                          f'media.name = "Roblox microphone (Quadra)" }}',
+                          f'media.name = "Roblox microphone (Quinta)" }}',
                     str(fifo)]
         if shutil.which("pacat"):
             return ["pacat", "--record", "--raw", "--format=float32le", f"--rate={rate}",
                     f"--channels={channels}", "--latency-msec=20", "--client-name=Roblox",
-                    "--stream-name=Roblox microphone (Quadra)", "--property=media.role=phone", str(fifo)]
+                    "--stream-name=Roblox microphone (Quinta)", "--property=media.role=phone", str(fifo)]
         return None
 
     @classmethod
@@ -2261,7 +2261,7 @@ class HostAudio:
         if self.log_path:
             try:
                 with open(self.log_path, "ab") as log:
-                    log.write(f"[Quadra Audio] Playback helper exited with code {status}; {detail or 'no error output'}\n".encode())
+                    log.write(f"[Quinta Audio] Playback helper exited with code {status}; {detail or 'no error output'}\n".encode())
             except OSError:
                 pass
 
@@ -2435,14 +2435,14 @@ def _prepare_darling_server(env, log):
         # the server's output separate so it cannot hold the launch log open.
         if darlingserver_running():
             return
-        log.write(b"[Quadra Startup] Darling warmup starting\n")
+        log.write(b"[Quinta Startup] Darling warmup starting\n")
         log.flush()
         status = _darling_warmup(env)
         output = _warmup_output()
         log.write(output.encode(errors="replace"))
-        log.write(f"[Quadra Startup] Darling warmup status={status}\n".encode())
+        log.write(f"[Quinta Startup] Darling warmup status={status}\n".encode())
         if status and "Cannot mount overlay: No such device" in output:
-            log.write(b"[Quadra Startup] OverlayFS unavailable; stopping before Roblox starts\n")
+            log.write(b"[Quinta Startup] OverlayFS unavailable; stopping before Roblox starts\n")
             log.flush()
             raise RuntimeError(_(
                 "Darling could not start because the kernel's OverlayFS filesystem is unavailable. "
@@ -2551,7 +2551,7 @@ class RobloxSession:
         variables.append(f"QUADRA_DPI_SCALE={display.validated_dpi_scale(self.settings.get('dpi_scale', 1.0)):.3f}")
         if self.settings.get("renderer", "opengl") == "metal":
             # The launch script makes it DYLD_FRAMEWORK_PATH just before exec:
-            # Quadra's Metal.framework in place of Darling's.
+            # Quinta's Metal.framework in place of Darling's.
             variables.append(f"MACOBLOX_METAL_FRAMEWORKS=/Volumes/SystemRoot{METAL_DIR}")
         # Host graphics libraries see the guest environment after exec.
         variables.extend(f"{name}={value}" for name, value in
@@ -2659,16 +2659,16 @@ class RobloxSession:
         saved renderer is untouched) uses OpenGL, and the reason is kept for the log and the UI."""
         from . import graphics
         try:
-            return env, "Quadra M2VK (" + graphics.validate_metal(env, METAL_HOST_LIBRARY) + ")"
+            return env, "Quinta M2VK (" + graphics.validate_metal(env, METAL_HOST_LIBRARY) + ")"
         except RuntimeError as error:
             if not self.settings.get("metal_fallback", True):
                 raise
             reason = str(error).strip()
         self.metal_fallback_reason = reason
-        self.notes.append("Quadra M2VK could not start, so this launch uses OpenGL: " + reason)
+        self.notes.append("Quinta M2VK could not start, so this launch uses OpenGL: " + reason)
         self.settings = dict(self.settings, renderer="opengl")
         self._gpu_environment = None
-        return self.environment(), "OpenGL (Quadra M2VK could not start)"
+        return self.environment(), "OpenGL (Quinta M2VK could not start)"
 
     def _start(self):
         missing = missing_tools()
@@ -2685,13 +2685,13 @@ class RobloxSession:
             from . import graphics
             missing = graphics.missing_metal_dependencies()
             if missing:
-                raise RuntimeError(_("Quadra M2VK needs: {items}. Install them or select another renderer.",
+                raise RuntimeError(_("Quinta M2VK needs: {items}. Install them or select another renderer.",
                                      items=", ".join(missing)))
             if not metal_built():
-                self.notes.append("Building Quadra M2VK (prototype/metal-vulkan/build.sh)")
+                self.notes.append("Building Quinta M2VK (prototype/metal-vulkan/build.sh)")
                 ok, output = build_metal()
                 if not ok:
-                    raise RuntimeError(_("Could not build Quadra M2VK:\n{output}", output=output))
+                    raise RuntimeError(_("Could not build Quinta M2VK:\n{output}", output=output))
             try:
                 (CACHE_DIR / "metal-shader-cache").mkdir(parents=True, exist_ok=True)
             except OSError as error:
@@ -2775,7 +2775,7 @@ class RobloxSession:
         # description: guest output must not overwrite a host lifecycle record.
         with open(self.log_path, "wb", opener=lambda path, flags:
                   os.open(path, flags | os.O_APPEND)) as log:
-            log.write(f"Quadra {__version__}\n".encode())
+            log.write(f"Quinta {__version__}\n".encode())
             log.write(f"Darling: {darling_version(env)}\n".encode())
             log.write(f"Darling selection: {DARLING_RUNTIME['runtime']}; {DARLING_EXECUTABLE}; root {DARLING_SYSROOT}\n".encode())
             log.write(f"Renderer requested: {renderer_name}\n".encode())
@@ -2811,7 +2811,7 @@ class RobloxSession:
             if self.settings.get("renderer") == "metal" and self.settings.get("metal_diagnostics", False):
                 log.write(f"Metal performance trace: {self.metal_diagnostics_path}\n".encode())
             for note in self.notes:
-                log.write(f"[Quadra Startup] {note}\n".encode(errors="replace"))
+                log.write(f"[Quinta Startup] {note}\n".encode(errors="replace"))
             _prepare_darling_server(env, log)
             changed = raise_darling_priority()
             if changed:
@@ -2863,7 +2863,7 @@ class RobloxSession:
                     if self.log_path:
                         try:
                             with open(self.log_path, 'ab', buffering=0) as log:
-                                log.write(f'\n[Quadra Lifecycle] frontend_detached status={status} live_players={len(players)}; monitoring guest\n'.encode())
+                                log.write(f'\n[Quinta Lifecycle] frontend_detached status={status} live_players={len(players)}; monitoring guest\n'.encode())
                         except OSError:
                             pass
         if self.audio:
@@ -2921,7 +2921,7 @@ class RobloxSession:
                                   "startup_failure", "explicit_cleanup"):
                     reason = "explicit_cleanup"
                 stamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-                record = (f"\n[Quadra Lifecycle] time={stamp} reason={reason} "
+                record = (f"\n[Quinta Lifecycle] time={stamp} reason={reason} "
                           f"frontend_status={frontend} selected_prefix_games={game_count} "
                           "guest_exit=unknown before_cleanup=1\n")
                 with open(self.log_path, "ab", buffering=0) as log:
@@ -3017,7 +3017,7 @@ def query_server_location(ip_address):
     url = f"https://apis.rovalra.com/v1/geolocation?ip={address}"
     result = None
     try:
-        request = urllib.request.Request(url, headers={"User-Agent": "Quadra"})
+        request = urllib.request.Request(url, headers={"User-Agent": "Quinta"})
         with urllib.request.urlopen(request, timeout=5) as response:
             data = json.loads(response.read(65536).decode())
         location = data.get("location", {}) if isinstance(data, dict) else {}

@@ -432,9 +432,9 @@ __attribute__((constructor)) static void quadra_reset_workqueue_stacks(void) {
         if (matches == 1) {
             quadra_wqthread_original = entry;
             __atomic_store_n(found, (void *)quadra_start_wqthread, __ATOMIC_RELEASE);
-            quadra_log("[Quadra] GCD worker threads restart on a fresh stack\n");
+            quadra_log("[Quinta] GCD worker threads restart on a fresh stack\n");
         } else {
-            quadra_log("[Quadra] Darling's workqueue entry not found, GCD worker stacks unchanged\n");
+            quadra_log("[Quinta] Darling's workqueue entry not found, GCD worker stacks unchanged\n");
         }
         return;
     }

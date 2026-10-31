@@ -124,10 +124,10 @@ class DiscordPresenceTests(unittest.TestCase):
     def test_activity_branding_and_buttons(self):
         activity = discord.DiscordRPC._activity(
             details="Game", buttons=[("Game page", "https://www.roblox.com/games/1"),
-                                     ("Get Quadra", discord.WEBSITE_URL), ("Third", "https://example.com")])
+                                     ("Get Quinta", discord.WEBSITE_URL), ("Third", "https://example.com")])
         self.assertEqual(activity["assets"]["large_image"], discord.LOGO)
         self.assertEqual(activity["buttons"], [{"label": "Game page", "url": "https://www.roblox.com/games/1"},
-                                               {"label": "Get Quadra", "url": discord.WEBSITE_URL}])
+                                               {"label": "Get Quinta", "url": discord.WEBSITE_URL}])
         self.assertNotIn("buttons", discord.DiscordRPC._activity(details="Menu"))
 
 

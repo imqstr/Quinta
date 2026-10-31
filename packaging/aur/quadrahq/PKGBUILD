@@ -7,7 +7,7 @@ pkgrel=1
 pkgdesc='Run the macOS Roblox client on Linux through Darling'
 arch=('x86_64')
 url='https://quadrahq.org'
-_repo='https://github.com/QuadraHQ/Quadra'
+_repo='https://github.com/imqstr/Quinta'
 license=('GPL-3.0-only' 'MIT' 'ISC' 'OFL-1.1')
 depends=('unzip' 'python' 'python-gobject' 'python-cairo'
          'gtk4>=4.14' 'libadwaita>=1.5' 'webkitgtk-6.0' 'sdl2' 'wayland'
@@ -15,7 +15,7 @@ depends=('unzip' 'python' 'python-gobject' 'python-cairo'
 depends+=('hicolor-icon-theme' 'shared-mime-info' 'desktop-file-utils')
 makedepends=('clang' 'lld' 'pkgconf' 'vulkan-headers' 'rust>=1.98')
 optdepends=('darling: regular Darling runtime'
-            'ciderdarling-bin: QuadraHQ Darling runtime (also available from the launcher)'
+            'ciderdarling-bin: Quinta Darling runtime (also available from the launcher)'
             'mangohud: performance overlay'
             'mesa: Mesa EGL and Zink for the Vulkan renderer'
             'vulkan-driver: hardware Vulkan driver for the Vulkan renderer'
@@ -27,13 +27,13 @@ source=("$pkgname-$_tag.tar.gz::$_repo/releases/download/v$_tag/quadrahq-$_tag-s
 sha256sums=('b522dde65d89c204f2e9a97db2f7d3b586ad447164a13af9fac081b1fa0c064a')
 
 build() {
-  cd "Quadra-$_tag"
+  cd "Quinta-$_tag"
   QUADRA_BUILD_DIR="$srcdir/native-build" ./build_debug_shim.sh
   QUADRA_BUILD_DIR="$srcdir/native-build" bash packaging/build-metal.sh
 }
 
 package() {
-  cd "Quadra-$_tag"
+  cd "Quinta-$_tag"
   bash packaging/install-payload.sh "$PWD" "$srcdir/native-build" "$pkgdir" /usr/lib
   python -m compileall -q -d /usr/share/quadrahq/launcher "$pkgdir/usr/share/quadrahq/launcher"
 }

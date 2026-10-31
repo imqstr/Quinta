@@ -32,7 +32,7 @@ rustPlatform.buildRustPackage {
     export MACOBLOX_METAL_LIBLLVM=${llvmPackages.llvm.lib}/lib/libLLVM.so
   '';
   meta = {
-    description = "Quadra's Metal on Vulkan host bridge";
+    description = "Quinta's Metal on Vulkan host bridge";
     license = lib.licenses.gpl3Only;
     platforms = [ "x86_64-linux" ];
   };

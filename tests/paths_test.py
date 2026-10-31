@@ -1,4 +1,4 @@
-"""Preserve user data when moving Cider and MacOBlox installations to Quadra."""
+"""Preserve user data when moving Cider and MacOBlox installations to Quinta."""
 import os
 from pathlib import Path
 import tempfile
@@ -36,11 +36,11 @@ class UserDirectoryMigrationTests(unittest.TestCase):
         self.assertEqual((older / 'settings.json').read_text(), 'older settings')
 
     def test_existing_quadra_data_is_never_replaced(self):
-        target = self.directory('quadrahq', 'Quadra settings')
+        target = self.directory('quadrahq', 'Quinta settings')
         cider = self.directory('ciderhq', 'Cider settings')
         result = paths.migrate_directories(target, cider, self.base / 'macoblox')
         self.assertEqual(result, target)
-        self.assertEqual((target / 'settings.json').read_text(), 'Quadra settings')
+        self.assertEqual((target / 'settings.json').read_text(), 'Quinta settings')
         self.assertEqual((cider / 'settings.json').read_text(), 'Cider settings')
 
     def test_older_session_migrates_when_cider_session_is_absent(self):

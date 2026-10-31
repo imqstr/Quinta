@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
             clock_ticks += 66666667;
             quadra_frame_presented(mock_display, mock_surface, 1);
         }
-        assert(strstr(logged,"[Quadra FPS drop] fps=15.0 baseline=60.0"));
+        assert(strstr(logged,"[Quinta FPS drop] fps=15.0 baseline=60.0"));
         clear_log();
         for (int i=0;i<75;i++) {
             clock_ticks += 66666667;

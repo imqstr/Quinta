@@ -29,7 +29,7 @@ buildFHSEnv (
       }
       trap cleanup EXIT
       ${quadrahq.payload}/bin/quadrahq --hardware-report --help >/dev/null
-      timeout 45 "''${command[@]}" shell /bin/echo "Quadra ${quadrahq.runtime} guest shell: PASS"
+      timeout 45 "''${command[@]}" shell /bin/echo "Quinta ${quadrahq.runtime} guest shell: PASS"
     '';
   }
 )

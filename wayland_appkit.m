@@ -215,7 +215,7 @@ static void validate_egl(void *native) {
         {
             const char *platform=getenv("EGL_PLATFORM"),*driver=getenv("MESA_LOADER_DRIVER_OVERRIDE");
             char line[320];
-            int length=snprintf(line,sizeof line,"[Quadra Wayland] EGL %s failed: error 0x%x, native %p, display %p, platform %s, driver %s\n",
+            int length=snprintf(line,sizeof line,"[Quinta Wayland] EGL %s failed: error 0x%x, native %p, display %p, platform %s, driver %s\n",
                 stage,error,native,display,platform?platform:"auto",driver?driver:"auto");
             if(length>0)write(2,line,(unsigned long)length<sizeof line?(unsigned long)length:sizeof line-1);
         }
@@ -225,7 +225,7 @@ static void validate_egl(void *native) {
         const char *vendor=eglQueryString(display,0x3053),*version=eglQueryString(display,0x3054);
         const char *platform=getenv("EGL_PLATFORM"),*driver=getenv("MESA_LOADER_DRIVER_OVERRIDE");
         char line[512];
-        int length=snprintf(line,sizeof line,"[Quadra Wayland] EGL initialized: native %p, display %p, version %d.%d (%s), vendor %s, platform %s, driver %s\n",
+        int length=snprintf(line,sizeof line,"[Quinta Wayland] EGL initialized: native %p, display %p, version %d.%d (%s), vendor %s, platform %s, driver %s\n",
             native,display,major,minor,version?version:"unknown",vendor?vendor:"unknown",platform?platform:"auto",driver?driver:"auto");
         if(length>0)write(2,line,(unsigned long)length<sizeof line?(unsigned long)length:sizeof line-1);
     }
@@ -240,7 +240,7 @@ static void initialize(void) {
     if(!get || !(api=get()))
         [NSException raise:@"NSWindowServerCommunicationException" format:@"Native Wayland initialization failed. Check the Wayland session and SDL2 helper (%s).",path?path:"helper not set"];
     if(api->version!=QUADRA_WAYLAND_ABI)
-        [NSException raise:@"NSWindowServerCommunicationException" format:@"Native Wayland helper is outdated or incompatible (ABI %u; expected %u). Rebuild Quadra before using Native Wayland.",api->version,QUADRA_WAYLAND_ABI];
+        [NSException raise:@"NSWindowServerCommunicationException" format:@"Native Wayland helper is outdated or incompatible (ABI %u; expected %u). Rebuild Quinta before using Native Wayland.",api->version,QUADRA_WAYLAND_ABI];
     /* Darling reports CGL success even when eglInitialize or config selection
      * fails. Check those operations explicitly before caching its display. */
     validate_egl(api->display());
@@ -574,7 +574,7 @@ int quadra_wayland_dispatch_event(id event) {
 - (void)pump:(id)timer {
     static BOOL pumping;if(pumping)return;pumping=YES;
     static BOOL traced;
-    if(!traced && getenv("QUADRA_TRACE_WAYLAND")){traced=YES;write(2,"[Quadra Wayland] AppKit pump active\n",sizeof("[Quadra Wayland] AppKit pump active\n")-1);}
+    if(!traced && getenv("QUADRA_TRACE_WAYLAND")){traced=YES;write(2,"[Quinta Wayland] AppKit pump active\n",sizeof("[Quinta Wayland] AppKit pump active\n")-1);}
     @try {
         struct quadra_wayland_event input;
         for(unsigned i=0;i<256 && api->poll(&input);i++) {
@@ -640,7 +640,7 @@ unsigned quadra_wayland_metal_view(id window,NSRect value,void **display,void **
     QuadraWaylandWindow *parent=platform;int x,y,width,height;
     if(!parent->handle || !subwindow_frame(parent,value,&x,&y,&width,&height))return 0;
     unsigned view=api->create_subwindow(parent->handle,x,y,width,height);
-    if(!view){char line[300];int length=snprintf(line,sizeof line,"[Quadra Wayland] Metal view failed: %s\n",api->error());if(length>0)write(2,line,length);return 0;}
+    if(!view){char line[300];int length=snprintf(line,sizeof line,"[Quinta Wayland] Metal view failed: %s\n",api->error());if(length>0)write(2,line,length);return 0;}
     *display=api->display();*surface=api->subwindow_wl_surface(view);
     if(!*surface){api->destroy_subwindow(view);return 0;}
     return view;

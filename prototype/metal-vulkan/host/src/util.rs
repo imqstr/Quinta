@@ -37,7 +37,7 @@ pub fn guard<T>(default: T, body: impl FnOnce() -> T) -> T {
                 .cloned()
                 .or_else(|| payload.downcast_ref::<&str>().map(|text| text.to_string()))
                 .unwrap_or_else(|| "unknown panic".into());
-            log_once(&format!("[Quadra Metal] internal error: {text}"));
+            log_once(&format!("[Quinta Metal] internal error: {text}"));
             set_error(text);
             default
         }
@@ -65,7 +65,7 @@ pub fn message_sink() -> MessageSink {
     MessageSink::new(|message: &DebugMessage| {
         if let Some(notice) = &message.degradation {
             log_once(&format!(
-                "[Quadra Metal] notice {}: {}",
+                "[Quinta Metal] notice {}: {}",
                 notice.degradation.code(),
                 notice.reason
             ));
@@ -75,7 +75,7 @@ pub fn message_sink() -> MessageSink {
         ) || crate::identity::forwarded_info(&message.id_name)
         {
             log_once(&format!(
-                "[Quadra Metal] {}: {}",
+                "[Quinta Metal] {}: {}",
                 message.id_name, message.text
             ));
         }
@@ -108,7 +108,7 @@ pub fn large_buffer_line(
         return None;
     }
     Some(format!(
-        "[Quadra Metal] buffer of {} MiB (options {options:#x}{}) took {took_ms} ms",
+        "[Quinta Metal] buffer of {} MiB (options {options:#x}{}) took {took_ms} ms",
         length >> 20,
         if with_bytes { ", with bytes" } else { "" },
     ))
@@ -126,7 +126,7 @@ pub fn note_pipeline_time(elapsed: Duration) {
         let mut stderr = std::io::stderr().lock();
         let _ = writeln!(
             stderr,
-            "[Quadra Metal] render pipelines: {count}, {:.1} s making in all (last {:.0} ms)",
+            "[Quinta Metal] render pipelines: {count}, {:.1} s making in all (last {:.0} ms)",
             total as f64 / 1e9,
             elapsed.as_secs_f64() * 1000.0
         );
@@ -161,7 +161,7 @@ mod tests {
         assert_eq!(large_buffer_line(15 << 20, 0, true, 49), None);
         assert_eq!(
             large_buffer_line(256 << 20, 0x20, false, 61).unwrap(),
-            "[Quadra Metal] buffer of 256 MiB (options 0x20) took 61 ms"
+            "[Quinta Metal] buffer of 256 MiB (options 0x20) took 61 ms"
         );
         assert!(large_buffer_line(4096, 0, true, 80)
             .unwrap()

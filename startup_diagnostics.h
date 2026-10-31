@@ -116,7 +116,7 @@ static void quadra_startup_trace_line(const char* selector, const char* phase,
                                          const QuadraStartupTrace* trace) {
     if (!trace->sequence)
         return;
-    write_str("[Quadra Startup] call=");
+    write_str("[Quinta Startup] call=");
     print_num((long long)trace->sequence);
     write_str(" "); write_str(selector);
     if (trace->key[0]) {
@@ -133,7 +133,7 @@ static QuadraStartupTrace quadra_startup_trace_begin(const char* selector,
     unsigned long sequence = __sync_add_and_fetch(&quadra_startup_trace_sequence, 1);
     if (sequence > 1024) {
         if (sequence == 1025)
-            write_str("[Quadra Startup] trace limit reached\n");
+            write_str("[Quinta Startup] trace limit reached\n");
         return trace;
     }
     trace.sequence = sequence;
@@ -192,7 +192,7 @@ static void quadra_install_startup_diagnostics(void) {
     installed += quadra_startup_hook(screen ? object_getClass((id)screen) : 0,
         "mainScreen", '@', 2, (IMP)quadra_startup_main_screen,
         &quadra_startup_main_screen_original);
-    write_str("[Quadra Startup] diagnostic methods installed=");
+    write_str("[Quinta Startup] diagnostic methods installed=");
     print_num(installed); write_str("/5\n");
 }
 

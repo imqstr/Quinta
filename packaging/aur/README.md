@@ -1,10 +1,10 @@
 # AUR packaging
 
-Quadra uses two package names for AUR repositories:
+Quinta uses two package names for AUR repositories:
 
 | Package | Recipe | Source |
 | --- | --- | --- |
-| `quadrahq` | `quadrahq/PKGBUILD` and `.SRCINFO` | Verified Quadra release |
+| `quadrahq` | `quadrahq/PKGBUILD` and `.SRCINFO` | Verified Quinta release |
 | `ciderhq` (legacy) | `ciderhq/PKGBUILD` and `.SRCINFO` | Published Cider 0.30 release |
 | `quadrahq-git` | `PKGBUILD` and `.SRCINFO` | Current GitHub checkout |
 
@@ -47,7 +47,7 @@ In a separate AUR checkout, copy only the selected recipe's `PKGBUILD` and
 ```bash
 makepkg --printsrcinfo > .SRCINFO
 git add PKGBUILD .SRCINFO
-git commit -m 'Update Quadra package'
+git commit -m 'Update Quinta package'
 git push
 ```
 

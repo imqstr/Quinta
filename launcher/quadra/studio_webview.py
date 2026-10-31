@@ -67,7 +67,7 @@ def _context():
 def runtime_download(version=VERSION, opener=urllib.request.urlopen):
     """{url, size, sha256 (hex)} of the full x64 runtime installer for `version`."""
     request = urllib.request.Request(f"{API}/versions/{version}/files?action=GenerateDownloadInfo", method="POST",
-                                     headers={"User-Agent": "Quadra"})
+                                     headers={"User-Agent": "Quinta"})
     with opener(request, timeout=30, context=_context()) as response:
         files = json.load(response)
     for entry in files:

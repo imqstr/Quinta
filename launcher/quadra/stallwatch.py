@@ -69,9 +69,9 @@ MARKERS = (
     (re.compile(r"replaceDataModel"), "replace data model"),
     (re.compile(r"Replicator destroyed"), "replicator destroyed"),
     (re.compile(r"nextDrawable timed out"), "swapchain timeout"),
-    (re.compile(r"\[Quadra Metal\] buffer of"), "large buffer"),
-    (re.compile(r"\[Quadra Metal\] render pipelines"), "pipelines"),
-    (re.compile(r"\[Quadra Input\]"), "input"),
+    (re.compile(r"\[Quinta Metal\] buffer of"), "large buffer"),
+    (re.compile(r"\[Quinta Metal\] render pipelines"), "pipelines"),
+    (re.compile(r"\[Quinta Input\]"), "input"),
 )
 KEY_MARKERS = ("join", "leave")
 DEDUPLICATE = 5.0
@@ -921,7 +921,7 @@ def _wait_for_game(stop):
 def cli(argv):
     import argparse
     parser = argparse.ArgumentParser(prog="quadrahq --watch-stalls", description=__doc__.split("\n")[0])
-    parser.add_argument("--output", type=Path, help="directory for the capture and report (default: Quadra's logs)")
+    parser.add_argument("--output", type=Path, help="directory for the capture and report (default: Quinta's logs)")
     parser.add_argument("--interval", type=float, default=INTERVAL, help="seconds between CPU samples")
     parser.add_argument("--no-stacks", action="store_true", help="record the CPU timeline only")
     parser.add_argument("--report", type=Path, metavar="CAPTURE", help="print the report of a capture file and exit")

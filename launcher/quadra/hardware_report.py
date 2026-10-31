@@ -38,7 +38,7 @@ def _input(core, environment=None):
         newest = max(Path(core.LOGS).glob('launch-*.log'), key=lambda path: path.stat().st_mtime)
         with newest.open(errors='replace') as stream:
             for line in stream.read(32 * 1024 * 1024).splitlines():
-                at = line.find('[Quadra Input]')
+                at = line.find('[Quinta Input]')
                 if at >= 0 and 'addLocalMonitor' not in line:
                     text = line[at:at + 160].strip()
                     lines[text] = lines.get(text, 0) + 1
@@ -114,7 +114,7 @@ def collect(output_dir=None, *, graphics=False, gameplay=None):
 
 
 def _m2vk(core, environment):
-    """Quadra M2VK's own view of the GPU: the device and driver it opens, whether the runtime has
+    """Quinta M2VK's own view of the GPU: the device and driver it opens, whether the runtime has
     measured that exact combination, and whether a test copy ran on it. No paths or account data."""
     from . import graphics as renderer
     if not core.metal_built():

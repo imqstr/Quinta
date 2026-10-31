@@ -101,14 +101,14 @@ static void *quadra_eglCreateContext(void *display, void *config, void *share, c
             if (context) {
                 quadra_register_egl_context(context);
                 char line[120];
-                int length = snprintf(line, sizeof line, "[Quadra GL] Core Profile %d.%d context for Roblox: created\n",
+                int length = snprintf(line, sizeof line, "[Quinta GL] Core Profile %d.%d context for Roblox: created\n",
                                       versions[i][0], versions[i][1]);
                 if (length > 0) write(2, line, (unsigned long)length);
                 return context;
             }
         }
-        write(2, "[Quadra GL] Core Profile context failed, using Compatibility\n",
-              sizeof("[Quadra GL] Core Profile context failed, using Compatibility\n") - 1);
+        write(2, "[Quinta GL] Core Profile context failed, using Compatibility\n",
+              sizeof("[Quinta GL] Core Profile context failed, using Compatibility\n") - 1);
     }
     void *context = eglCreateContext(display, config, share, attributes);
     if (context)
@@ -162,7 +162,7 @@ static const unsigned char *quadra_glGetString(unsigned int name) {
         const char *text = (const char *)value;
         int software = strstr(text, "llvmpipe") || strstr(text, "softpipe") || strstr(text, "SWR");
         char line[512];
-        int length = snprintf(line, sizeof line, "[Quadra GL] renderer: %s (OpenGL %s)%s\n", text,
+        int length = snprintf(line, sizeof line, "[Quinta GL] renderer: %s (OpenGL %s)%s\n", text,
                               version ? (const char *)version : "?",
                               software ? " -- SOFTWARE RENDERING: the GPU driver is not in use" : "");
         if (length > 0) write(2, line, (unsigned long)length < sizeof line ? (unsigned long)length : sizeof line - 1);
@@ -282,7 +282,7 @@ static unsigned int quadra_eglChooseConfig(void *display, const int *attributes,
         return ok;
     void *better = config_for_visual(display, root_visual);
     char line[160];
-    snprintf(line, sizeof line, "[Quadra GL] EGL config visual 0x%x, screen visual 0x%x: %s\n",
+    snprintf(line, sizeof line, "[Quinta GL] EGL config visual 0x%x, screen visual 0x%x: %s\n",
              chosen, root_visual, better ? "using a config for the screen visual" : "no config for it");
     log_line(line);
     if (better)
@@ -302,13 +302,13 @@ static void *quadra_eglCreateWindowSurface(void *display, void *config, unsigned
         static volatile long wayland_surfaces;
         if (quadra_wayland_enabled() && __sync_add_and_fetch(&wayland_surfaces, 1) <= 6) {
             char line[160];
-            snprintf(line, sizeof line, "[Quadra Wayland] EGL drawable created: native %p, surface %p\n", (void *)window, surface);
+            snprintf(line, sizeof line, "[Quinta Wayland] EGL drawable created: native %p, surface %p\n", (void *)window, surface);
             log_line(line);
         }
         const char *trace = getenv("QUADRA_TRACE_CGL");
         if (trace && trace[0] == '1') {
             char line[160];
-            snprintf(line, sizeof line, "[Quadra GL] eglCreateWindowSurface window 0x%lx -> surface %p\n", window, surface);
+            snprintf(line, sizeof line, "[Quinta GL] eglCreateWindowSurface window 0x%lx -> surface %p\n", window, surface);
             log_line(line);
         }
         return surface;
@@ -319,7 +319,7 @@ static void *quadra_eglCreateWindowSurface(void *display, void *config, unsigned
         static volatile long wayland_failures;
         if (__sync_add_and_fetch(&wayland_failures, 1) <= 8) {
             char line[192];
-            snprintf(line, sizeof line, "[Quadra Wayland] EGL surface failed: error 0x%x, native %p%s\n",
+            snprintf(line, sizeof line, "[Quinta Wayland] EGL surface failed: error 0x%x, native %p%s\n",
                 error, (void *)window, window ? "" : " (view has no attached drawable yet)");
             log_line(line);
         }
@@ -347,7 +347,7 @@ static void *quadra_eglCreateWindowSurface(void *display, void *config, unsigned
     }
     char line[320];
     int length = snprintf(line, sizeof line,
-             "[Quadra GL] eglCreateWindowSurface failed (EGL error 0x%x): native window 0x%lx, "
+             "[Quinta GL] eglCreateWindowSurface failed (EGL error 0x%x): native window 0x%lx, "
              "window visual 0x%x, config visual 0x%x, screen visual 0x%x; retry %s",
              error, window, window_visual, config_visual(display, config), root_visual, retry_status);
     if (length >= 0 && (unsigned int)length < sizeof line) {
@@ -426,7 +426,7 @@ unsigned long quadra_replace_gl_subwindow(void *display, unsigned long parent, u
     if (*(int *)(old_attributes + 92) != 0 /* IsUnmapped */)
         map_window(display, window);
     destroy_window(display, old);
-    static const char message[] = "[Quadra GL] GL subwindow uses the screen visual\n";
+    static const char message[] = "[Quinta GL] GL subwindow uses the screen visual\n";
     write(2, message, sizeof message - 1);
     return window;
 }
@@ -527,8 +527,8 @@ static void swap_interval_zero(void) {
     quadra_unlock(&configured_lock);
     long count = __sync_add_and_fetch(&logged, 1);
     if (count <= 8 || count % 100 == 0)
-        write(2, "[Quadra GL] vsync off (swap interval 0)\n",
-              sizeof("[Quadra GL] vsync off (swap interval 0)\n") - 1);
+        write(2, "[Quinta GL] vsync off (swap interval 0)\n",
+              sizeof("[Quinta GL] vsync off (swap interval 0)\n") - 1);
 }
 
 static int environment_flag(const char *name, int *cache) {
@@ -601,8 +601,8 @@ void quadra_frame_presented(void *display, void *surface, unsigned int succeeded
     if (report && (verbose || dropped)) {
         char line[96];
         int length = dropped
-            ? snprintf(line, sizeof line, "[Quadra FPS drop] fps=%.1f baseline=%.1f surface=%p\n", fps, baseline, surface)
-            : snprintf(line, sizeof line, "[Quadra FPS] %.1f surface=%p\n", fps, surface);
+            ? snprintf(line, sizeof line, "[Quinta FPS drop] fps=%.1f baseline=%.1f surface=%p\n", fps, baseline, surface)
+            : snprintf(line, sizeof line, "[Quinta FPS] %.1f surface=%p\n", fps, surface);
         if (length > 0) write(2, line, (unsigned long)length < sizeof line ? (unsigned long)length : sizeof line - 1);
     }
 }

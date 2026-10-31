@@ -48,20 +48,20 @@ class InputReportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             logs = Path(directory) / 'logs'
             logs.mkdir()
-            (logs / 'launch-1.log').write_text('[Quadra Input] old\n')
+            (logs / 'launch-1.log').write_text('[Quinta Input] old\n')
             newest = logs / 'launch-2.log'
-            newest.write_text('noise /home/someone/secret\n[Quadra Input] mouse lock on (native window confined)\n'
-                              'x [Quadra Input] no raw motion arrived, mouse lock uses pointer deltas\n'
-                              '[Quadra Input] mouse lock on (native window confined)\n'
-                              '[Quadra Input] addLocalMonitorForEventsMatchingMask mask=0x800\n')
+            newest.write_text('noise /home/someone/secret\n[Quinta Input] mouse lock on (native window confined)\n'
+                              'x [Quinta Input] no raw motion arrived, mouse lock uses pointer deltas\n'
+                              '[Quinta Input] mouse lock on (native window confined)\n'
+                              '[Quinta Input] addLocalMonitorForEventsMatchingMask mask=0x800\n')
             os.utime(logs / 'launch-1.log', (1, 1))
             settings = dict(core.DEFAULT_SETTINGS, display_backend='x11', raw_mouse=True)
             with patch.object(core, 'LOGS', logs), patch.object(core, 'load_settings', return_value=settings):
                 report = hardware_report._input(core)
             self.assertEqual((report['display_backend'], report['raw_mouse']), ('x11', True))
             self.assertEqual(report['log'], [
-                {'line': '[Quadra Input] mouse lock on (native window confined)', 'count': 2},
-                {'line': '[Quadra Input] no raw motion arrived, mouse lock uses pointer deltas', 'count': 1}])
+                {'line': '[Quinta Input] mouse lock on (native window confined)', 'count': 2},
+                {'line': '[Quinta Input] no raw motion arrived, mouse lock uses pointer deltas', 'count': 1}])
             self.assertNotIn('secret', json.dumps(report))
 
     def test_a_missing_log_or_xwayland_is_reported_as_nothing(self):

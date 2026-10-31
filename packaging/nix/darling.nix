@@ -94,7 +94,7 @@ stdenvNoCC.mkDerivation {
 
   passthru = { inherit fhsPrefix; };
   meta = {
-    description = "Pinned ${runtime} runtime for Quadra's FHS environment";
+    description = "Pinned ${runtime} runtime for Quinta's FHS environment";
     homepage =
       if cider then "https://github.com/QuadraHQ/CiderDarling" else "https://www.darlinghq.org";
     license = lib.licenses.gpl3Only;

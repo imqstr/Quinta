@@ -1,4 +1,4 @@
-"""Quadra user directories and migration from Cider and MacOBlox installations."""
+"""Quinta user directories and migration from Cider and MacOBlox installations."""
 import logging
 import os
 from functools import lru_cache
@@ -8,7 +8,7 @@ from pathlib import Path
 def migrate_directory(source, target):
     """Move a legacy directory only when the destination has no user data.
 
-    Renaming preserves cookie/keychain permissions. Existing Quadra data wins;
+    Renaming preserves cookie/keychain permissions. Existing Quinta data wins;
     the legacy directory is then left available for manual recovery.
     """
     source, target = Path(source), Path(target)

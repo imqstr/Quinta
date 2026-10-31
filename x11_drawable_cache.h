@@ -297,7 +297,7 @@ static void quadra_install_x11_drawable_cache(Class cls) {
     if (!valid || !method_getImplementation(convert) || !method_getImplementation(frame) ||
         !method_getImplementation(show) || !method_getImplementation(hide)) {
         __atomic_store_n(&quadra_drawable_install_state, 3, __ATOMIC_RELEASE);
-        write_str("[Quadra] X11 drawable cache skipped: unsupported backend ABI\n");
+        write_str("[Quinta] X11 drawable cache skipped: unsupported backend ABI\n");
         return;
     }
     quadra_drawable_class = cls;
@@ -312,6 +312,6 @@ static void quadra_install_x11_drawable_cache(Class cls) {
     method_setImplementation(show, (IMP)quadra_drawable_show);
     method_setImplementation(hide, (IMP)quadra_drawable_hide);
     __atomic_store_n(&quadra_drawable_install_state, 2, __ATOMIC_RELEASE);
-    write_str("[Quadra] X11 drawable updates skip unchanged geometry and visibility\n");
+    write_str("[Quinta] X11 drawable updates skip unchanged geometry and visibility\n");
 }
 #endif

@@ -1,4 +1,4 @@
-//! The host half of Quadra's Metal on Vulkan: metal2vulkan-runtime behind the C table that
+//! The host half of Quinta's Metal on Vulkan: metal2vulkan-runtime behind the C table that
 //! `../quadra_metal.h` describes. The guest Metal.framework (`../framework`) holds the handles
 //! this file gives out; see the header for the rules both sides keep.
 #![allow(clippy::missing_safety_doc, clippy::too_many_arguments)]
@@ -372,7 +372,7 @@ extern "C" fn device_create(_options: *const c_void) -> *mut c_void {
         options.messages = Some(util::message_sink());
         match Device::system_default_with(&options) {
             Ok(device) => {
-                log_once(&format!("[Quadra Metal] Vulkan device: {}", device.name()));
+                log_once(&format!("[Quinta Metal] Vulkan device: {}", device.name()));
                 identity::log(&device);
                 preload::initialize();
                 diagnostics::register(&device);
@@ -889,7 +889,7 @@ extern "C" fn library_new(device: *mut c_void, data: *const c_void, length: u64)
         let prepared = match air::prepare(bytes) {
             Ok(prepared) => prepared,
             Err(error) => {
-                log_once(&format!("[Quadra Metal] shader upgrade: {error}"));
+                log_once(&format!("[Quinta Metal] shader upgrade: {error}"));
                 return fail(format!("newLibraryWithData ({length} bytes): {error}"));
             }
         };
@@ -1185,7 +1185,7 @@ extern "C" fn command_buffer_wait(command_buffer: *mut c_void) -> c_int {
     }
     guard(5, || {
         if let Err(error) = command_buffer.buffer.wait_until_completed() {
-            log_once(&format!("[Quadra Metal] waitUntilCompleted: {error}"));
+            log_once(&format!("[Quinta Metal] waitUntilCompleted: {error}"));
         }
         let result = command_buffer.buffer.status();
         if result == CommandBufferStatus::Completed
@@ -1207,7 +1207,7 @@ extern "C" fn command_buffer_wait(command_buffer: *mut c_void) -> c_int {
                 .error_description()
                 .unwrap_or_default();
             log_once(&format!(
-                "[Quadra Metal] command buffer failed: {description}"
+                "[Quinta Metal] command buffer failed: {description}"
             ));
         }
         status(result)
@@ -1339,7 +1339,7 @@ macro_rules! encoder {
             }
             _ => {
                 log_once(concat!(
-                    "[Quadra Metal] call on an ended or missing ",
+                    "[Quinta Metal] call on an ended or missing ",
                     stringify!($variant)
                 ));
                 return;
@@ -1356,7 +1356,7 @@ fn record_error(errors: &Mutex<Option<String>>, description: impl Into<String>) 
         .unwrap()
         .get_or_insert_with(|| description.clone());
     set_error(description.clone());
-    log_once(&format!("[Quadra Metal] {description}"));
+    log_once(&format!("[Quinta Metal] {description}"));
 }
 
 /// Encoder calls answer nothing in Metal; a refusal is logged once per distinct text.
@@ -1385,7 +1385,7 @@ extern "C" fn render_end(encoder: *mut c_void) -> c_int {
                 .lock()
                 .unwrap()
                 .get_or_insert_with(|| format!("render endEncoding: {error}"));
-            log_once(&format!("[Quadra Metal] render endEncoding: {error}"));
+            log_once(&format!("[Quinta Metal] render endEncoding: {error}"));
             0
         }
     })
@@ -1756,7 +1756,7 @@ extern "C" fn blit_end(encoder: *mut c_void) -> c_int {
                 .lock()
                 .unwrap()
                 .get_or_insert_with(|| format!("blit endEncoding: {error}"));
-            log_once(&format!("[Quadra Metal] blit endEncoding: {error}"));
+            log_once(&format!("[Quinta Metal] blit endEncoding: {error}"));
             0
         }
     })
@@ -1989,7 +1989,7 @@ extern "C" fn compute_end(encoder: *mut c_void) -> c_int {
                 .lock()
                 .unwrap()
                 .get_or_insert_with(|| format!("compute endEncoding: {error}"));
-            log_once(&format!("[Quadra Metal] compute endEncoding: {error}"));
+            log_once(&format!("[Quinta Metal] compute endEncoding: {error}"));
             0
         }
     })
@@ -2404,7 +2404,7 @@ extern "C" fn surface_new(
         match Surface::new(device, target) {
             Ok(surface) => handle(Obj::Surface(surface)),
             Err(error) => {
-                log_once(&format!("[Quadra Metal] presentation surface: {error}"));
+                log_once(&format!("[Quinta Metal] presentation surface: {error}"));
                 fail(error)
             }
         }
@@ -2422,7 +2422,7 @@ extern "C" fn surface_configure(
     guard(0, || match surface.configure(config) {
         Ok(()) => 1,
         Err(error) => {
-            log_once(&format!("[Quadra Metal] surface configure: {error}"));
+            log_once(&format!("[Quinta Metal] surface configure: {error}"));
             set_error(error);
             0
         }
@@ -2442,7 +2442,7 @@ extern "C" fn surface_next_drawable(
             handle(Obj::Drawable(drawable))
         }
         Err(error) => {
-            log_once(&format!("[Quadra Metal] nextDrawable: {error}"));
+            log_once(&format!("[Quinta Metal] nextDrawable: {error}"));
             fail(error)
         }
     })
@@ -2453,7 +2453,7 @@ extern "C" fn drawable_present(drawable: *mut c_void) -> c_int {
     guard(0, || match drawable.present_now() {
         Ok(()) => 1,
         Err(error) => {
-            log_once(&format!("[Quadra Metal] present: {error}"));
+            log_once(&format!("[Quinta Metal] present: {error}"));
             0
         }
     })

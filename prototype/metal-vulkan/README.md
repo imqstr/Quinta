@@ -1,8 +1,8 @@
 # Metal on Vulkan (experimental)
 
-This checkout uses QuadraM2VK's `development` branch, based on upstream `a2c440b`,
+This checkout uses Quinta M2VK's `development` branch, based on upstream `a2c440b`,
 and requires guest/host ABI **2**. Build and deploy the framework and host library together.
-The original Quadra dependency was `720ef1c`; its recorded gameplay evidence below does
+The original Quinta dependency was `720ef1c`; its recorded gameplay evidence below does
 not qualify this modified build. The preceding `0b73dd0` bridge passed an authored RTX 3060 Ti
 native Wayland lifecycle test, and the user reported that home and minimum-graphics stalls
 were gone. First-visit area hitches remain under investigation. The increased warm-state
@@ -40,11 +40,11 @@ RobloxPlayer (guest, Mach-O)            host (ELF)
   `MTLRenderPipelineDescriptor`, `MTLTextureDescriptor`, `MTLSamplerDescriptor`,
   `MTLDepthStencilDescriptor`, `MTLVertexDescriptor`, `MTLCompileOptions`, `MTLCaptureManager`,
   `MTLCreateSystemDefaultDevice`, `MTLCopyAllDevices`). Unknown selectors are logged once
-  (`[Quadra Metal] missing -[...]`) and answered with zeros. `CAMetalLayer` is taken over at run
+  (`[Quinta Metal] missing -[...]`) and answered with zeros. `CAMetalLayer` is taken over at run
   time by a subclass, without linking QuartzCore, which links Metal. Roblox's
   `Resources/builtins.shaders` (Metal source, which cannot be compiled on Linux) are emulated:
   its three upload kernels run as buffer-to-texture blits.
-- `host/`: the local QuadraM2VK fork of [steelbrain/metal2vulkan](https://github.com/steelbrain/metal2vulkan) 0.2's runtime
+- `host/`: the local Quinta M2VK fork of [steelbrain/metal2vulkan](https://github.com/steelbrain/metal2vulkan) 0.2's runtime
   (GPL-2.0-or-later OR LGPL-3.0-or-later) behind the C table, plus
   presentation (`src/present.rs`) and the AIR upgrade (`src/air.rs`).
 - Shaders: Roblox's metallibs are format 2.2 with LLVM bitcode of module version 1 and Metal
@@ -149,7 +149,7 @@ Native helpers can call `quadra_metal_host_preload` and
 
 ## Tuning, memory pressure and hardware reports
 
-Settings -> Environment -> Quadra M2VK sets these for the next launch; the host reads them
+Settings -> Environment -> Quinta M2VK sets these for the next launch; the host reads them
 from the environment, and an unset, empty or misspelled value is the default:
 
 | Variable | Values | Effect |
@@ -165,7 +165,7 @@ The runtime enables `VK_EXT_memory_priority` and `VK_EXT_pageable_device_local_m
 that has them and gives its blocks priorities (render targets and buffers above pooled textures).
 On the RTX 3060 Ti (8 GiB, 615.78.08) it made 9,216 MiB of `Private` buffers where the same runtime
 without them failed at 7,168 MiB with an out-of-device-memory error: a card short of video memory
-demotes textures instead of failing an allocation. The launch log's `[Quadra Metal] gpu:` line states the
+demotes textures instead of failing an allocation. The launch log's `[Quinta Metal] gpu:` line states the
 vendor and device IDs, driver, whether the runtime has measured that exact combination, the driver
 defects it assumes and the optional extensions taken; a problem report should include it.
 
@@ -182,7 +182,7 @@ a present last returned.
 
 ## Baseline evidence and qualification
 
-The gameplay and hardware results in this section were recorded by the original Quadra
+The gameplay and hardware results in this section were recorded by the original Quinta
 bridge. Recheck them with the modified framework and host before distributing this build.
 
 - Roblox accepts the device: `[FLog::Graphics] Metal renderer: NVIDIA GeForce RTX 3060 Ti`.
@@ -212,7 +212,7 @@ bridge. Recheck them with the modified framework and host before distributing th
   Darling session's Metal framework environment.
 - Still experimental: longer gameplay, resize/minimize stress, visibility-query
   correctness, other GPUs and X11 presentation need testing. VR is disabled for
-  Metal because Quadra's VR bridge attaches to the OpenGL renderer.
+  Metal because Quinta's VR bridge attaches to the OpenGL renderer.
 - The X11 window backend stalls on this desktop (niri with xwayland-satellite) about 0.3 s
   into launch for OpenGL too: the main thread waits in a darlingserver call. This is not
   related to Metal. Native Wayland works.
@@ -240,7 +240,7 @@ bridge. Recheck them with the modified framework and host before distributing th
 
 Place the reviewed fork at `vendor/metal2vulkan` before building. A source checkout or a
 symlink works; all three product crates must come from the same revision. For the offline
-source archive, from the Quadra repository root:
+source archive, from the Quinta repository root:
 
 ```sh
 mkdir -p vendor/metal2vulkan
@@ -299,7 +299,7 @@ compares the original ABI 1 bridge and this ABI 2 build on the same authored wor
 
 ## Licenses
 
-Everything here was written for Quadra (GPL-3.0-only). metal2vulkan is a Cargo dependency
+Everything here was written for Quinta (GPL-3.0-only). metal2vulkan is a Cargo dependency
 (GPL-2.0-or-later OR LGPL-3.0-or-later). No code from spidercraft's port or its continuation
 (github.com/georgenoob1234/Roblox-Mac-Linux-Port, no license) is included. That continuation
 handles the same old-AIR forms with a patch to metal2vulkan 0.1 and an offline SPIR-V cache.

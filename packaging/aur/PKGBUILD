@@ -1,12 +1,12 @@
 # Maintainer: aubree.wtf <https://aubree.wtf/>
 pkgname=quadrahq-git
-_name=Quadra
+_name=Quinta
 pkgver=0.37.4.r0
 pkgrel=1
 pkgdesc="Run the macOS Roblox client on Linux through Darling"
 arch=('x86_64')
 url="https://quadrahq.org"
-_repo="https://github.com/QuadraHQ/Quadra"
+_repo="https://github.com/imqstr/Quinta"
 license=('GPL-3.0-only' 'MIT' 'ISC' 'OFL-1.1')
 depends=('unzip' 'python' 'python-gobject' 'python-cairo'
          'gtk4>=4.14' 'libadwaita>=1.5' 'webkitgtk-6.0' 'sdl2' 'wayland'
@@ -14,7 +14,7 @@ depends=('unzip' 'python' 'python-gobject' 'python-cairo'
 depends+=('hicolor-icon-theme' 'shared-mime-info' 'desktop-file-utils')
 makedepends=('git' 'clang' 'lld' 'pkgconf' 'vulkan-headers' 'rust>=1.98')
 optdepends=('darling: regular Darling runtime'
-            'ciderdarling-bin: QuadraHQ Darling runtime (also available from the launcher)'
+            'ciderdarling-bin: Quinta Darling runtime (also available from the launcher)'
             'mangohud: performance overlay'
             'mesa: Mesa EGL and Zink for the Vulkan renderer'
             'vulkan-driver: hardware Vulkan driver for the Vulkan renderer'

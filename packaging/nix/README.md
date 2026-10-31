@@ -1,13 +1,13 @@
 # NixOS
 
-The flake builds Quadra for **x86_64-linux**, including the launcher, shim,
+The flake builds Quinta for **x86_64-linux**, including the launcher, shim,
 native Wayland helper, Metal bridge and a pinned Darling runtime.
 **CiderDarling is the default**. Regular Darling is available too.
 Roblox downloads on first setup; settings, downloads and sign-in stay in
 your writable user directories.
 
 The package uses [Nixpkgs' FHS environment](https://nixos.org/manual/nixpkgs/stable/#sec-fhs-environments)
-for Darling's Linux bridges and the same rootless helpers as Quadra's Flatpak.
+for Darling's Linux bridges and the same rootless helpers as Quinta's Flatpak.
 It supplies the GTK/WebKit, graphics and audio libraries without installing
 anything into `/usr` or `/opt`. You do not need a separate Darling package,
 `nix-ld`, or a setuid Darling wrapper.
@@ -42,7 +42,7 @@ CiderDarling update feed.
 
 ## NixOS module
 
-Add Quadra to your system flake inputs, then import its module:
+Add Quinta to your system flake inputs, then import its module:
 
 ```nix
 {
@@ -71,7 +71,7 @@ Add Quadra to your system flake inputs, then import its module:
 ```
 
 The module enables `hardware.graphics.enable` and installs desktop entries
-and Roblox link handlers. To make Quadra your preferred link handler, add:
+and Roblox link handlers. To make Quinta your preferred link handler, add:
 
 ```nix
 xdg.mime.defaultApplications = {

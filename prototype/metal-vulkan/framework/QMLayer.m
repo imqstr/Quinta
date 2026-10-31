@@ -160,7 +160,7 @@ static void *make_surface(qm_layer_state *state, id window, int wayland, CGRect 
     if (wayland) {
         wayland_view_create create = (wayland_view_create)dlsym(QM_RTLD_DEFAULT, "quadra_wayland_metal_view");
         if (!create) {
-            qm_log("[Quadra Metal] this shim has no native Wayland Metal views");
+            qm_log("[Quinta Metal] this shim has no native Wayland Metal views");
             return 0;
         }
         void *display = 0, *surface = 0;
@@ -183,14 +183,14 @@ static void *make_surface(qm_layer_state *state, id window, int wayland, CGRect 
     }
     void *surface = qm->surface_new(qm_handle(qm_device), &target);
     if (!surface)
-        qm_log("[Quadra Metal] no presentation surface: %s", qm->last_error());
+        qm_log("[Quinta Metal] no presentation surface: %s", qm->last_error());
     return surface;
 }
 
 static QMDrawable *offscreen_drawable(id layer, qm_layer_state *state, unsigned width, unsigned height) {
     if (!state->warned_offscreen) {
         state->warned_offscreen = YES;
-        qm_log("[Quadra Metal] CAMetalLayer has no window yet: drawing offscreen");
+        qm_log("[Quinta Metal] CAMetalLayer has no window yet: drawing offscreen");
     }
     if (!state->offscreen || state->offscreen->info.width != width || state->offscreen->info.height != height ||
         state->offscreen->info.pixel_format != (state->pixel_format ? state->pixel_format : 80)) {
@@ -263,7 +263,7 @@ static id layer_next_drawable(id self, SEL _cmd) {
     config.visible = 1;
     if (memcmp(&config, &state->config, sizeof config)) {
         if (state->config.drawable_width != width || state->config.drawable_height != height)
-            qm_log("[Quadra Metal] drawable %ux%u at %d,%d (view %ux%u)", width, height, x, y, view_width, view_height);
+            qm_log("[Quinta Metal] drawable %ux%u at %d,%d (view %ux%u)", width, height, x, y, view_width, view_height);
         if (wayland && state->wayland_view) {
             wayland_view_frame move = (wayland_view_frame)dlsym(QM_RTLD_DEFAULT, "quadra_wayland_metal_view_frame");
             if (move)
@@ -402,7 +402,7 @@ void qm_install_layer(void) {
         return;
     base_layer_class = (Class)objc_getClass("CAMetalLayer");
     if (!base_layer_class) {
-        qm_log("[Quadra Metal] QuartzCore has no CAMetalLayer; nothing to present to");
+        qm_log("[Quinta Metal] QuartzCore has no CAMetalLayer; nothing to present to");
         return;
     }
     Class cls = objc_allocateClassPair(base_layer_class, "QMMetalLayer", 0);
@@ -458,5 +458,5 @@ void qm_install_layer(void) {
         original_set_layer = (void (*)(id, SEL, id))method_getImplementation(set_layer);
         method_setImplementation(set_layer, (void (*)(void))view_set_layer);
     }
-    qm_log("[Quadra Metal] CAMetalLayer now presents through Vulkan");
+    qm_log("[Quinta Metal] CAMetalLayer now presents through Vulkan");
 }

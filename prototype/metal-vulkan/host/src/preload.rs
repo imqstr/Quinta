@@ -271,7 +271,7 @@ pub fn record_render(desc: &QmRenderPipelineDesc) {
         recorder.recipe(render_recipe(desc)?)
     })();
     if let Err(error) = result {
-        crate::util::log_once(&format!("[Quadra Metal] {error}"));
+        crate::util::log_once(&format!("[Quinta Metal] {error}"));
     }
 }
 
@@ -283,7 +283,7 @@ pub fn record_compute(function: &Function) {
         .source(function)
         .and_then(|function| recorder.recipe(Recipe::Compute { function }))
     {
-        crate::util::log_once(&format!("[Quadra Metal] {error}"));
+        crate::util::log_once(&format!("[Quinta Metal] {error}"));
     }
 }
 
@@ -367,13 +367,13 @@ pub fn warm_live(device: &Device, graphics_budget: u64, tuning: &Tuning) -> Warm
     match run_inner(device, None, std::ptr::null_mut(), maximum as u32, true) {
         Ok((count, states)) => {
             crate::util::log_once(&format!(
-                "[Quadra Metal] retained {count} preloaded pipeline states for the game device (memory-based limit {maximum})"
+                "[Quinta Metal] retained {count} preloaded pipeline states for the game device (memory-based limit {maximum})"
             ));
             states
         }
         Err(error) => {
             crate::util::log_once(&format!(
-                "[Quadra Metal] in-process shader preloading unavailable: {error}"
+                "[Quinta Metal] in-process shader preloading unavailable: {error}"
             ));
             WarmStates::default()
         }

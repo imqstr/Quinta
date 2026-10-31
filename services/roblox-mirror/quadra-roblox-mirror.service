@@ -1,5 +1,5 @@
 [Unit]
-Description=Quadra public Roblox deployment mirror
+Description=Quinta public Roblox deployment mirror
 After=network-online.target
 Wants=network-online.target
 

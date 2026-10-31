@@ -1,4 +1,4 @@
-//! The user's Quadra M2VK settings, as the launcher passes them in the environment.
+//! The user's Quinta M2VK settings, as the launcher passes them in the environment.
 //!
 //! Every value has a safe default for an unset, empty or unrecognized variable: a typo in a
 //! setting never changes how a game runs.
@@ -104,9 +104,9 @@ impl Tuning {
             changed.push(format!("up to {} warm states", self.warm_states));
         }
         if changed.is_empty() {
-            "[Quadra Metal] settings: defaults".to_owned()
+            "[Quinta Metal] settings: defaults".to_owned()
         } else {
-            format!("[Quadra Metal] settings: {}", changed.join(", "))
+            format!("[Quinta Metal] settings: {}", changed.join(", "))
         }
     }
 }
@@ -127,7 +127,7 @@ mod tests {
     #[test]
     fn an_empty_environment_is_the_defaults() {
         assert_eq!(tuning(&[]), Tuning::default());
-        assert_eq!(tuning(&[]).describe(), "[Quadra Metal] settings: defaults");
+        assert_eq!(tuning(&[]).describe(), "[Quinta Metal] settings: defaults");
         assert_eq!(tuning(&[]).policy(), DevicePolicy::default());
     }
 
@@ -145,7 +145,7 @@ mod tests {
         assert_eq!(set.warm_states, 512);
         assert_eq!(
             set.describe(),
-            "[Quadra Metal] settings: accuracy exact, memory priority off, 4 compile threads, up to 512 warm states"
+            "[Quinta Metal] settings: accuracy exact, memory priority off, 4 compile threads, up to 512 warm states"
         );
         let typos = tuning(&[
             ("MACOBLOX_METAL_ACCURACY", "excat"),

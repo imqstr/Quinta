@@ -341,8 +341,8 @@ static void closeHostedView(id self, SEL selector) {
         initializeBridge();
         id timer = [NSTimer timerWithTimeInterval:0.02 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
         [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
-        write(2, "[Quadra Web] Embedded pages open in the launcher's browser window\n",
-              sizeof("[Quadra Web] Embedded pages open in the launcher's browser window\n") - 1);
+        write(2, "[Quinta Web] Embedded pages open in the launcher's browser window\n",
+              sizeof("[Quinta Web] Embedded pages open in the launcher's browser window\n") - 1);
     });
 }
 + (void)tick:(id)timer {
@@ -604,7 +604,7 @@ static BOOL validUserAgent(NSString *agent) {
 static void enqueueRequest(long number, NSMutableDictionary *message, void (^completion)(id, NSError *)) {
     initializeBridge();
     if (completion && [callbacks count] >= WEB_PENDING_LIMIT) {
-        completion(nil, [NSError errorWithDomain:@"QuadraWeb" code:1
+        completion(nil, [NSError errorWithDomain:@"QuintaWeb" code:1
             userInfo:@{NSLocalizedDescriptionKey: @"Too many pending browser requests."}]);
         return;
     }
@@ -628,7 +628,7 @@ static long request(NSMutableDictionary *message, void (^completion)(id, NSError
                 if (generation == __atomic_load_n(&bridgeGeneration, __ATOMIC_RELAXED))
                     enqueueRequest(number, message, completion);
                 else if (completion)
-                    completion(nil, [NSError errorWithDomain:@"QuadraWeb" code:1
+                    completion(nil, [NSError errorWithDomain:@"QuintaWeb" code:1
                         userInfo:@{NSLocalizedDescriptionKey: @"The embedded browser disconnected."}]);
             });
         }
@@ -883,7 +883,7 @@ static id webViewAllocWithZone(id cls, SEL selector, void *zone) {
             id currentDelegate = [self navigationDelegate];
             if ([currentDelegate respondsToSelector:@selector(webView:didFailProvisionalNavigation:withError:)])
                 [currentDelegate webView:self didFailProvisionalNavigation:navigation
-                    withError:[NSError errorWithDomain:@"QuadraWeb" code:1
+                    withError:[NSError errorWithDomain:@"QuintaWeb" code:1
                         userInfo:@{NSLocalizedDescriptionKey: @"The embedded page could not be sent to the browser."}]];
         });
     }
@@ -954,8 +954,8 @@ static void receiveMessage(NSDictionary *message) {
         if (deliverClientURL(message[@"url"]))
             sendMessage(@{@"op": @"return-to-game"});
         else
-            write(2, "[Quadra Web] A launch link from the page could not be delivered\n",
-                  sizeof("[Quadra Web] A launch link from the page could not be delivered\n") - 1);
+            write(2, "[Quinta Web] A launch link from the page could not be delivered\n",
+                  sizeof("[Quinta Web] A launch link from the page could not be delivered\n") - 1);
         return;
     }
     if ([type isEqual:@"reply"]) {
@@ -967,7 +967,7 @@ static void receiveMessage(NSDictionary *message) {
         [callbacks removeObjectForKey:key];
         if (block) {
             NSError *error = message[@"error"]
-                ? [NSError errorWithDomain:@"QuadraWeb" code:1 userInfo:@{NSLocalizedDescriptionKey: message[@"error"]}]
+                ? [NSError errorWithDomain:@"QuintaWeb" code:1 userInfo:@{NSLocalizedDescriptionKey: message[@"error"]}]
                 : nil;
             @try {
                 block(message[@"value"], error);
@@ -1031,7 +1031,7 @@ static void receiveMessage(NSDictionary *message) {
         view->_loading = NO;
         if ([delegate respondsToSelector:@selector(webView:didFailProvisionalNavigation:withError:)])
             [delegate webView:view didFailProvisionalNavigation:view->_navigation
-                withError:[NSError errorWithDomain:@"QuadraWeb" code:1
+                withError:[NSError errorWithDomain:@"QuintaWeb" code:1
                                           userInfo:@{NSLocalizedDescriptionKey: message[@"message"] ?: @"The page could not be loaded."}]];
     }
 }

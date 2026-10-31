@@ -18,9 +18,9 @@ The archive and extracted app are local artifacts, excluded from git.
    implements this using Darling's existing `CGGetOnlineDisplayList`.
 5. Studio then creates two `NSWindow` objects and receives SIGSEGV before
    an editor or login UI becomes usable. Reproduced with both the installed
-   Quadra shim and the freshly built Quinta shim, using the X11 backend.
+   Quinta shim and the freshly built Quinta shim, using the X11 backend.
 
-The runtime tested was Quadra's pinned CiderDarling revision
+The runtime tested was Quinta's pinned CiderDarling revision
 `b0fcb0700dc1322cf8a840e69ccd469fecd0f0e7`. No conclusion about the exact
 crashing Qt/AppKit method has been established. Diagnostic register logs and
 core files remain local; they are not published with the source.

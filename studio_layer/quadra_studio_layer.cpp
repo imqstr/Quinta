@@ -1,6 +1,6 @@
 /*
- * Quadra's copy of Vinegar's Vulkan layer (https://github.com/vinegarhq/vinegar, layer/vinegar_layer.cpp).
- * Changes: the layer and its entry points are named for Quadra (VK_LAYER_QUADRA_studio,
+ * Quinta's copy of Vinegar's Vulkan layer (https://github.com/vinegarhq/vinegar, layer/vinegar_layer.cpp).
+ * Changes: the layer and its entry points are named for Quinta (VK_LAYER_QUADRA_studio,
  * QuadraStudioLayer_*), nothing else. See studio_layer/README.md.
  */
 
@@ -221,7 +221,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL QuadraStudioLayer_EnumerateInstanceLayerProp
     if(pProperties)
     {
         strcpy(pProperties->layerName, "VK_LAYER_QUADRA_studio");
-        strcpy(pProperties->description, "Quadra Studio layer");
+        strcpy(pProperties->description, "Quinta Studio layer");
         pProperties->implementationVersion = 1;
         pProperties->specVersion = VK_API_VERSION_1_0;
     }

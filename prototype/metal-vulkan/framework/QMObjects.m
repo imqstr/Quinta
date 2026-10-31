@@ -259,7 +259,7 @@ static int builtin_kind(const char *name) {
         memset(&info, 0, sizeof info);
         qm->device_info(handle, &info);
         described = YES;
-        qm_log("[Quadra Metal] device %s (vendor %04x device %04x), unified memory %d", info.name, info.vendor_id,
+        qm_log("[Quinta Metal] device %s (vendor %04x device %04x), unified memory %d", info.name, info.vendor_id,
                info.device_id, info.has_unified_memory);
     }
     return &info;
@@ -322,14 +322,14 @@ static int builtin_kind(const char *name) {
 - (BOOL)supportsFamily:(NSInteger)family {
     BOOL answer = qm->device_supports_family(handle, family);
     char text[96];
-    snprintf(text, sizeof text, "[Quadra Metal] supportsFamily %ld -> %d", (long)family, answer);
+    snprintf(text, sizeof text, "[Quinta Metal] supportsFamily %ld -> %d", (long)family, answer);
     log_once(text);
     return answer;
 }
 - (BOOL)supportsFeatureSet:(NSUInteger)set {
     BOOL answer = set >= 10000 && set <= 10005; /* macOS_GPUFamily1_v1 ... GPUFamily2_v1 */
     char text[96];
-    snprintf(text, sizeof text, "[Quadra Metal] supportsFeatureSet %lu -> %d", (unsigned long)set, answer);
+    snprintf(text, sizeof text, "[Quinta Metal] supportsFeatureSet %lu -> %d", (unsigned long)set, answer);
     log_once(text);
     return answer;
 }
@@ -424,7 +424,7 @@ static int builtin_kind(const char *name) {
     if (strstr(text, "blitTexture3D_RGBA8") && strstr(text, "blitTexture2D_R8")) {
         QMLibrary *library = [QMLibrary new];
         library->builtins = YES;
-        qm_log("[Quadra Metal] builtins.shaders: its upload kernels run as blits");
+        qm_log("[Quinta Metal] builtins.shaders: its upload kernels run as blits");
         return library;
     }
     if (error) {
@@ -432,7 +432,7 @@ static int builtin_kind(const char *name) {
             "Metal source cannot be compiled on Linux"] forKey:NSLocalizedDescriptionKey];
         *error = [NSError errorWithDomain:[NSString stringWithUTF8String:"MTLLibraryErrorDomain"] code:3 userInfo:details];
     }
-    log_once("[Quadra Metal] newLibraryWithSource: Metal source cannot be compiled on Linux");
+    log_once("[Quinta Metal] newLibraryWithSource: Metal source cannot be compiled on Linux");
     return nil;
 }
 - (id)newDefaultLibrary { return nil; }
@@ -582,7 +582,7 @@ static void *queue_worker(void *argument);
         if (!pthread_create(&thread, 0, queue_worker, self))
             pthread_detach(thread);
         else {
-            qm_log("[Quadra Metal] command queue thread creation failed; draining on the committing thread");
+            qm_log("[Quinta Metal] command queue thread creation failed; draining on the committing thread");
             fallback = YES;
         }
     }
@@ -846,13 +846,13 @@ static void append_block(QMCommandBufferHandler **list, unsigned *count, QMComma
 }
 - (void)setVertexBuffers:(const id *)values offsets:(const NSUInteger *)offsets withRange:(NSRange)range {
     void *handles[31];
-    if (range.length > 31 || range.location > 31 - range.length) { qm_log("[Quadra Metal] invalid buffer range"); return; }
+    if (range.length > 31 || range.location > 31 - range.length) { qm_log("[Quinta Metal] invalid buffer range"); return; }
     for (NSUInteger i = 0; i < range.length; i++) handles[i] = qm_handle(values[i]);
     qm->render_set_buffers(handle, QM_STAGE_VERTEX, handles, (const uint64_t *)offsets, (uint32_t)range.location, (uint32_t)range.length);
 }
 - (void)setFragmentBuffers:(const id *)values offsets:(const NSUInteger *)offsets withRange:(NSRange)range {
     void *handles[31];
-    if (range.length > 31 || range.location > 31 - range.length) { qm_log("[Quadra Metal] invalid buffer range"); return; }
+    if (range.length > 31 || range.location > 31 - range.length) { qm_log("[Quinta Metal] invalid buffer range"); return; }
     for (NSUInteger i = 0; i < range.length; i++) handles[i] = qm_handle(values[i]);
     qm->render_set_buffers(handle, QM_STAGE_FRAGMENT, handles, (const uint64_t *)offsets, (uint32_t)range.location, (uint32_t)range.length);
 }
@@ -876,13 +876,13 @@ static void append_block(QMCommandBufferHandler **list, unsigned *count, QMComma
 }
 - (void)setVertexTextures:(const id *)textures withRange:(NSRange)range {
     void *handles[128];
-    if (range.length > 128 || range.location > 128 - range.length) { qm_log("[Quadra Metal] invalid textures range"); return; }
+    if (range.length > 128 || range.location > 128 - range.length) { qm_log("[Quinta Metal] invalid textures range"); return; }
     for (NSUInteger i = 0; i < range.length; i++) handles[i] = qm_handle(textures[i]);
     qm->render_set_textures(handle, QM_STAGE_VERTEX, handles, (uint32_t)range.location, (uint32_t)range.length);
 }
 - (void)setFragmentTextures:(const id *)textures withRange:(NSRange)range {
     void *handles[128];
-    if (range.length > 128 || range.location > 128 - range.length) { qm_log("[Quadra Metal] invalid textures range"); return; }
+    if (range.length > 128 || range.location > 128 - range.length) { qm_log("[Quinta Metal] invalid textures range"); return; }
     for (NSUInteger i = 0; i < range.length; i++) handles[i] = qm_handle(textures[i]);
     qm->render_set_textures(handle, QM_STAGE_FRAGMENT, handles, (uint32_t)range.location, (uint32_t)range.length);
 }
@@ -894,13 +894,13 @@ static void append_block(QMCommandBufferHandler **list, unsigned *count, QMComma
 }
 - (void)setVertexSamplerStates:(const id *)samplers withRange:(NSRange)range {
     void *handles[16];
-    if (range.length > 16 || range.location > 16 - range.length) { qm_log("[Quadra Metal] invalid sampler range"); return; }
+    if (range.length > 16 || range.location > 16 - range.length) { qm_log("[Quinta Metal] invalid sampler range"); return; }
     for (NSUInteger i = 0; i < range.length; i++) handles[i] = qm_handle(samplers[i]);
     qm->render_set_samplers(handle, QM_STAGE_VERTEX, handles, (uint32_t)range.location, (uint32_t)range.length);
 }
 - (void)setFragmentSamplerStates:(const id *)samplers withRange:(NSRange)range {
     void *handles[16];
-    if (range.length > 16 || range.location > 16 - range.length) { qm_log("[Quadra Metal] invalid sampler range"); return; }
+    if (range.length > 16 || range.location > 16 - range.length) { qm_log("[Quinta Metal] invalid sampler range"); return; }
     for (NSUInteger i = 0; i < range.length; i++) handles[i] = qm_handle(samplers[i]);
     qm->render_set_samplers(handle, QM_STAGE_FRAGMENT, handles, (uint32_t)range.location, (uint32_t)range.length);
 }
@@ -1141,14 +1141,14 @@ static void append_block(QMCommandBufferHandler **list, unsigned *count, QMComma
     if (index >= COMPUTE_SLOTS)
         return;
     if (length > 4096 || (length && !value)) {
-        qm_log("[Quadra Metal] invalid inline byte span");
+        qm_log("[Quinta Metal] invalid inline byte span");
         return;
     }
     if (byte_capacities[index] < (length ? length : 1)) {
         NSUInteger capacity = 16;
         while (capacity < length) capacity *= 2;
         void *grown = realloc(bytes[index], capacity);
-        if (!grown) { qm_log("[Quadra Metal] inline byte allocation failed"); return; }
+        if (!grown) { qm_log("[Quinta Metal] inline byte allocation failed"); return; }
         bytes[index] = grown;
         byte_capacities[index] = capacity;
     }
@@ -1187,7 +1187,7 @@ static void append_block(QMCommandBufferHandler **list, unsigned *count, QMComma
         [self setSamplerState:values[index] atIndex:range.location + index];
 }
 - (void)setThreadgroupMemoryLength:(NSUInteger)length atIndex:(NSUInteger)index {
-    if (index >= 31) { qm_log("[Quadra Metal] invalid threadgroup memory index"); return; }
+    if (index >= 31) { qm_log("[Quinta Metal] invalid threadgroup memory index"); return; }
     threadgroup_lengths[index] = length;
     threadgroup_set |= 1u << index;
     if (handle) qm->compute_set_threadgroup_memory(handle, length, (uint32_t)index);
@@ -1217,14 +1217,14 @@ static void append_block(QMCommandBufferHandler **list, unsigned *count, QMComma
         params = (const uint32_t *)((char *)((QMBuffer *)buffers[0])->contents + offsets[0]);
     QMTexture *texture = textures[0];
     if (!params || !buffers[1] || ![texture isKindOfClass:[QMTexture class]]) {
-        log_once("[Quadra Metal] builtin upload without its parameters, input or texture");
+        log_once("[Quinta Metal] builtin upload without its parameters, input or texture");
         return;
     }
     NSUInteger element = kind == BUILTIN_3D_RGBA8 ? 4 : kind == BUILTIN_3D_RG8 ? 2 : 1;
     NSUInteger expected = kind == BUILTIN_3D_RGBA8 ? 70 : kind == BUILTIN_3D_RG8 ? 30 : 10;
     if (texture->info.pixel_format != expected) {
         char text[160];
-        snprintf(text, sizeof text, "[Quadra Metal] builtin upload %d into pixel format %llu: copied as raw bytes", kind,
+        snprintf(text, sizeof text, "[Quinta Metal] builtin upload %d into pixel format %llu: copied as raw bytes", kind,
                  (unsigned long long)texture->info.pixel_format);
         log_once(text);
     }

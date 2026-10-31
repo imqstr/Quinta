@@ -38,7 +38,7 @@ class PresenceTests(unittest.TestCase):
         self.presence.feed(DOCUMENT % '-1')
         self.assertEqual(self.shown()['details'], 'Idling')
         self.assertEqual(self.shown()['large_image'], discord.LOGO)
-        self.assertEqual(self.shown()['large_text'], 'Quadra Studio')
+        self.assertEqual(self.shown()['large_text'], 'Quinta Studio')
 
     def test_an_open_place_shows_its_name_and_icon_from_the_moment_it_was_opened(self):
         self.presence.feed(DOCUMENT % '-1')

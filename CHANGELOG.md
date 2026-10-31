@@ -6,7 +6,7 @@
 ## 0.37.p4 — 2026-10-26
 
 - Fix VR controllers never vibrating. Roblox only passes vibration to the controllers while the headset reports a
-  focused session that has controllers able to vibrate, and Quadra reported neither. `VRService.VRSessionState` now
+  focused session that has controllers able to vibrate, and Quinta reported neither. `VRService.VRSessionState` now
   follows the headset too (Idle, Visible, Focused, Stopping) instead of staying Idle.
 - Nothing else changes from 0.37.p3.
 
@@ -23,10 +23,10 @@
 ## 0.37.p2 — 2026-10-25
 
 - Fix text that vanished in the Grid look (and in Monochrome). A long subtitle could squeeze the chosen value of a
-  dropdown down to an ellipsis: Settings -> Quadra M2VK -> Accuracy showed "…" instead of "Fast". Every dropdown now
+  dropdown down to an ellipsis: Settings -> Quinta M2VK -> Accuracy showed "…" instead of "Fast". Every dropdown now
   keeps its value whole.
 - Dim disabled buttons and switches once, not twice. Newer libadwaita (1.10 checked) already fades them with a filter,
-  and the theme faded them by opacity as well, which left them at about a fifth of their strength. "Apply and restart Quadra"
+  and the theme faded them by opacity as well, which left them at about a fifth of their strength. "Apply and restart Quinta"
   was nearly unreadable while it was disabled. A disabled main button now has a readable style of its own.
 - Nothing else changes from 0.37.p1.
 
@@ -64,11 +64,11 @@
   - Fetch Studio's packages from Roblox's alternate hosts when `setup.rbxcdn.com` refuses or fails.
   - Start Studio through a `quadrahq --studio` process that stays until Studio closes (GameMode, presence and the
     backup need one); a second start, such as the browser handing over a sign-in, only launches.
-- Show Quadra's current logo in Discord presence: the application's own `ciderhq` image is still the old apple, so the
+- Show Quinta's current logo in Discord presence: the application's own `ciderhq` image is still the old apple, so the
   logo is now served from quadrahq.org.
-- Finish the MacOBlox/Cider to Quadra rename inside the code: the launcher's Python package is `quadra`, the shim is
+- Finish the MacOBlox/Cider to Quinta rename inside the code: the launcher's Python package is `quadra`, the shim is
   `libQuadraShims.dylib` (native Wayland helper `libquadra-wayland.so`), and the settings variables are `QUADRA_*`.
-  `MACOBLOX_*` variables set by hand are still read as `QUADRA_*`. `MACOBLOX_METAL*` (read by Quadra M2VK) and the
+  `MACOBLOX_*` variables set by hand are still read as `QUADRA_*`. `MACOBLOX_METAL*` (read by Quinta M2VK) and the
   `CIDER_*` names and CiderDarling identifiers that the Darling runtime reads keep their names until those projects
   are renamed.
 - Move to the `QuadraHQ/Quadra` repository. The installer and the updater move an existing checkout's `origin` from
@@ -93,11 +93,11 @@
   (setting `kevent_poll_ms`, default 100, 0 turns it off). The game ran at full speed 2 s after a leave in 3 of 3 trials
   instead of 18 s in 9 of 9. Only threads with that name are affected. It is a workaround for Darling's kqueue
   emulation: what those loops were not woken for is still not identified.
-- Update Quadra M2VK: the pinned runtime enables `VK_EXT_memory_priority` and pageable device-local memory by default
+- Update Quinta M2VK: the pinned runtime enables `VK_EXT_memory_priority` and pageable device-local memory by default
   (an 8 GiB card made 9,216 MiB of device buffers where it failed at 7,168 MiB before), and the performance trace
   splits live memory into device-local and host.
-- Add a Quadra M2VK settings tab (accuracy, present mode, memory priority, compile threads, warm states, VRAM limit and
-  fallback). Before launch the GPU path is proven with a self-test, and Quadra falls back to OpenGL once when the GPU
+- Add a Quinta M2VK settings tab (accuracy, present mode, memory priority, compile threads, warm states, VRAM limit and
+  fallback). Before launch the GPU path is proven with a self-test, and Quinta falls back to OpenGL once when the GPU
   cannot run Metal, with a clearer message when no driver is found.
 - Log the GPU and driver identity and the runtime's account of an unmeasured driver, say why a drawable acquisition
   timed out and wait only 100 ms for an image when nothing of ours can free one, and name large or slow buffer
@@ -105,7 +105,7 @@
 - Prefer the libLLVM a process already maps and find Debian's `libLLVM.so.1` by its directory, so the legacy shader
   upgrade works with LLVM 18, 19 and 23.
 - Add the GPU and driver, the session type, desktop, Xwayland version, window backend, raw mouse setting and the
-  `[Quadra Input]` lines to `quadrahq --hardware-report`.
+  `[Quinta Input]` lines to `quadrahq --hardware-report`.
 - Add `quadrahq --watch-stalls`, which records the game's per-thread CPU use, stacks of busy threads, what blocked
   threads wait on (futex words, timeouts, sockets, pipes, timers) and reports them against the launch log's join and
   leave markers. The game must be started with the freeze diagnostics setting on. It never stops the game's threads
@@ -152,7 +152,7 @@
   GNOME interface, and aubree.lat's dark monochrome style. Keep running
   sessions, logs and open settings intact when switching.
 - Retry Roblox deployment 403s on alternate official metadata and archive
-  origins before the Quadra mirror. Cold mirror downloads use those archive
+  origins before the Quinta mirror. Cold mirror downloads use those archive
   alternatives too, retaining channel/version validation and atomic installs
   (#36).
 - Keep Shift Lock's requested cursor position in event order on native
@@ -164,7 +164,7 @@
 
 ## 0.34 — 2026-10-22
 
-- Integrate the pinned Quadra M2VK performance and stability fork, including
+- Integrate the pinned Quinta M2VK performance and stability fork, including
   native Wayland presentation, pipeline retention and resource lifetime fixes.
 - Prepare learned pipelines, installed shader libraries and bounded local
   resources before playing, with progress and Skip and play controls. Add
@@ -190,7 +190,7 @@
 
 ## 0.31 — 2026-10-19
 
-- Retry public Roblox version and macOS client downloads through Quadra's
+- Retry public Roblox version and macOS client downloads through Quinta's
   self-hosted cache when the original endpoint returns HTTP 403 (#36). Keep
   account traffic on Roblox and reject incomplete client downloads.
 - Preserve right-drag camera motion when left-click is pressed during mouse
@@ -199,14 +199,14 @@
   transition. The intermittent 60-to-15 FPS issue (#34) still needs a trace
   captured during a drop; this diagnostic does not change game pacing.
 
-- Rebrand Cider / CiderHQ to **Quadra / QuadraHQ** at **quadrahq.org**, keeping
+- Rebrand Cider / CiderHQ to **Quinta / Quinta** at **quadrahq.org**, keeping
   the existing logo. The command is `quadrahq` and the app ID is
   `org.quadrahq.Quadra`.
 - Migrate Cider and MacOBlox settings, cache, source installs and Darling
-  session files without replacing existing Quadra data. Keep CiderDarling's
+  session files without replacing existing Quinta data. Keep CiderDarling's
   runtime identifiers and the current GitHub repositories compatible.
 - Release native packages under `quadrahq` and update Flatpak packaging. The
-  legacy Cider 0.30 AUR recipe remains pinned; the Quadra release source and
+  legacy Cider 0.30 AUR recipe remains pinned; the Quinta release source and
   stable AUR recipe are published with checksums.
 
 ## 0.30 — 2026-10-17

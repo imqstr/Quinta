@@ -1,4 +1,4 @@
-"""Optional UI regression for the Quadra M2VK settings group.
+"""Optional UI regression for the Quinta M2VK settings group.
 
 GDK_BACKEND=x11 GSK_RENDERER=cairo xvfb-run -a -s "-screen 0 1280x900x24" python3 tests/m2vk_settings_ui.py
 
@@ -44,13 +44,13 @@ with patch.object(core, "load_settings", return_value=dict(core.DEFAULT_SETTINGS
     group = page.m2vk_group
     # Its own tab, holding the renderer choice and the settings.
     tab = page.stack.get_page(page.m2vk_page)
-    assert tab.get_name() == "m2vk" and tab.get_title() == "Quadra M2VK"
+    assert tab.get_name() == "m2vk" and tab.get_title() == "Quinta M2VK"
     assert [p.get_name() for p in page.stack.get_pages()][:2] == ["env", "m2vk"]
     assert group.get_parent() is not None
     tab_renderer = [w for w in walk(page.m2vk_page) if isinstance(w, Adw.ComboRow) and w.get_title() == "Renderer"]
     assert len(tab_renderer) == 1
     assert group not in list(walk(page.env_page)), "the settings are no longer on the Environment tab"
-    # Only meaningful for Quadra M2VK.
+    # Only meaningful for Quinta M2VK.
     assert window.settings["renderer"] == "opengl" and not group.get_sensitive()
     with patch.object(core, "PREBUILT_SHIM", None), \
             patch.object(graphics, "missing_metal_dependencies", return_value=[]):
@@ -89,7 +89,7 @@ with patch.object(core, "load_settings", return_value=dict(core.DEFAULT_SETTINGS
 
     # Reset puts every row and every stored value back.
     reset = [w for w in walk(page) if isinstance(w, (Adw.ActionRow, getattr(Adw, "ButtonRow", Adw.ActionRow)))
-             and w.get_title() == "Reset Quadra M2VK settings"][0]
+             and w.get_title() == "Reset Quinta M2VK settings"][0]
     reset.emit("activated")
     assert accuracy.get_selected() == 0 and present.get_selected() == 0 and priority.get_active()
     assert (memory.get_value(), threads.get_value(), warm.get_value()) == (0, 0, 256)
@@ -124,4 +124,4 @@ with patch.object(core, "load_settings", return_value=dict(core.DEFAULT_SETTINGS
         assert labels and not any(label.get_layout().is_ellipsized() for label in labels), (value, labels)
     window.destroy()
 
-print("PASS: Quadra M2VK settings group: availability, saving, environment and reset")
+print("PASS: Quinta M2VK settings group: availability, saving, environment and reset")

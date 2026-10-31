@@ -189,7 +189,7 @@ def installed_version():
 
 
 def _open(url, timeout=30):
-    return urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Quadra"}),
+    return urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Quinta"}),
                                   timeout=timeout)
 
 
@@ -204,7 +204,7 @@ def wine_releases():
     """Kombucha's release tags, newest first, for the choice in Settings. The
     "unstable" ones are Wine's latest commit: they may break Studio."""
     request = urllib.request.Request("https://api.github.com/repos/vinegarhq/kombucha/releases?per_page=30",
-                                     headers={"User-Agent": "Quadra", "Accept": "application/vnd.github+json"})
+                                     headers={"User-Agent": "Quinta", "Accept": "application/vnd.github+json"})
     with urllib.request.urlopen(request, timeout=15) as response:
         releases = json.load(response)
     return [release["tag_name"] for release in releases
@@ -300,7 +300,7 @@ def _vulkan_layer_environment():
     manifest = directory / "VkLayer_QUADRA_studio.json"
     text = json.dumps({"file_format_version": "1.0.0", "layer": {
         "name": "VK_LAYER_QUADRA_studio", "type": "GLOBAL", "library_path": str(library),
-        "api_version": "1.0.0", "implementation_version": "1", "description": "Quadra Studio layer",
+        "api_version": "1.0.0", "implementation_version": "1", "description": "Quinta Studio layer",
         "functions": {"vkGetInstanceProcAddr": "QuadraStudioLayer_GetInstanceProcAddr",
                       "vkGetDeviceProcAddr": "QuadraStudioLayer_GetDeviceProcAddr"}}}, indent=2)
     if not manifest.exists() or manifest.read_text() != text:

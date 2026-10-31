@@ -88,7 +88,7 @@ pub fn describe(identity: &Identity) -> String {
         identity.defects.join(",")
     };
     format!(
-        "[Quadra Metal] gpu: {} | vendor {:#06x} device {:#06x} {} | driver {} {} (id {}, version {:#x}) | Vulkan {} | measured {} | driver workarounds {} | heaps {} | extensions {}",
+        "[Quinta Metal] gpu: {} | vendor {:#06x} device {:#06x} {} | driver {} {} (id {}, version {:#x}) | Vulkan {} | measured {} | driver workarounds {} | heaps {} | extensions {}",
         identity.name,
         identity.vendor_id,
         identity.device_id,
@@ -206,7 +206,7 @@ pub fn log(device: &Device) {
     log_once(&describe(&identity));
     if !identity.measured {
         log_once(
-            "[Quadra Metal] this GPU and driver release are not among the combinations the runtime has measured; it takes exact paths and assumes the driver's known defects. Include the gpu line above when reporting a problem.",
+            "[Quinta Metal] this GPU and driver release are not among the combinations the runtime has measured; it takes exact paths and assumes the driver's known defects. Include the gpu line above when reporting a problem.",
         );
     }
 }

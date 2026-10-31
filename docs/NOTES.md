@@ -1,4 +1,4 @@
-# Quadra
+# Quinta
 
 Roblox Client for macOS (x86_64) on Linux via Darling. As of
 2026-09-23: The main menu, login (Quick Login), avatar, and games are working.
@@ -51,7 +51,7 @@ Delete files from within the shell (`darling shell rm ...`) or while the server 
 From a regular Linux terminal:
 
 ```bash
-cd Quadra
+cd Quinta
 ./run_debug.sh
 ```
 

@@ -1,4 +1,4 @@
-# Quadra website and report hosting
+# Quinta website and report hosting
 
 The website runs on korona behind Caddy. Public website files live in this
 repository under `website/dist/`. Private report-service code and configuration
@@ -16,7 +16,7 @@ the repository and branch before accepting it. The secret is stored only in
 `quadra-site-sync.path` starts `quadra-site-sync.service` after a valid push.
 `quadra-site-sync.timer` also checks every minute so missed deliveries recover.
 The sync service fetches the trusted main branch from
-`https://github.com/QuadraHQ/Quadra.git` (the repository was `CiderHQ-org/Cider`
+`https://github.com/imqstr/Quinta.git` (the repository was `CiderHQ-org/Cider`
 before the organization move; the webhook payload names the repository, so the
 receiver accepts only the current name), prepares static files in a
 new release directory, and atomically switches `/var/www/quadrahq/current`.

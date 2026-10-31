@@ -96,7 +96,7 @@ static int quadra_IOServiceAddMatchingNotification(
         CFRelease(matching);
     if (iterator)
         *iterator = 0;
-    write_str("[Quadra] IOKit HID notification registered with empty iterator\n");
+    write_str("[Quinta] IOKit HID notification registered with empty iterator\n");
     return 0;
 }
 DYLD_INTERPOSE(quadra_IOServiceAddMatchingNotification,
@@ -162,7 +162,7 @@ static void quadra_apply_ui_color_test(char* source,
         if (index == length) {
             for (index = 0; index < length; index++)
                 source[position + index] = replacement[index];
-            write_str("[Quadra GL] Forced UI fragment shader color\n");
+            write_str("[Quinta GL] Forced UI fragment shader color\n");
             return;
         }
     }
@@ -236,7 +236,7 @@ static void quadra_glShaderSource(unsigned int shader, int count,
                         free(copy);
                         copy = forced;
                         total = forced_length;
-                        write_str("[Quadra GL] Forced UI vertex coverage\n");
+                        write_str("[Quinta GL] Forced UI vertex coverage\n");
                     }
                 }
                 fixed_string = copy;
@@ -290,7 +290,7 @@ static void quadra_glCompileShader(unsigned int shader) {
         if (output) {
             fwrite(source, 1, (unsigned long)length, output);
             fclose(output);
-            write_str("[Quadra GL] Captured first failed shader source\n");
+            write_str("[Quinta GL] Captured first failed shader source\n");
         }
     }
     free(source);
@@ -321,7 +321,7 @@ static int quadra_trace_cgl_should_log(volatile long* counter) {
 }
 
 static void quadra_trace_cgl_prefix(const char* name, volatile long* counter) {
-    write_str("[Quadra CGL] ");
+    write_str("[Quinta CGL] ");
     write_str(name);
     write_str(" #");
     print_num(*counter);
@@ -367,7 +367,7 @@ static int quadra_CGLCreateContext(void* format, void* share, void** result) {
     if (quadra_trace_cgl_enabled() && format) {
         // struct _CGLPixelFormatObj { GLuint retain_count; CGLPixelFormatAttribute* attributes; }
         int* attributes = ((int**)format)[1];
-        write_str("[Quadra CGL] pixel format:");
+        write_str("[Quinta CGL] pixel format:");
         for (int index = 0; attributes && index < 64 && attributes[index]; index++) {
             write_str(" ");
             print_num(attributes[index]);
@@ -546,7 +546,7 @@ static void quadra_dump_program_sources(unsigned int program, volatile int* once
     unsigned int shaders[4] = {0, 0, 0, 0};
     int shader_count = 0;
     attached_shaders(program, 4, &shader_count, shaders);
-    write_str(actual ? "[Quadra GL] actual program=" : "[Quadra GL] final program=");
+    write_str(actual ? "[Quinta GL] actual program=" : "[Quinta GL] final program=");
     print_num(program);
     write_str(" attached="); print_num(shader_count); write_str(" shaders=");
     for (int index = 0; index < shader_count && index < 4; index++) {
@@ -625,7 +625,7 @@ static void quadra_ensure_gl_window_surface(void) {
                                 context);
     long attempt = __sync_add_and_fetch(&quadra_gl_surface_repair_attempts, 1);
     if (attempt <= 5) {
-        write_str("[Quadra GL] draw-time EGL surface repair #");
+        write_str("[Quinta GL] draw-time EGL surface repair #");
         print_num(attempt);
         write_str(" result=");
         print_num(attached);
@@ -782,7 +782,7 @@ static void quadra_trace_window_draw(unsigned int mode, int count) {
         int blocks = 0;
         if (get_program)
             get_program((unsigned int)program, 0x8A36U, &blocks);
-        write_str("[Quadra GL] uniform-blocks program=");
+        write_str("[Quinta GL] uniform-blocks program=");
         print_num(program);
         write_str(" count=");
         print_num(blocks);
@@ -804,7 +804,7 @@ static void quadra_trace_window_draw(unsigned int mode, int count) {
             name[127] = 0;
             if (binding >= 0)
                 get_integer_indexed(0x8A28U, (unsigned int)binding, &buffer);
-            write_str("[Quadra GL] uniform-block #");
+            write_str("[Quinta GL] uniform-block #");
             print_num(block);
             write_str(" name=");
             write_str(name);
@@ -822,7 +822,7 @@ static void quadra_trace_window_draw(unsigned int mode, int count) {
         (unsigned char (*)(unsigned int))dlsym(RTLD_NEXT, "glIsEnabled");
     void* (*current_context)(void) =
         (void* (*)(void))dlsym(RTLD_NEXT, "eglGetCurrentContext");
-    write_str("[Quadra GL] window-draw #");
+    write_str("[Quinta GL] window-draw #");
     print_num(sequence);
     write_str(" mode=");
     print_hex(mode);
@@ -1213,7 +1213,7 @@ static long quadra_millis(void) {
 static void quadra_dns_trace(const char* node, const char* service,
                                const void* hints, int attempts, int status,
                                long waited_ms, long took_ms) {
-    write_str("[Quadra DNS] node=");
+    write_str("[Quinta DNS] node=");
     write_str(node ? node : "(null)");
     write_str(" service=");
     write_str(service ? service : "(null)");
@@ -1297,12 +1297,12 @@ void my_cxa_throw(void* thrown_exception, void* tinfo, void (*dest)(void*)) {
         if (real_throw) real_throw(thrown_exception, tinfo, dest);
         while (1);
     }
-    write_str("\n[Quadra Hook] ========================================\n");
-    write_str("[Quadra Hook] __cxa_throw called!\n");
+    write_str("\n[Quinta Hook] ========================================\n");
+    write_str("[Quinta Hook] __cxa_throw called!\n");
     if (tinfo) {
         const char* mangled = ((const char**)tinfo)[1];
         if (mangled) {
-            write_str("[Quadra Hook] Mangled type: ");
+            write_str("[Quinta Hook] Mangled type: ");
             write_str(mangled);
             write_str("\n");
             typedef char* (*demangle_fn)(const char*, char*, unsigned long*, int*);
@@ -1311,7 +1311,7 @@ void my_cxa_throw(void* thrown_exception, void* tinfo, void (*dest)(void*)) {
                 int status = 0;
                 char* demangled = demangle(mangled, 0, 0, &status);
                 if (demangled) {
-                    write_str("[Quadra Hook] Demangled type: ");
+                    write_str("[Quinta Hook] Demangled type: ");
                     write_str(demangled);
                     write_str("\n");
                 }
@@ -1320,9 +1320,9 @@ void my_cxa_throw(void* thrown_exception, void* tinfo, void (*dest)(void*)) {
     }
     // C++ can throw scalars and arbitrary classes, not just std::exception.
     // Never interpret an unknown exception object as a vtable or call through it.
-    write_str("[Quadra Hook] Backtrace:\n");
+    write_str("[Quinta Hook] Backtrace:\n");
     print_backtrace();
-    write_str("[Quadra Hook] ========================================\n\n");
+    write_str("[Quinta Hook] ========================================\n\n");
     if (real_throw)
         real_throw(thrown_exception, tinfo, dest);
     while (1);
@@ -1335,16 +1335,16 @@ void my_objc_exception_throw(id exception) {
         if (real_throw) real_throw(exception);
         while (1);
     }
-    write_str("\n[Quadra Hook] ========================================\n");
-    write_str("[Quadra Hook] objc_exception_throw called!\n");
+    write_str("\n[Quinta Hook] ========================================\n");
+    write_str("[Quinta Hook] objc_exception_throw called!\n");
     if (exception) {
-        write_str("[Quadra Hook] Exception class: ");
+        write_str("[Quinta Hook] Exception class: ");
         write_str(object_getClassName(exception));
         write_str("\n");
     }
-    write_str("[Quadra Hook] Backtrace:\n");
+    write_str("[Quinta Hook] Backtrace:\n");
     print_backtrace();
-    write_str("[Quadra Hook] ========================================\n\n");
+    write_str("[Quinta Hook] ========================================\n\n");
     if (real_throw)
         real_throw(exception);
     while (1);
@@ -1359,12 +1359,12 @@ void my_Unwind_Resume(void* exc) {
         if (real_fn) real_fn(exc);
         while (1);
     }
-    write_str("\n[Quadra Hook] ========================================\n");
-    write_str("[Quadra Hook] _Unwind_Resume called! exc: ");
+    write_str("\n[Quinta Hook] ========================================\n");
+    write_str("[Quinta Hook] _Unwind_Resume called! exc: ");
     print_hex((unsigned long long)exc);
     write_str("\nBacktrace:\n");
     print_backtrace();
-    write_str("[Quadra Hook] ========================================\n\n");
+    write_str("[Quinta Hook] ========================================\n\n");
     if (real_fn) real_fn(exc);
     while (1);
 }
@@ -1378,14 +1378,14 @@ void my_throw_system_error(int err, const char* msg) {
         if (real_fn) real_fn(err, msg);
         while (1);
     }
-    write_str("\n[Quadra Hook] ========================================\n");
-    write_str("[Quadra Hook] std::__throw_system_error called! err: ");
+    write_str("\n[Quinta Hook] ========================================\n");
+    write_str("[Quinta Hook] std::__throw_system_error called! err: ");
     print_num(err);
     write_str(", msg: ");
     write_str(msg ? msg : "(null)");
     write_str("\nBacktrace:\n");
     print_backtrace();
-    write_str("[Quadra Hook] ========================================\n\n");
+    write_str("[Quinta Hook] ========================================\n\n");
     if (real_fn) real_fn(err, msg);
     while (1);
 }
@@ -1398,10 +1398,10 @@ void my_cxa_rethrow(void) {
         if (real_fn) real_fn();
         while (1);
     }
-    write_str("\n[Quadra Hook] ========================================\n");
-    write_str("[Quadra Hook] __cxa_rethrow called!\nBacktrace:\n");
+    write_str("\n[Quinta Hook] ========================================\n");
+    write_str("[Quinta Hook] __cxa_rethrow called!\nBacktrace:\n");
     print_backtrace();
-    write_str("[Quadra Hook] ========================================\n\n");
+    write_str("[Quinta Hook] ========================================\n\n");
     if (real_fn) real_fn();
     while (1);
 }
@@ -1423,11 +1423,11 @@ static int quadra_has_protocol_string(int argc, const char *argv[]) {
 }
 
 static void quadra_log_startup_argv(int argc, const char *argv[]) {
-    write_str("[Quadra Argv] argc=");
+    write_str("[Quinta Argv] argc=");
     print_num(argc);
     write_str("\n");
     for (int index = 0; index < argc; index++) {
-        write_str("[Quadra Argv] argv[");
+        write_str("[Quinta Argv] argv[");
         print_num(index);
         write_str("]=");
         write_str(argv && argv[index] ? argv[index] : "(null)");
@@ -1435,22 +1435,22 @@ static void quadra_log_startup_argv(int argc, const char *argv[]) {
     }
     quadra_protocol_string_present = quadra_has_protocol_string(argc, argv);
     const char* pending = getenv("QUADRA_PENDING_URI");
-    write_str("[Quadra URL] Startup sources: -protocolString=");
+    write_str("[Quinta URL] Startup sources: -protocolString=");
     print_num(quadra_protocol_string_present != 0);
     write_str(" QUADRA_PENDING_URI=");
     print_num(pending && pending[0] ? 1 : 0);
     write_str("\n");
     if (quadra_protocol_string_present && pending && pending[0])
-        write_str("[Quadra URL] Both protocolString and pending URI are present; protocolString wins\n");
+        write_str("[Quinta URL] Both protocolString and pending URI are present; protocolString wins\n");
 }
 
 int my_NSApplicationMain(int argc, const char *argv[]) {
-    write_str("\n[Quadra Hook] NSApplicationMain entered!\n");
+    write_str("\n[Quinta Hook] NSApplicationMain entered!\n");
     quadra_log_startup_argv(argc, argv);
     if (quadra_protocol_string_present) {
-        write_str("[Quadra URL] Pending URI injection: disabled (native -protocolString present)\n");
+        write_str("[Quinta URL] Pending URI injection: disabled (native -protocolString present)\n");
     } else {
-        write_str("[Quadra URL] Pending URI injection: enabled (no -protocolString)\n");
+        write_str("[Quinta URL] Pending URI injection: enabled (no -protocolString)\n");
         // Capture the process-bound copy before the launcher can clear its
         // host-side pending file. The value remains opaque until it is turned
         // into the Cocoa URL object at delivery time.
@@ -1462,8 +1462,8 @@ int my_NSApplicationMain(int argc, const char *argv[]) {
     if (open_display && !quadra_wayland_enabled()) {
         void* test_dpy = open_display(0);
         if (!test_dpy) {
-            write_str("[Quadra] FATAL: Cannot connect to X11 display! XOpenDisplay returned NULL.\n");
-            write_str("[Quadra] Make sure an X server or Xwayland is running.\n");
+            write_str("[Quinta] FATAL: Cannot connect to X11 display! XOpenDisplay returned NULL.\n");
+            write_str("[Quinta] Make sure an X server or Xwayland is running.\n");
             extern void quadra_immediate_exit(int);
             quadra_immediate_exit(1);
         } else if (close_display) {
@@ -1472,9 +1472,9 @@ int my_NSApplicationMain(int argc, const char *argv[]) {
     }
     int (*real_main)(int, const char*[]) = (int (*)(int, const char*[]))dlsym(RTLD_NEXT, "NSApplicationMain");
     int res = real_main ? real_main(argc, argv) : 0;
-    write_str("\n[Quadra Hook] NSApplicationMain returned: ");
+    write_str("\n[Quinta Hook] NSApplicationMain returned: ");
     print_num(res);
-    write_str("\n[Quadra Hook] Backtrace:\n");
+    write_str("\n[Quinta Hook] Backtrace:\n");
     print_backtrace();
     return res;
 }
@@ -1509,12 +1509,12 @@ static void crash_handler(int sig, void* info, void* uap) {
     // A second fault must not recurse through the diagnostic writer.
     if (__atomic_exchange_n(&reporting, 1, __ATOMIC_RELAXED))
         _exit(128 + sig);
-    write_str("\n\n[Quadra FATAL CRASH] ****************************************\n");
-    write_str("[Quadra FATAL CRASH] Signal received: ");
+    write_str("\n\n[Quinta FATAL CRASH] ****************************************\n");
+    write_str("[Quinta FATAL CRASH] Signal received: ");
     print_num(sig);
     write_str("\n");
     if (info) {
-        write_str("[Quadra FATAL CRASH] siginfo: ");
+        write_str("[Quinta FATAL CRASH] siginfo: ");
         print_hex((unsigned long long)info);
         // Darwin siginfo_t: si_code at byte 8, si_pid at 12, si_addr at 24.
         const unsigned char* si = (const unsigned char*)info;
@@ -1527,7 +1527,7 @@ static void crash_handler(int sig, void* info, void* uap) {
         write_str("\n");
     }
     if (uap) {
-        write_str("[Quadra FATAL CRASH] ucontext: ");
+        write_str("[Quinta FATAL CRASH] ucontext: ");
         print_hex((unsigned long long)uap);
         write_str("\n");
         unsigned long long* p = (unsigned long long*)uap;
@@ -1561,12 +1561,12 @@ static void crash_handler(int sig, void* info, void* uap) {
             write_str("  register context unavailable or too short\n");
         }
     }
-    write_str("[Quadra FATAL CRASH] ****************************************\n\n");
+    write_str("[Quinta FATAL CRASH] ****************************************\n\n");
     _exit(128 + sig);
 }
 
 int my_sigaction(int sig, const struct darwin_sigaction *act, struct darwin_sigaction *oact) {
-    write_str("[Quadra Hook] sigaction called for sig: ");
+    write_str("[Quinta Hook] sigaction called for sig: ");
     print_num(sig);
     write_str(", new handler: ");
     print_hex(act ? (unsigned long long)act->sa_sigaction : 0);
@@ -1586,7 +1586,7 @@ DYLD_INTERPOSE(my_sigaction, sigaction);
 static id (*orig_concrete_initWithString)(id self, SEL _cmd, id str) = 0;
 static id hooked_concrete_initWithString(id self, SEL _cmd, id str) {
     if (!str) {
-        write_str("\n[Quadra Hook] -[NSConcreteScanner initWithString:nil] called!\n");
+        write_str("\n[Quinta Hook] -[NSConcreteScanner initWithString:nil] called!\n");
     }
     return orig_concrete_initWithString(self, _cmd, str);
 }
@@ -1595,13 +1595,13 @@ static id hooked_concrete_initWithString(id self, SEL _cmd, id str) {
 static void (*orig_app_run)(id self, SEL _cmd) = 0;
 static void quadra_queue_pending_uri(id app);
 static void hooked_app_run(id self, SEL _cmd) {
-    write_str("\n[Quadra Hook] -[NSApplication run] entered!\n");
+    write_str("\n[Quinta Hook] -[NSApplication run] entered!\n");
     // If Darling does not call finishLaunching through the swizzled entry
     // point, the main-queue turn below still runs after AppKit has started its
     // event loop and the delegate has been installed.
     quadra_queue_pending_uri(self);
     orig_app_run(self, _cmd);
-    write_str("\n[Quadra Hook] -[NSApplication run] returned!\n");
+    write_str("\n[Quinta Hook] -[NSApplication run] returned!\n");
 }
 
 static int ascii_strings_equal(const char* left, const char* right) {
@@ -1692,7 +1692,7 @@ static id quadra_pending_uri(void) {
     }
 
     if (quadra_pending_uri_string) {
-        write_str("[Quadra URL] Pending URI detected\n");
+        write_str("[Quinta URL] Pending URI detected\n");
     }
     return quadra_pending_uri_string;
 }
@@ -1703,7 +1703,7 @@ static signed char quadra_log_uri_selector(id delegate, const char* name) {
     Method method = delegate_class ? class_getInstanceMethod(delegate_class, selector) : 0;
     signed char responds = ((signed char (*)(id, SEL, SEL))objc_msgSend)(
         delegate, sel_registerName("respondsToSelector:"), selector);
-    write_str("[Quadra URL] Selector ");
+    write_str("[Quinta URL] Selector ");
     write_str(name);
     write_str(" responds=");
     print_num(responds != 0);
@@ -1725,13 +1725,13 @@ static unsigned long quadra_uri_delay_ms(void) {
     unsigned long delay = 0;
     for (const char* digit = value; *digit; digit++) {
         if (*digit < '0' || *digit > '9' || delay > 1000) {
-            write_str("[Quadra URL] Invalid delay; using 0 ms\n");
+            write_str("[Quinta URL] Invalid delay; using 0 ms\n");
             return 0;
         }
         delay = delay * 10 + (unsigned long)(*digit - '0');
     }
     if (delay > 10000) {
-        write_str("[Quadra URL] Delay exceeds 10000 ms; using 0 ms\n");
+        write_str("[Quinta URL] Delay exceeds 10000 ms; using 0 ms\n");
         return 0;
     }
     return delay;
@@ -1766,7 +1766,7 @@ static void quadra_deliver_pending_uri(id app) {
     if (quadra_protocol_string_present) {
         if (!quadra_pending_uri_injection_logged) {
             quadra_pending_uri_injection_logged = 1;
-            write_str("[Quadra URL] Pending URI injection skipped; -protocolString already supplied the URI\n");
+            write_str("[Quinta URL] Pending URI injection skipped; -protocolString already supplied the URI\n");
         }
         return;
     }
@@ -1779,11 +1779,11 @@ static void quadra_deliver_pending_uri(id app) {
     if (!delegate && app)
         delegate = ((id (*)(id, SEL))objc_msgSend)(app, sel_registerName("delegate"));
     if (!delegate) {
-        write_str("[Quadra URL] Delegate not available yet\n");
+        write_str("[Quinta URL] Delegate not available yet\n");
         return;
     }
     quadra_captured_delegate = delegate;
-    write_str("[Quadra URL] Delegate: ");
+    write_str("[Quinta URL] Delegate: ");
     write_str(object_getClassName(delegate));
     write_str("\n");
 
@@ -1796,20 +1796,20 @@ static void quadra_deliver_pending_uri(id app) {
     id url = ((id (*)(id, SEL, id))objc_msgSend)(
         (id)objc_getClass("NSURL"), sel_registerName("URLWithString:"), value);
     if (!url) {
-        write_str("[Quadra URL] NSURL rejected the pending URI; trying legacy handlers\n");
+        write_str("[Quinta URL] NSURL rejected the pending URI; trying legacy handlers\n");
     } else {
         id absolute = ((id (*)(id, SEL))objc_msgSend)(url, sel_registerName("absoluteString"));
         signed char unchanged = absolute && ((signed char (*)(id, SEL, id))objc_msgSend)(
             absolute, sel_registerName("isEqualToString:"), value);
-        write_str("[Quadra URL] NSURL absoluteString matches pending=");
+        write_str("[Quinta URL] NSURL absoluteString matches pending=");
         print_num(unchanged != 0);
         write_str("\n");
     }
 
     const char* order = getenv("QUADRA_URI_SELECTOR_ORDER");
     int apple_first = ascii_strings_equal(order, "B");
-    write_str(apple_first ? "[Quadra URL] Selector order=B\n" :
-                            "[Quadra URL] Selector order=A\n");
+    write_str(apple_first ? "[Quinta URL] Selector order=B\n" :
+                            "[Quinta URL] Selector order=A\n");
     for (int choice = 0; choice < 3; choice++) {
         int kind = apple_first ? (choice == 0 ? 2 : choice == 1 ? 0 : 1) : choice;
         if (kind == 0 && url && has_open_urls) {
@@ -1817,87 +1817,87 @@ static void quadra_deliver_pending_uri(id app) {
         id urls = ((id (*)(id, SEL, const id*, unsigned long))objc_msgSend)(
             (id)objc_getClass("NSArray"), sel_registerName("arrayWithObjects:count:"), &url, 1);
         if (!urls) {
-            write_str("[Quadra URL] Delivered failed\n");
+            write_str("[Quinta URL] Delivered failed\n");
             return;
         }
-        write_str("[Quadra URL] Using: application:openURLs:\n");
-        write_str("[Quadra URL] Before application:openURLs:\n");
+        write_str("[Quinta URL] Using: application:openURLs:\n");
+        write_str("[Quinta URL] Before application:openURLs:\n");
         @try {
             // -[RobloxPlayerAppDelegate application:openURLs:] is void with
             // NSApplication* and NSArray<NSURL*>* object arguments.
             ((void (*)(id, SEL, id, id))objc_msgSend)(delegate, open_urls, app, urls);
-            write_str("[Quadra URL] After application:openURLs:\n");
+            write_str("[Quinta URL] After application:openURLs:\n");
             quadra_pending_uri_delivered = 1;
-            write_str("[Quadra URL] Delivered successfully\n");
+            write_str("[Quinta URL] Delivered successfully\n");
         } @catch (id exception) {
             (void)exception;
-            write_str("[Quadra URL] Delivered failed\n");
+            write_str("[Quinta URL] Delivered failed\n");
         }
         return;
         }
 
         if (kind == 1 && has_open_file) {
         SEL open_file = sel_registerName(open_file_name);
-        write_str("[Quadra URL] Using: application:openFile:\n");
+        write_str("[Quinta URL] Using: application:openFile:\n");
         signed char accepted = 0;
-        write_str("[Quadra URL] Before application:openFile:\n");
+        write_str("[Quinta URL] Before application:openFile:\n");
         @try {
             accepted = ((signed char (*)(id, SEL, id, id))objc_msgSend)(delegate, open_file, app, value);
-            write_str("[Quadra URL] After application:openFile: accepted=");
+            write_str("[Quinta URL] After application:openFile: accepted=");
             print_num(accepted != 0);
             write_str("\n");
         } @catch (id exception) {
             (void)exception;
-            write_str("[Quadra URL] Delivered failed\n");
+            write_str("[Quinta URL] Delivered failed\n");
             return;
         }
         if (accepted) {
             quadra_pending_uri_delivered = 1;
-            write_str("[Quadra URL] Delivered successfully\n");
+            write_str("[Quinta URL] Delivered successfully\n");
         } else {
-            write_str("[Quadra URL] Delivered failed\n");
+            write_str("[Quinta URL] Delivered failed\n");
         }
         return;
         }
 
         if (kind == 2 && has_get_url) {
         SEL handle_get_url = sel_registerName(handle_get_url_name);
-        write_str("[Quadra URL] Using: application:handleGetURLEvent:withReplyEvent:\n");
+        write_str("[Quinta URL] Using: application:handleGetURLEvent:withReplyEvent:\n");
         id event = quadra_make_url_event(value);
         if (!event) {
-            write_str("[Quadra URL] Delivered failed\n");
+            write_str("[Quinta URL] Delivered failed\n");
             return;
         }
-        write_str("[Quadra URL] Before application:handleGetURLEvent:withReplyEvent:\n");
+        write_str("[Quinta URL] Before application:handleGetURLEvent:withReplyEvent:\n");
         @try {
             ((void (*)(id, SEL, id, id, id))objc_msgSend)(delegate, handle_get_url, app, event, 0);
-            write_str("[Quadra URL] After application:handleGetURLEvent:withReplyEvent:\n");
+            write_str("[Quinta URL] After application:handleGetURLEvent:withReplyEvent:\n");
             quadra_pending_uri_delivered = 1;
-            write_str("[Quadra URL] Delivered successfully\n");
+            write_str("[Quinta URL] Delivered successfully\n");
         } @catch (id exception) {
             (void)exception;
-            write_str("[Quadra URL] Delivered failed\n");
+            write_str("[Quinta URL] Delivered failed\n");
         }
         return;
         }
     }
 
-    write_str("[Quadra URL] Delivered failed\n");
+    write_str("[Quinta URL] Delivered failed\n");
 }
 
 static void quadra_queue_pending_uri(id app) {
     if (quadra_protocol_string_present) {
         if (!quadra_pending_uri_injection_logged) {
             quadra_pending_uri_injection_logged = 1;
-            write_str("[Quadra URL] Pending URI injection skipped; -protocolString already supplied the URI\n");
+            write_str("[Quinta URL] Pending URI injection skipped; -protocolString already supplied the URI\n");
         }
         return;
     }
     if (!quadra_pending_uri())
         return;
-    write_str("[Quadra URL] Pending URI injection running\n");
+    write_str("[Quinta URL] Pending URI injection running\n");
     unsigned long delay_ms = quadra_uri_delay_ms();
-    write_str("[Quadra URL] Queued delivery after ");
+    write_str("[Quinta URL] Queued delivery after ");
     print_num(delay_ms);
     write_str(" ms\n");
     if (delay_ms) {
@@ -1949,7 +1949,7 @@ static void* quadra_set_window_icon_thread(void* unused) {
                0 /* PropModeReplace */, longs, (int)count);
         if (sync)
             sync(display, 0);
-        write_str("[Quadra] Window icon set\n");
+        write_str("[Quinta] Window icon set\n");
     }
     if (display && close_display)
         close_display(display);
@@ -2036,7 +2036,7 @@ static void hooked_app_finish_launching(id self, SEL cmd) {
     quadra_install_late_hooks();
     quadra_start_xfixes_worker(); // ready before the first mouse lock
     orig_app_finish_launching(self, cmd);
-    write_str("[Quadra Hook] -[NSApplication finishLaunching] returned\n");
+    write_str("[Quinta Hook] -[NSApplication finishLaunching] returned\n");
     quadra_queue_pending_uri(self);
 
     id windows = ((id (*)(id, SEL))objc_msgSend)(self, sel_registerName("windows"));
@@ -2054,7 +2054,7 @@ static void hooked_app_finish_launching(id self, SEL cmd) {
         if (!visible) {
             ((void (*)(id, SEL, id))objc_msgSend)(
                 window, sel_registerName("makeKeyAndOrderFront:"), 0);
-            write_str("[Quadra] Ordered RBXWindow to the front after launch\n");
+            write_str("[Quinta] Ordered RBXWindow to the front after launch\n");
         }
     }
 }
@@ -2071,7 +2071,7 @@ static void quadra_write_quit_sentinel(void) {
     if (!file)
         return;
     fclose(file);
-    write_str("[Quadra] Quit sentinel written\n");
+    write_str("[Quinta] Quit sentinel written\n");
 }
 static void hooked_app_check_for_terminate(id self, SEL _cmd) {
     // No-op: Cocotron's _checkForTerminate calls [self terminate: self] whenever
@@ -2079,7 +2079,7 @@ static void hooked_app_check_for_terminate(id self, SEL _cmd) {
 }
 static void (*orig_app_terminate)(id self, SEL _cmd, id sender) = 0;
 static void hooked_app_terminate(id self, SEL _cmd, id sender) {
-    write_str("\n[Quadra Hook] -[NSApplication terminate:] called!\nBacktrace:\n");
+    write_str("\n[Quinta Hook] -[NSApplication terminate:] called!\nBacktrace:\n");
     print_backtrace();
     if (sender != self)
         quadra_write_quit_sentinel();
@@ -2089,7 +2089,7 @@ static void hooked_app_terminate(id self, SEL _cmd, id sender) {
 // Swizzle NSApplication setDelegate:
 static void (*orig_app_setDelegate)(id self, SEL _cmd, id del) = 0;
 static void hooked_app_setDelegate(id self, SEL _cmd, id del) {
-    write_str("\n[Quadra Hook] -[NSApplication setDelegate:] called with: ");
+    write_str("\n[Quinta Hook] -[NSApplication setDelegate:] called with: ");
     write_str(del ? object_getClassName(del) : "(nil)");
     write_str("\n");
     orig_app_setDelegate(self, _cmd, del);
@@ -2099,9 +2099,9 @@ static void hooked_app_setDelegate(id self, SEL _cmd, id del) {
 // Swizzle NSBundle loadNibNamed:owner:
 static signed char (*orig_loadNibNamed)(id self, SEL _cmd, id name, id owner) = 0; // BOOL
 static signed char hooked_loadNibNamed(id self, SEL _cmd, id name, id owner) {
-    write_str("\n[Quadra Hook] +[NSBundle loadNibNamed:owner:] entered\n");
+    write_str("\n[Quinta Hook] +[NSBundle loadNibNamed:owner:] entered\n");
     signed char res = orig_loadNibNamed(self, _cmd, name, owner);
-    write_str("[Quadra Hook] +[NSBundle loadNibNamed:owner:] returned: ");
+    write_str("[Quinta Hook] +[NSBundle loadNibNamed:owner:] returned: ");
     print_num(res);
     write_str("\n");
     return res;
@@ -2110,9 +2110,9 @@ static signed char hooked_loadNibNamed(id self, SEL _cmd, id name, id owner) {
 // Swizzle NSNib instantiateNibWithExternalNameTable:
 static signed char (*orig_instantiateNib)(id self, SEL _cmd, id table) = 0; // BOOL
 static signed char hooked_instantiateNib(id self, SEL _cmd, id table) {
-    write_str("\n[Quadra Hook] -[NSNib instantiateNibWithExternalNameTable:] entered\n");
+    write_str("\n[Quinta Hook] -[NSNib instantiateNibWithExternalNameTable:] entered\n");
     signed char res = orig_instantiateNib(self, _cmd, table);
-    write_str("[Quadra Hook] -[NSNib instantiateNibWithExternalNameTable:] returned: ");
+    write_str("[Quinta Hook] -[NSNib instantiateNibWithExternalNameTable:] returned: ");
     print_num(res);
     write_str("\n");
     return res;
@@ -2122,14 +2122,14 @@ static signed char hooked_instantiateNib(id self, SEL _cmd, id table) {
 static __thread unsigned int in_wt_init;
 static id (*orig_wt_initWithCoder)(id self, SEL _cmd, id coder) = 0;
 static id hooked_wt_initWithCoder(id self, SEL _cmd, id coder) {
-    write_str("[Quadra Hook] -[NSWindowTemplate initWithCoder:] START\n");
+    write_str("[Quinta Hook] -[NSWindowTemplate initWithCoder:] START\n");
     in_wt_init++;
     id res = 0;
     @try {
         res = orig_wt_initWithCoder(self, _cmd, coder);
     } @catch (id exception) {
         if (quadra_crash_diagnostics_enabled()) {
-            write_str("[Quadra Startup] Window template exception class: ");
+            write_str("[Quinta Startup] Window template exception class: ");
             write_str(object_getClassName(exception));
             write_str("\n");
         }
@@ -2137,7 +2137,7 @@ static id hooked_wt_initWithCoder(id self, SEL _cmd, id coder) {
     } @finally {
         in_wt_init--;
     }
-    write_str("[Quadra Hook] -[NSWindowTemplate initWithCoder:] END -> ");
+    write_str("[Quinta Hook] -[NSWindowTemplate initWithCoder:] END -> ");
     print_hex((unsigned long long)res);
     write_str("\n");
     return res;
@@ -2167,9 +2167,9 @@ static id hooked_decodeObjectForKey(id self, SEL _cmd, id key) {
 // Swizzle NSIBObjectData initWithCoder:
 static id (*orig_od_initWithCoder)(id self, SEL _cmd, id coder) = 0;
 static id hooked_od_initWithCoder(id self, SEL _cmd, id coder) {
-    write_str("[Quadra Hook] -[NSIBObjectData initWithCoder:] START\n");
+    write_str("[Quinta Hook] -[NSIBObjectData initWithCoder:] START\n");
     id res = orig_od_initWithCoder(self, _cmd, coder);
-    write_str("[Quadra Hook] -[NSIBObjectData initWithCoder:] END -> ");
+    write_str("[Quinta Hook] -[NSIBObjectData initWithCoder:] END -> ");
     print_hex((unsigned long long)res);
     write_str("\n");
     return res;
@@ -2178,19 +2178,19 @@ static id hooked_od_initWithCoder(id self, SEL _cmd, id coder) {
 // Swizzle NSIBObjectData establishConnections
 static void (*orig_od_establish)(id self, SEL _cmd) = 0;
 static void hooked_od_establish(id self, SEL _cmd) {
-    write_str("[Quadra Hook] -[NSIBObjectData establishConnections] START\n");
+    write_str("[Quinta Hook] -[NSIBObjectData establishConnections] START\n");
     orig_od_establish(self, _cmd);
-    write_str("[Quadra Hook] -[NSIBObjectData establishConnections] END\n");
+    write_str("[Quinta Hook] -[NSIBObjectData establishConnections] END\n");
 }
 
 // Swizzle NSNibConnector establishConnection
 static void (*orig_conn_establish)(id self, SEL _cmd) = 0;
 static void hooked_conn_establish(id self, SEL _cmd) {
-    write_str("[Quadra Hook] -[NSNibConnector establishConnection] called on: ");
+    write_str("[Quinta Hook] -[NSNibConnector establishConnection] called on: ");
     write_str(object_getClassName(self));
     write_str("\n");
     orig_conn_establish(self, _cmd);
-    write_str("[Quadra Hook] -[NSNibConnector establishConnection] finished\n");
+    write_str("[Quinta Hook] -[NSNibConnector establishConnection] finished\n");
 }
 
 // Cocoa x86_64 ABI: NSRect is four doubles passed by value; BOOL is signed char.
@@ -2202,11 +2202,11 @@ typedef signed char QuadraBool;
 // Swizzle NSWindow initWithContentRect:styleMask:backing:defer:
 static id (*orig_win_init)(id self, SEL _cmd, QuadraRect r, unsigned long sm, unsigned long bs, QuadraBool def) = 0;
 static id hooked_win_init(id self, SEL _cmd, QuadraRect r, unsigned long sm, unsigned long bs, QuadraBool def) {
-    write_str("\n[Quadra Hook] -[NSWindow initWithContentRect:...] START, class: ");
+    write_str("\n[Quinta Hook] -[NSWindow initWithContentRect:...] START, class: ");
     write_str(object_getClassName(self));
     write_str("\n");
     id res = orig_win_init(self, _cmd, r, sm, bs, def);
-    write_str("[Quadra Hook] -[NSWindow initWithContentRect:...] END -> ");
+    write_str("[Quinta Hook] -[NSWindow initWithContentRect:...] END -> ");
     print_hex((unsigned long long)res);
     write_str("\n");
     return res;
@@ -2372,7 +2372,7 @@ static void layer_set_contents_scale(id self, SEL cmd, double scale) {
         (id)objc_getClass("NSNumber"), sel_registerName("numberWithDouble:"), scale);
     objc_setAssociatedObject(self, &contents_scale_key, number, 1);
     if (scale != 1.0)
-        write_str("[Quadra] Warning: CALayer backing rendering above/below 1x is unimplemented\n");
+        write_str("[Quinta] Warning: CALayer backing rendering above/below 1x is unimplemented\n");
 }
 static double layer_contents_scale(id self, SEL cmd) {
     (void)cmd;
@@ -2428,7 +2428,7 @@ static volatile long quadra_gl_flush_count;
 
 static void trace_gl_context(const char* action, id self, long count) {
     void** slots = (void**)self;
-    write_str("[Quadra GL] ");
+    write_str("[Quinta GL] ");
     write_str(action);
     if (count >= 0) {
         write_str(" #");
@@ -2491,7 +2491,7 @@ static void hooked_gl_context_make_current(id self, SEL cmd) {
         void* display = current_display();
         void* context = current_context();
         int attached = make_current(display, slots[5], slots[5], context);
-        write_str("[Quadra GL] repaired missing EGL window surface result=");
+        write_str("[Quinta GL] repaired missing EGL window surface result=");
         print_num(attached);
         write_str(" error=");
         print_hex(egl_error ? egl_error() : 0);
@@ -2538,7 +2538,7 @@ static void trace_gl_frame_state(long count) {
     void* (*egl_current_display)(void) =
         (void* (*)(void))dlsym(RTLD_NEXT, "eglGetCurrentDisplay");
 
-    write_str("[Quadra GL] frame-state #");
+    write_str("[Quinta GL] frame-state #");
     print_num(count);
     write_str(" draws=");
     print_num(quadra_gl_draw_count);
@@ -2636,7 +2636,7 @@ static void hooked_gl_context_flush(id self, SEL cmd) {
             if (finish)
                 finish();
             if (count <= 5) {
-                write_str("[Quadra GL] test-clear before-error=");
+                write_str("[Quinta GL] test-clear before-error=");
                 print_hex(before_error);
                 write_str(" after-error=");
                 print_hex(get_error ? get_error() : 0);
@@ -2669,7 +2669,7 @@ static void hooked_layer_context_render_layer(id self, SEL cmd, id layer) {
     if (CGLGetCurrentContext() != previous) {
         int error = quadra_CGLSetCurrentContext(previous);
         if (!error && __sync_add_and_fetch(&quadra_layer_context_restores, 1) == 1)
-            write_str("[Quadra GL] Restored app GL context after CALayerContext render\n");
+            write_str("[Quinta GL] Restored app GL context after CALayerContext render\n");
     }
 }
 
@@ -2976,13 +2976,13 @@ static unsigned long long quadra_input_now_ns(void) {
 static void* quadra_xfixes_worker(void* unused) {
     (void)unused;
     if (!quadra_raw_xfixes_open()) {
-        write_str("[Quadra] XFixes unavailable, mouse lock may bounce\n");
+        write_str("[Quinta] XFixes unavailable, mouse lock may bounce\n");
         __atomic_store_n(&quadra_cursor_retry_after, quadra_input_now_ns() + 1000000000ULL, __ATOMIC_RELEASE);
         __atomic_store_n(&quadra_cursor_worker_ready, 0, __ATOMIC_RELEASE);
         __atomic_store_n(&quadra_cursor_worker_started, 0, __ATOMIC_RELEASE);
         return 0;
     }
-    write_str("[Quadra] XFixes ready for cursor hiding\n");
+    write_str("[Quinta] XFixes ready for cursor hiding\n");
     void* (*open_display)(const char*) =
         (void* (*)(const char*))dlsym(RTLD_DEFAULT, "XOpenDisplay");
     int (*close_display)(void*) = (int (*)(void*))dlsym(RTLD_DEFAULT, "XCloseDisplay");
@@ -2997,7 +2997,7 @@ static void* quadra_xfixes_worker(void* unused) {
     void* xlib_display = open_display ? open_display(0) : 0;
     QuadraCursorApplyAPI cursor_api = {undefine_cursor, query_tree, free_data, sync_display};
     if (xlib_display && undefine_cursor && query_tree && free_data && sync_display)
-        write_str("[Quadra] Window cursor worker ready\n");
+        write_str("[Quinta] Window cursor worker ready\n");
     __atomic_store_n(&quadra_cursor_worker_ready, 1, __ATOMIC_RELEASE);
     int applied = 0;
     for (;;) {
@@ -3016,7 +3016,7 @@ static void* quadra_xfixes_worker(void* unused) {
             if (quadra_cursor_selection_apply(&cursor_api, xlib_display, selected.window)) {
                 static volatile long defined;
                 if (__sync_add_and_fetch(&defined, 1) <= 3) {
-                    write_str("[Quadra Cursor] Applied selected cursor; rendering children inherit it\n");
+                    write_str("[Quinta Cursor] Applied selected cursor; rendering children inherit it\n");
                 }
             }
         }
@@ -3026,7 +3026,7 @@ static void* quadra_xfixes_worker(void* unused) {
             static int reported;
             if (!reported) {
                 reported = 1;
-                write_str("[Quadra Cursor] Visible locked-cursor overlay unavailable\n");
+                write_str("[Quinta Cursor] Visible locked-cursor overlay unavailable\n");
             }
         }
         if (wanted != applied) {
@@ -3040,7 +3040,7 @@ static void* quadra_xfixes_worker(void* unused) {
                 if (xlib_display && close_display) close_display(xlib_display);
                 __atomic_store_n(&quadra_cursor_retry_after, quadra_input_now_ns() + 1000000000ULL, __ATOMIC_RELEASE);
                 __atomic_store_n(&quadra_cursor_worker_started, 0, __ATOMIC_RELEASE);
-                write_str("[Quadra Cursor] XFixes transition failed; cursor worker will retry\n");
+                write_str("[Quinta Cursor] XFixes transition failed; cursor worker will retry\n");
                 quadra_wake_event_queue();
                 return 0;
             }
@@ -3341,7 +3341,7 @@ static int quadra_raw_mouse_x_event(id self, void* event) {
     if (quadra_pointer_grabbed && quadra_env_cached("QUADRA_TRACE_LOCK", &trace_events)) {
         static long traced;
         if (traced++ < 40) {
-            write_str("[Quadra Lock] X event type=");
+            write_str("[Quinta Lock] X event type=");
             print_num(*(int*)event);
             write_str(wanted ? " wanted=1" : " wanted=0");
             write_str(quadra_raw_mouse_active ? " active=1\n" : " active=0\n");
@@ -3367,8 +3367,8 @@ static int quadra_raw_mouse_x_event(id self, void* event) {
         static int reported;
         if (wanted && !reported) {
             reported = 1;
-            write_str(selected ? "[Quadra Input] mouse lock uses raw motion (XInput 2)\n"
-                               : "[Quadra Input] no raw motion, mouse lock uses pointer deltas\n");
+            write_str(selected ? "[Quinta Input] mouse lock uses raw motion (XInput 2)\n"
+                               : "[Quinta Input] no raw motion, mouse lock uses pointer deltas\n");
         }
     }
     int type = *(int*)event;
@@ -3383,7 +3383,7 @@ static int quadra_raw_mouse_x_event(id self, void* event) {
             quadra_accumulate_raw_motion(self, dx, dy);
             static volatile int trace = -1;
             if (quadra_env_cached("QUADRA_TRACE_LOCK", &trace) && quadra_raw_events <= 200) {
-                write_str("[Quadra Lock] raw dx=");
+                write_str("[Quinta Lock] raw dx=");
                 print_num((long long)dx);
                 write_str(" dy=");
                 print_num((long long)dy);
@@ -3418,7 +3418,7 @@ static int quadra_raw_mouse_x_event(id self, void* event) {
             quadra_flush_raw_motion(self);
             __atomic_store_n(&quadra_raw_mouse_active, 0, __ATOMIC_RELEASE);
             quadra_raw_mouse_select(display, 0);
-            write_str("[Quadra Input] no raw motion arrived, mouse lock uses pointer deltas\n");
+            write_str("[Quinta Input] no raw motion arrived, mouse lock uses pointer deltas\n");
         }
         if (!quadra_raw_mouse_active && (dx || dy))
             quadra_accumulate_raw_motion(self, dx, dy);
@@ -3463,7 +3463,7 @@ static void quadra_release_mouse_capture_inner(int restore) {
         // Process restore/ungrab before the private worker shows the cursor.
         if (sync) sync(quadra_capture_display, 0);
         if (__sync_add_and_fetch(&quadra_associate_mouse_count, 1) <= 20)
-            write_str("[Quadra Input] mouse lock off\n");
+            write_str("[Quinta Input] mouse lock off\n");
     }
     /* End the selection on its event owner, even when no further X event
      * arrives before a rapid unlock/relock. The next lock negotiates afresh. */
@@ -3555,7 +3555,7 @@ static int quadra_apply_mouse_capture_inner(int grab, int has_snapshot,
     if (!grab_pointer || !get_geometry || !display || !handle || !positioned ||
         !get_geometry(display, handle, &root, &geometry_x, &geometry_y, &width, &height, &border, &depth) ||
         !width || !height) {
-        write_str("[Quadra Input] mouse lock unavailable: native pointer/window query failed\n");
+        write_str("[Quinta Input] mouse lock unavailable: native pointer/window query failed\n");
         return quadra_capture_error;
     }
     // Button events include wheel buttons. Focus remains with the ordinary
@@ -3565,7 +3565,7 @@ static int quadra_apply_mouse_capture_inner(int grab, int has_snapshot,
                                1 /* GrabModeAsync */, 1 /* GrabModeAsync */,
                                handle /* confine_to */, 0, 0 /* CurrentTime */);
     if (result != 0 /* GrabSuccess */) {
-        write_str("[Quadra Input] XGrabPointer failed: ");
+        write_str("[Quinta Input] XGrabPointer failed: ");
         print_num(result);
         write_str("\n");
         return quadra_capture_error;
@@ -3654,7 +3654,7 @@ static int quadra_apply_mouse_capture_inner(int grab, int has_snapshot,
     quadra_capture_error = 0;
     quadra_set_x_cursor_hidden(1);
     if (__sync_add_and_fetch(&quadra_associate_mouse_count, 1) <= 20)
-        write_str("[Quadra Input] mouse lock on (native window confined)\n");
+        write_str("[Quinta Input] mouse lock on (native window confined)\n");
     return 0;
 }
 static int quadra_apply_mouse_capture(int grab) {
@@ -3696,7 +3696,7 @@ static void quadra_apply_locked_cursor_position(void) {
     if (x < 0 || y < 0 || x >= (int)width || y >= (int)height) {
         static unsigned int rejected;
         if (rejected++ < 8) {
-            write_str("[Quadra Input] rejected mouse-lock target outside native window: x=");
+            write_str("[Quinta Input] rejected mouse-lock target outside native window: x=");
             print_num(x); write_str(" y="); print_num(y); write_str("\n");
         }
         return;
@@ -3748,7 +3748,7 @@ static void quadra_process_mouse_capture_requests(void) {
         now - quadra_raw_last_motion_ns >= 100000000ULL) {
         __atomic_store_n(&quadra_raw_mouse_active, 0, __ATOMIC_RELEASE);
         quadra_raw_mouse_select(quadra_capture_display, 0);
-        write_str("[Quadra Input] no raw motion arrived, mouse lock uses pointer deltas\n");
+        write_str("[Quinta Input] no raw motion arrived, mouse lock uses pointer deltas\n");
         quadra_lock_anchor_pending = 1;
     }
     if (quadra_pointer_grabbed && quadra_native_motion_active &&
@@ -3859,7 +3859,7 @@ static void quadra_trace_lock_motion(id event, double dx, double dy, const char*
         return;
     QuadraPoint location = quadra_real_event_location(event);
     unsigned long type = ((unsigned long (*)(id, SEL))objc_msgSend)(event, sel_registerName("type"));
-    write_str("[Quadra Lock] type=");
+    write_str("[Quinta Lock] type=");
     print_num((long long)type);
     write_str(" dx=");
     print_num((long long)dx);
@@ -4080,9 +4080,9 @@ static void quadra_recover_gl_drawable(id self, int scheduled) {
     SEL retry = sel_registerName("_ciderRetryWaylandDrawable:");
     ((void (*)(id, SEL, id, SEL, id))objc_msgSend)((id)objc_getClass("NSObject"),
         sel_registerName("cancelPreviousPerformRequestsWithTarget:selector:object:"), self, retry, (id)0);
-    if (recovered) write_str("[Quadra Wayland] Recovered an initially unavailable EGL drawable\n");
+    if (recovered) write_str("[Quinta Wayland] Recovered an initially unavailable EGL drawable\n");
     else if (retries[slot].attempts == 12)
-        write_str("[Quadra Wayland] EGL drawable remains unavailable after retries; use X11 / Xwayland and send the complete launch log\n");
+        write_str("[Quinta Wayland] EGL drawable remains unavailable after retries; use X11 / Xwayland and send the complete launch log\n");
     else ((void (*)(id, SEL, SEL, id, double))objc_msgSend)(self,
         sel_registerName("performSelector:withObject:afterDelay:"), retry, (id)0, 0.1);
 }
@@ -4119,7 +4119,7 @@ static void quadra_attach_recovered_gl_drawable(void* context) {
     if (allowed) bindings[slot].attempts++;
     quadra_unlock(&binding_lock);
     if (allowed && !quadra_CGLContextMakeCurrentAndAttachToWindow(context, surface))
-        write_str("[Quadra Wayland] Attached recovered drawable on the rendering thread\n");
+        write_str("[Quinta Wayland] Attached recovered drawable on the rendering thread\n");
 }
 extern void* objc_autoreleasePoolPush(void);
 extern void objc_autoreleasePoolPop(void*);
@@ -4172,7 +4172,7 @@ unsigned int* quadra_cursor_pixels_from_image(
     unsigned int byte_order = info & 0x7000U;
     static volatile long described;
     if (__sync_add_and_fetch(&described, 1) <= 4) {
-        write_str("[Quadra Cursor] source ");
+        write_str("[Quinta Cursor] source ");
         print_num((long long)width);
         write_str("x");
         print_num((long long)height);
@@ -4380,7 +4380,7 @@ static id hooked_x11_cursor_init_image(id self, SEL cmd, id image,
     static volatile long dumped_cursors;
     long dump_index = __sync_add_and_fetch(&dumped_cursors, 1) - 1;
     if (dump_index < 4) {
-        write_str("[Quadra Cursor] #");
+        write_str("[Quinta Cursor] #");
         print_num(dump_index);
         write_str(" size=");
         print_num((long long)width);
@@ -4492,7 +4492,7 @@ static id event_add_local_monitor(id cls, SEL cmd, unsigned long long mask,
         }
     }
     __sync_lock_release(&quadra_monitor_lock);
-    write_str("[Quadra Input] addLocalMonitorForEventsMatchingMask mask=");
+    write_str("[Quinta Input] addLocalMonitorForEventsMatchingMask mask=");
     print_hex(mask);
     write_str(stored ? "\n" : " (table full, ignored)\n");
     if (!stored) {
@@ -4573,7 +4573,7 @@ static void hooked_app_send_event(id self, SEL cmd, id event) {
             event, sel_registerName("type"));
         quadra_track_key_event(event, type);
         if ((type == 10 || type == 11) && quadra_trace_keys_enabled()) {
-            write_str(type == 10 ? "[Quadra Keys] game keyDown code=" : "[Quadra Keys] game keyUp   code=");
+            write_str(type == 10 ? "[Quinta Keys] game keyDown code=" : "[Quinta Keys] game keyUp   code=");
             print_num(((unsigned short (*)(id, SEL))objc_msgSend)(event, sel_registerName("keyCode")));
             write_str(((signed char (*)(id, SEL))objc_msgSend)(event, sel_registerName("isARepeat")) ? " repeat\n" : "\n");
         }
@@ -4742,7 +4742,7 @@ static void hooked_window_send_event(id self, SEL cmd, id event) {
         if (log) {
             QuadraPoint location = ((QuadraPoint (*)(id, SEL))objc_msgSend)(
                 event, sel_registerName("locationInWindow"));
-            write_str("[Quadra Event] type=");
+            write_str("[Quinta Event] type=");
             print_num((long long)type);
             write_str(" window=");
             write_str(object_getClassName(self));
@@ -4800,13 +4800,13 @@ static void quadra_log_url(const char* prefix, id url) {
 }
 static id (*orig_web_view_init)(id, SEL, QuadraRect, id) = 0;
 static id hooked_web_view_init(id self, SEL cmd, QuadraRect frame, id configuration) {
-    write_str("[Quadra Web] WKWebView initWithFrame:configuration:\n");
+    write_str("[Quinta Web] WKWebView initWithFrame:configuration:\n");
     return orig_web_view_init(self, cmd, frame, configuration);
 }
 static id (*orig_web_view_load_request)(id, SEL, id) = 0;
 static id hooked_web_view_load_request(id self, SEL cmd, id request) {
     id url = request ? ((id (*)(id, SEL))objc_msgSend)(request, sel_registerName("URL")) : 0;
-    quadra_log_url("[Quadra Web] WKWebView loadRequest: ", url);
+    quadra_log_url("[Quinta Web] WKWebView loadRequest: ", url);
     return orig_web_view_load_request(self, cmd, request);
 }
 // Links open in the launcher's browser window when it is there
@@ -4815,12 +4815,12 @@ extern int quadra_web_open_url(id url);
 static QuadraBool (*orig_workspace_open_url)(id, SEL, id) = 0;
 static QuadraBool hooked_workspace_open_url(id self, SEL cmd, id url) {
     if (url && quadra_web_open_url(url)) {
-        write_str("[Quadra Web] NSWorkspace openURL: shown by the launcher\n");
+        write_str("[Quinta Web] NSWorkspace openURL: shown by the launcher\n");
         return 1;
     }
     QuadraBool result = orig_workspace_open_url(self, cmd, url);
-    quadra_log_url(result ? "[Quadra Web] NSWorkspace openURL: (ok) "
-                            : "[Quadra Web] NSWorkspace openURL: (failed) ", url);
+    quadra_log_url(result ? "[Quinta Web] NSWorkspace openURL: (ok) "
+                            : "[Quinta Web] NSWorkspace openURL: (failed) ", url);
     return result;
 }
 
@@ -5045,10 +5045,10 @@ static int quadra_SecItemAdd(id attributes, id* result) {
     if (result)
         *result = 0;
     if (!written) {
-        write_str("[Quadra Keychain] could not store generic password item\n");
+        write_str("[Quinta Keychain] could not store generic password item\n");
         return -36; // errSecIO
     }
-    write_str("[Quadra Keychain] stored generic password item\n");
+    write_str("[Quinta Keychain] stored generic password item\n");
     return 0;
 }
 DYLD_INTERPOSE(quadra_SecItemAdd, SecItemAdd);
@@ -5087,7 +5087,7 @@ static id (*orig_pixel_format_init)(id, SEL, const unsigned int*) = 0;
 static id hooked_pixel_format_init(id self, SEL cmd, const unsigned int* attributes) {
     if (quadra_trace_cgl_enabled()) {
         // Up to the terminating 0 (the array may be on the caller's stack).
-        write_str("[Quadra CGL] NSOpenGLPixelFormat attributes:");
+        write_str("[Quinta CGL] NSOpenGLPixelFormat attributes:");
         for (int index = 0; attributes && index < 64; index++) {
             write_str(" ");
             print_num(attributes[index]);
@@ -5137,7 +5137,7 @@ static void quadra_install_event_queue_source(void) {
     } context = {.perform = quadra_event_queue_source_perform};
     const void *source = CFRunLoopSourceCreate(0, 0, &context);
     if (!source) {
-        write_str("[Quadra] Could not create event queue wake source\n");
+        write_str("[Quinta] Could not create event queue wake source\n");
         return;
     }
     /* Retained for the installed hooks' lifetime. AppKit adds its modal and
@@ -5402,7 +5402,7 @@ static void hooked_post_x_event_inner(id self, SEL cmd, void* event) {
         static volatile int trace_x = -1;
         static long traced_x;
         if (quadra_env_cached("QUADRA_TRACE_XEVENTS", &trace_x) && traced_x++ < 80) {
-            write_str("[Quadra X] event type=");
+            write_str("[Quinta X] event type=");
             print_num(type);
             write_str(" display=");
             print_num((long long)(unsigned long)quadra_x11_display_connection(self));
@@ -5459,7 +5459,7 @@ static void hooked_post_x_event_inner(id self, SEL cmd, void* event) {
                 if (!name || !ascii_strings_equal(name, "RBXWindow") ||
                     quadra_native_window_handle(window) != *(unsigned long*)((char*)event + 32))
                     continue;
-                write_str("[Quadra] Window close requested (WM_DELETE_WINDOW)\n");
+                write_str("[Quinta] Window close requested (WM_DELETE_WINDOW)\n");
                 __atomic_store_n(&quadra_mouse_lock_requested, 0, __ATOMIC_RELEASE);
                 __atomic_store_n(&quadra_input_focused, 0, __ATOMIC_RELEASE);
                 quadra_release_mouse_capture(0);
@@ -5530,7 +5530,7 @@ static void hooked_post_x_event_inner(id self, SEL cmd, void* event) {
             return;
     } else if ((type == 2 || type == 3) && quadra_trace_keys_enabled()) {
         /* XKeyEvent: time at 56, keycode at 84 */
-        write_str(type == 2 ? "[Quadra Keys] X press   keycode=" : "[Quadra Keys] X release keycode=");
+        write_str(type == 2 ? "[Quinta Keys] X press   keycode=" : "[Quinta Keys] X release keycode=");
         print_num(*(unsigned int*)((char*)event + 84));
         write_str(" time=");
         print_num((long long)*(unsigned long*)((char*)event + 56));
@@ -5684,7 +5684,7 @@ static void quadra_install_late_hooks(void) {
             method_setImplementation(next, (IMP)hooked_display_next_event);
             method_setImplementation(post, (IMP)hooked_display_post_event);
             method_setImplementation(discard, (IMP)hooked_display_discard_events);
-            write_str("[Quadra] Event queue keeps non-matching events (NSDisplay fix)\n");
+            write_str("[Quinta] Event queue keeps non-matching events (NSDisplay fix)\n");
         }
     }
     static volatile int x_events_hooked;
@@ -5694,19 +5694,19 @@ static void quadra_install_late_hooks(void) {
         if (cursor) {
             orig_x11_display_set_cursor = (void (*)(id, SEL, id))method_getImplementation(cursor);
             method_setImplementation(cursor, (IMP)hooked_x11_display_set_cursor);
-            write_str("[Quadra] X11 cursor selection follows set/hide/unhide and resets\n");
+            write_str("[Quinta] X11 cursor selection follows set/hide/unhide and resets\n");
         }
         Method method = class_getInstanceMethod(x11_display_class, sel_registerName("postXEvent:"));
         if (method) {
             orig_post_x_event = (void (*)(id, SEL, void*))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_post_x_event);
-            write_str("[Quadra] Hooked X11Display postXEvent: (motion compression)\n");
+            write_str("[Quinta] Hooked X11Display postXEvent: (motion compression)\n");
         }
         method = class_getInstanceMethod(x11_display_class, sel_registerName("processPendingEvents"));
         if (method) {
             orig_process_pending_events = (void (*)(id, SEL))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_process_pending_events);
-            write_str("[Quadra] X11 input drains bounded to 128 events / 2 ms\n");
+            write_str("[Quinta] X11 input drains bounded to 128 events / 2 ms\n");
         }
     }
     static volatile int subwindow_hooked;
@@ -5719,7 +5719,7 @@ static void quadra_install_late_hooks(void) {
             orig_x11_subwindow_init =
                 (id (*)(id, SEL, id, QuadraRect))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_x11_subwindow_init);
-            write_str("[Quadra] Hooked X11SubWindow initWithParentWindow:frame: (GL visual)\n");
+            write_str("[Quinta] Hooked X11SubWindow initWithParentWindow:frame: (GL visual)\n");
         }
     }
     Class x11_cursor_class = objc_getClass("X11Cursor");
@@ -5731,7 +5731,7 @@ static void quadra_install_late_hooks(void) {
             orig_x11_cursor_init_image =
                 (id (*)(id, SEL, id, QuadraPoint))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_x11_cursor_init_image);
-            write_str("[Quadra] Replaced X11Cursor initWithImage:hotPoint: (row copy fix)\n");
+            write_str("[Quinta] Replaced X11Cursor initWithImage:hotPoint: (row copy fix)\n");
         }
     }
     static volatile int monitors_hooked;
@@ -5752,7 +5752,7 @@ static void quadra_install_late_hooks(void) {
             orig_app_send_event =
                 (void (*)(id, SEL, id))method_getImplementation(send);
             method_setImplementation(send, (IMP)hooked_app_send_event);
-            write_str("[Quadra] Implemented NSEvent local event monitors\n");
+            write_str("[Quinta] Implemented NSEvent local event monitors\n");
         }
         Method accepts = class_getInstanceMethod(
             objc_getClass("NSWindow"), sel_registerName("acceptsMouseMovedEvents"));
@@ -5760,14 +5760,14 @@ static void quadra_install_late_hooks(void) {
             orig_window_accepts_mouse_moved =
                 (QuadraBool (*)(id, SEL))method_getImplementation(accepts);
             method_setImplementation(accepts, (IMP)hooked_window_accepts_mouse_moved);
-            write_str("[Quadra] RBXWindow always accepts mouse-moved events\n");
+            write_str("[Quinta] RBXWindow always accepts mouse-moved events\n");
         }
         Method wclose = class_getInstanceMethod(
             objc_getClass("NSWindow"), sel_registerName("close"));
         if (wclose) {
             orig_window_close = (void (*)(id, SEL))method_getImplementation(wclose);
             method_setImplementation(wclose, (IMP)hooked_window_close);
-            write_str("[Quadra] RBXWindow close writes the quit sentinel\n");
+            write_str("[Quinta] RBXWindow close writes the quit sentinel\n");
         }
         Method wperform = class_getInstanceMethod(
             objc_getClass("NSWindow"), sel_registerName("performClose:"));
@@ -5787,7 +5787,7 @@ static void quadra_install_late_hooks(void) {
             orig_mouse_event_button_number =
                 (long (*)(id, SEL))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_mouse_event_button_number);
-            write_str("[Quadra] NSEvent buttonNumber uses macOS numbering\n");
+            write_str("[Quinta] NSEvent buttonNumber uses macOS numbering\n");
         }
         method = class_getInstanceMethod(mouse_event_class, sel_registerName("deltaX"));
         if (method) {
@@ -5800,7 +5800,7 @@ static void quadra_install_late_hooks(void) {
             orig_mouse_event_delta_y =
                 (double (*)(id, SEL))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_mouse_event_delta_y);
-            write_str("[Quadra] NSEvent motion deltaY uses macOS sign\n");
+            write_str("[Quinta] NSEvent motion deltaY uses macOS sign\n");
         }
         method = class_getInstanceMethod(mouse_event_class, sel_registerName("locationInWindow"));
         if (method) {
@@ -5821,7 +5821,7 @@ static void quadra_install_late_hooks(void) {
                 (QuadraPoint (*)(id, SEL))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_event_mouse_location);
         }
-        write_str("[Quadra] Mouse location freezes during mouse lock\n");
+        write_str("[Quinta] Mouse location freezes during mouse lock\n");
     }
     static volatile int text_input_added;
     Class text_view_class = objc_getClass("NSTextView");
@@ -5840,7 +5840,7 @@ static void quadra_install_late_hooks(void) {
             if (!class_getInstanceMethod(text_view_class, selector) &&
                 class_addMethod(text_view_class, selector, methods[index].imp,
                                 methods[index].types)) {
-                write_str("[Quadra] Added NSTextView ");
+                write_str("[Quinta] Added NSTextView ");
                 write_str(methods[index].name);
                 write_str("\n");
             }
@@ -5856,11 +5856,11 @@ static void quadra_install_late_hooks(void) {
         if (button_meta && !class_getInstanceMethod(button_meta, button_selector) &&
             class_addMethod(button_meta, button_selector,
                             (IMP)button_with_image_target_action, "@@:@@:"))
-            write_str("[Quadra] Added +[NSButton buttonWithImage:target:action:]\n");
+            write_str("[Quinta] Added +[NSButton buttonWithImage:target:action:]\n");
         if (text_field_meta && !class_getInstanceMethod(text_field_meta, label_selector) &&
             class_addMethod(text_field_meta, label_selector,
                             (IMP)text_field_label_with_string, "@@:@"))
-            write_str("[Quadra] Added +[NSTextField labelWithString:]\n");
+            write_str("[Quinta] Added +[NSTextField labelWithString:]\n");
     }
     static volatile int contacts_added;
     Class contact_store_class = objc_getClass("CNContactStore");
@@ -5872,7 +5872,7 @@ static void quadra_install_late_hooks(void) {
         if (!class_getInstanceMethod(contact_store_meta, status) &&
             class_addMethod(contact_store_meta, status,
                             (IMP)contact_store_authorization_denied, "q@:q"))
-            write_str("[Quadra] Added CNContactStore authorization (denied)\n");
+            write_str("[Quinta] Added CNContactStore authorization (denied)\n");
         if (!class_getInstanceMethod(contact_store_class, request))
             class_addMethod(contact_store_class, request,
                             (IMP)contact_store_request_access, "v@:q@?");
@@ -5907,7 +5907,7 @@ static void quadra_install_late_hooks(void) {
             orig_workspace_open_url = (QuadraBool (*)(id, SEL, id))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_workspace_open_url);
         }
-        write_str("[Quadra] Tracing WKWebView and NSWorkspace openURL:\n");
+        write_str("[Quinta] Tracing WKWebView and NSWorkspace openURL:\n");
     }
     Class window_class = objc_getClass("NSWindow");
     if (window_class &&
@@ -6322,7 +6322,7 @@ static int quadra_store_cookie(id cookie, int deleted) {
     if (changed) { // one write per line: HTTP threads log at the same time
         char line[300];
         unsigned long used = 0;
-        const char* parts[] = {"[Quadra Cookies] ", deleted ? "delete " : "set ",
+        const char* parts[] = {"[Quinta Cookies] ", deleted ? "delete " : "set ",
                                MSG0(const char*, name, "UTF8String"), " domain=",
                                MSG0(const char*, domain, "UTF8String"),
                                deleted ? "\n" : (expires ? " persistent\n" : " session\n")};
@@ -6483,7 +6483,7 @@ static void quadra_load_cookies(void) {
             quadra_cookie_unlock();
         }
     }
-    write_str("[Quadra Cookies] loaded ");
+    write_str("[Quinta Cookies] loaded ");
     print_num(loaded);
     write_str(" saved cookies\n");
 }
@@ -6524,13 +6524,13 @@ static void install_swizzles(void) {
     extern const char* getprogname(void);
     const char *prog = getprogname();
     if (prog && ascii_strings_equal(prog, "RobloxCrashHandler")) {
-        write_str("[Quadra] Crashpad handler started.\n");
+        write_str("[Quinta] Crashpad handler started.\n");
         return;
     }
 
-    write_str("[Quadra] libQuadraShims loaded.\n");
+    write_str("[Quinta] Compatibility shim loaded.\n");
     long slide = _dyld_get_image_vmaddr_slide(0);
-    write_str("[Quadra] Main executable ASLR slide: ");
+    write_str("[Quinta] Main executable ASLR slide: ");
     print_hex(slide);
     write_str("\n");
 
@@ -6546,7 +6546,7 @@ static void install_swizzles(void) {
     SEL currentEvent = sel_registerName("currentAppleEvent");
     if (eventManager && !class_getInstanceMethod(eventManager, currentEvent)) {
         class_addMethod(eventManager, currentEvent, (IMP)no_current_apple_event, "@@:");
-        write_str("[Quadra] Added currentAppleEvent=nil for direct launch\n");
+        write_str("[Quinta] Added currentAppleEvent=nil for direct launch\n");
     }
 
     Class url_class = objc_getClass("NSURL");
@@ -6556,7 +6556,7 @@ static void install_swizzles(void) {
         if (url_meta_class && class_addMethod(url_meta_class, relative_file_url,
                                               (IMP)url_file_with_path_relative_to_url,
                                               "@@:@@"))
-            write_str("[Quadra] Added NSURL fileURLWithPath:relativeToURL:\n");
+            write_str("[Quinta] Added NSURL fileURLWithPath:relativeToURL:\n");
     }
 
     Class event_class = objc_getClass("NSEvent");
@@ -6565,11 +6565,11 @@ static void install_swizzles(void) {
         SEL momentum_phase = sel_registerName("momentumPhase");
         if (!class_getInstanceMethod(event_class, phase) &&
             class_addMethod(event_class, phase, (IMP)event_phase_none, "Q@:"))
-            write_str("[Quadra] Added NSEvent phase=None\n");
+            write_str("[Quinta] Added NSEvent phase=None\n");
         if (!class_getInstanceMethod(event_class, momentum_phase) &&
             class_addMethod(event_class, momentum_phase,
                             (IMP)event_phase_none, "Q@:"))
-            write_str("[Quadra] Added NSEvent momentumPhase=None\n");
+            write_str("[Quinta] Added NSEvent momentumPhase=None\n");
     }
 
     Class process_info_class = objc_getClass("NSProcessInfo");
@@ -6579,11 +6579,11 @@ static void install_swizzles(void) {
         if (!class_getInstanceMethod(process_info_class, thermal_state) &&
             class_addMethod(process_info_class, thermal_state,
                             (IMP)process_info_thermal_state_nominal, "q@:"))
-            write_str("[Quadra] Added NSProcessInfo thermalState=nominal\n");
+            write_str("[Quinta] Added NSProcessInfo thermalState=nominal\n");
         if (!class_getInstanceMethod(process_info_class, low_power) &&
             class_addMethod(process_info_class, low_power,
                             (IMP)process_info_low_power_mode_disabled, "B@:"))
-            write_str("[Quadra] Added NSProcessInfo lowPowerMode=false\n");
+            write_str("[Quinta] Added NSProcessInfo lowPowerMode=false\n");
     }
 
     Class gl_context_class = objc_getClass("NSOpenGLContext");
@@ -6599,7 +6599,7 @@ static void install_swizzles(void) {
                 quadra_gl_window_offset = ivar_getOffset(surface);
                 orig_gl_update_view_parameters = (void (*)(id, SEL))method_getImplementation(update);
                 method_setImplementation(update, (IMP)hooked_gl_update_view_parameters);
-                write_str("[Quadra Wayland] Bounded recovery for initially unavailable EGL drawables enabled\n");
+                write_str("[Quinta Wayland] Bounded recovery for initially unavailable EGL drawables enabled\n");
             }
         }
         Method method = class_getInstanceMethod(
@@ -6628,7 +6628,7 @@ static void install_swizzles(void) {
                 (void (*)(id, SEL))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_gl_context_flush);
         }
-        write_str("[Quadra] Tracing NSOpenGLContext drawable presentation\n");
+        write_str("[Quinta] Tracing NSOpenGLContext drawable presentation\n");
     }
 
     Class layer_context_class = objc_getClass("CALayerContext");
@@ -6639,7 +6639,7 @@ static void install_swizzles(void) {
             orig_layer_context_render_layer =
                 (void (*)(id, SEL, id))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_layer_context_render_layer);
-            write_str("[Quadra] Hooked CALayerContext renderLayer: (restores GL context)\n");
+            write_str("[Quinta] Hooked CALayerContext renderLayer: (restores GL context)\n");
         }
     }
 
@@ -6651,7 +6651,7 @@ static void install_swizzles(void) {
             orig_ca_renderer_render_layer =
                 (void (*)(id, SEL, id, double, double))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_ca_renderer_render_layer);
-            write_str("[Quadra] Hooked CARenderer image upload (empty layers remain transparent)\n");
+            write_str("[Quinta] Hooked CARenderer image upload (empty layers remain transparent)\n");
         }
     }
 
@@ -6669,7 +6669,7 @@ static void install_swizzles(void) {
             if (!class_getInstanceMethod(scroll_event_class, selector) &&
                 class_addMethod(scroll_event_class, selector, event_methods[index].imp,
                                 event_methods[index].types)) {
-                write_str("[Quadra] Added NSEvent ");
+                write_str("[Quinta] Added NSEvent ");
                 write_str(event_methods[index].name);
                 write_str("\n");
             }
@@ -6684,10 +6684,10 @@ static void install_swizzles(void) {
     SEL unarchive = sel_registerName("unarchivedObjectOfClass:fromData:error:");
     if (archiver_meta && !class_getInstanceMethod(archiver_meta, archive) &&
         class_addMethod(archiver_meta, archive, (IMP)keyed_archiver_archived_data, "@@:@c^@"))
-        write_str("[Quadra] Added +[NSKeyedArchiver archivedDataWithRootObject:requiringSecureCoding:error:]\n");
+        write_str("[Quinta] Added +[NSKeyedArchiver archivedDataWithRootObject:requiringSecureCoding:error:]\n");
     if (unarchiver_meta && !class_getInstanceMethod(unarchiver_meta, unarchive) &&
         class_addMethod(unarchiver_meta, unarchive, (IMP)keyed_unarchiver_unarchived_object, "@@:#@^@"))
-        write_str("[Quadra] Added +[NSKeyedUnarchiver unarchivedObjectOfClass:fromData:error:]\n");
+        write_str("[Quinta] Added +[NSKeyedUnarchiver unarchivedObjectOfClass:fromData:error:]\n");
 
     const char* hide_menu = getenv("QUADRA_HIDE_MENU_BAR");
     Class menu_view_class = objc_getClass("NSMainMenuView");
@@ -6695,7 +6695,7 @@ static void install_swizzles(void) {
         Method method = class_getClassMethod(menu_view_class, sel_registerName("menuHeight"));
         if (method) {
             method_setImplementation(method, (IMP)quadra_zero_menu_height);
-            write_str("[Quadra] Menu bar hidden\n");
+            write_str("[Quinta] Menu bar hidden\n");
         }
     }
 
@@ -6707,7 +6707,7 @@ static void install_swizzles(void) {
             orig_cookies_with_response_headers =
                 (id (*)(id, SEL, id, id))method_getImplementation(method);
             method_setImplementation(method, (IMP)cookies_with_response_headers);
-            write_str("[Quadra] Hooked NSHTTPCookie response parser\n");
+            write_str("[Quinta] Hooked NSHTTPCookie response parser\n");
         }
         Class storage_class = objc_getClass("NSHTTPCookieStorage");
         Method set_method = storage_class
@@ -6747,7 +6747,7 @@ static void install_swizzles(void) {
         if (method) {
             orig_current_display = (id (*)(id, SEL))method_getImplementation(method);
             method_setImplementation(method, (IMP)shared_current_display);
-            write_str("[Quadra] Sharing NSDisplay across rendering threads\n");
+            write_str("[Quinta] Sharing NSDisplay across rendering threads\n");
         }
     }
 
@@ -6765,7 +6765,7 @@ static void install_swizzles(void) {
         if (web_preferences_meta_class &&
             class_addMethod(web_preferences_meta_class, standard_preferences,
                             (IMP)web_preferences_standard_preferences, "@@:"))
-            write_str("[Quadra] Added WebPreferences standardPreferences\n");
+            write_str("[Quinta] Added WebPreferences standardPreferences\n");
     }
 
     Class capture_device_class = objc_getClass("AVCaptureDevice");
@@ -6777,15 +6777,15 @@ static void install_swizzles(void) {
         if (!class_getClassMethod(capture_device_class, devices) &&
             class_addMethod(capture_device_meta_class, devices,
                             (IMP)empty_capture_devices, "@@:"))
-            write_str("[Quadra] Added empty AVCaptureDevice devices inventory\n");
+            write_str("[Quinta] Added empty AVCaptureDevice devices inventory\n");
         if (!class_getClassMethod(capture_device_class, devices_for_type) &&
             class_addMethod(capture_device_meta_class, devices_for_type,
                             (IMP)empty_capture_devices_for_media_type, "@@:@"))
-            write_str("[Quadra] Added empty AVCaptureDevice devicesWithMediaType:\n");
+            write_str("[Quinta] Added empty AVCaptureDevice devicesWithMediaType:\n");
         if (!class_getClassMethod(capture_device_class, default_for_type) &&
             class_addMethod(capture_device_meta_class, default_for_type,
                             (IMP)no_default_capture_device, "@@:@"))
-            write_str("[Quadra] Added AVCaptureDevice defaultDeviceWithMediaType:=nil\n");
+            write_str("[Quinta] Added AVCaptureDevice defaultDeviceWithMediaType:=nil\n");
         // Voice chat asks for microphone permission through these (Darling
         // has neither): granted, the host's own permissions apply.
         SEL authorization = sel_registerName("authorizationStatusForMediaType:");
@@ -6795,7 +6795,7 @@ static void install_swizzles(void) {
                             (IMP)capture_authorization_status, "q@:@") &&
             class_addMethod(capture_device_meta_class, request_access,
                             (IMP)capture_request_access, "v@:@@?"))
-            write_str("[Quadra] Added AVCaptureDevice media permission (granted)\n");
+            write_str("[Quinta] Added AVCaptureDevice media permission (granted)\n");
     }
 
     Class layerCls = objc_getClass("CALayer");
@@ -6803,7 +6803,7 @@ static void install_swizzles(void) {
                  && !class_getInstanceMethod(layerCls, sel_registerName("contentsScale"))) {
         class_addMethod(layerCls, sel_registerName("setContentsScale:"), (IMP)layer_set_contents_scale, "v@:d");
         class_addMethod(layerCls, sel_registerName("contentsScale"), (IMP)layer_contents_scale, "d@:");
-        write_str("[Quadra] Added CALayer contentsScale state (1x rendering only)\n");
+        write_str("[Quinta] Added CALayer contentsScale state (1x rendering only)\n");
     }
 
     Class viewCls = objc_getClass("NSView");
@@ -6811,13 +6811,13 @@ static void install_swizzles(void) {
                 && !class_getInstanceMethod(viewCls, sel_registerName("allowedTouchTypes"))) {
         class_addMethod(viewCls, sel_registerName("setAllowedTouchTypes:"), (IMP)view_set_allowed_touch_types, "v@:Q");
         class_addMethod(viewCls, sel_registerName("allowedTouchTypes"), (IMP)view_allowed_touch_types, "Q@:");
-        write_str("[Quadra] Added NSView allowedTouchTypes state (no touch synthesis)\n");
+        write_str("[Quinta] Added NSView allowedTouchTypes state (no touch synthesis)\n");
     }
     SEL backingSize = sel_registerName("convertSizeToBacking:");
     if (viewCls && !class_getInstanceMethod(viewCls, backingSize)) {
         class_addMethod(viewCls, backingSize, (IMP)backing_size_1x,
                         "{CGSize=dd}@:{CGSize=dd}");
-        write_str("[Quadra] Added NSView convertSizeToBacking: (experimental 1x)\n");
+        write_str("[Quinta] Added NSView convertSizeToBacking: (experimental 1x)\n");
     }
 
 
@@ -6831,12 +6831,12 @@ static void install_swizzles(void) {
             class_addMethod(window_class, rect_from_screen,
                             (IMP)window_convert_rect_from_screen,
                             rect_conversion_types))
-            write_str("[Quadra] Added NSWindow convertRectFromScreen:\n");
+            write_str("[Quinta] Added NSWindow convertRectFromScreen:\n");
         if (!class_getInstanceMethod(window_class, rect_to_screen) &&
             class_addMethod(window_class, rect_to_screen,
                             (IMP)window_convert_rect_to_screen,
                             rect_conversion_types))
-            write_str("[Quadra] Added NSWindow convertRectToScreen:\n");
+            write_str("[Quinta] Added NSWindow convertRectToScreen:\n");
         struct { const char* name; IMP imp; const char* types; } titlebar_methods[] = {
             {"setTitlebarAppearsTransparent:", (IMP)window_set_titlebar_appears_transparent, "v@:c"},
             {"titlebarAppearsTransparent", (IMP)window_titlebar_appears_transparent, "c@:"},
@@ -6851,7 +6851,7 @@ static void install_swizzles(void) {
                 titlebar_added++;
         }
         if (titlebar_added)
-            write_str("[Quadra] Added NSWindow title bar options missing in this Darling\n");
+            write_str("[Quinta] Added NSWindow title bar options missing in this Darling\n");
         SEL win_at_pt = sel_registerName("windowNumberAtPoint:belowWindowWithWindowNumber:");
         Method mWinAtPt = class_getClassMethod(window_class, win_at_pt);
         if (mWinAtPt) {
@@ -6860,7 +6860,7 @@ static void install_swizzles(void) {
             class_addMethod(object_getClass((id)window_class), win_at_pt,
                             (IMP)window_number_at_point, "q@:{CGPoint=dd}q");
         }
-        write_str("[Quadra] Implemented +[NSWindow windowNumberAtPoint:belowWindowWithWindowNumber:]\n");
+        write_str("[Quinta] Implemented +[NSWindow windowNumberAtPoint:belowWindowWithWindowNumber:]\n");
     }
 
     Class ccls = objc_getClass("NSConcreteScanner");
@@ -6869,7 +6869,7 @@ static void install_swizzles(void) {
         if (m) {
             orig_concrete_initWithString = (id (*)(id, SEL, id))method_getImplementation(m);
             method_setImplementation(m, (IMP)hooked_concrete_initWithString);
-            write_str("[Quadra] Hooked NSConcreteScanner initWithString:\n");
+            write_str("[Quinta] Hooked NSConcreteScanner initWithString:\n");
         }
     }
 
@@ -6879,31 +6879,31 @@ static void install_swizzles(void) {
         if (mRun) {
             orig_app_run = (void (*)(id, SEL))method_getImplementation(mRun);
             method_setImplementation(mRun, (IMP)hooked_app_run);
-            write_str("[Quadra] Hooked NSApplication run\n");
+            write_str("[Quinta] Hooked NSApplication run\n");
         }
         Method mFinish = class_getInstanceMethod(appCls, sel_registerName("finishLaunching"));
         if (mFinish) {
             orig_app_finish_launching =
                 (void (*)(id, SEL))method_getImplementation(mFinish);
             method_setImplementation(mFinish, (IMP)hooked_app_finish_launching);
-            write_str("[Quadra] Hooked NSApplication finishLaunching\n");
+            write_str("[Quinta] Hooked NSApplication finishLaunching\n");
         }
         Method mTerm = class_getInstanceMethod(appCls, sel_registerName("terminate:"));
         if (mTerm) {
             orig_app_terminate = (void (*)(id, SEL, id))method_getImplementation(mTerm);
             method_setImplementation(mTerm, (IMP)hooked_app_terminate);
-            write_str("[Quadra] Hooked NSApplication terminate:\n");
+            write_str("[Quinta] Hooked NSApplication terminate:\n");
         }
         Method mCheck = class_getInstanceMethod(appCls, sel_registerName("_checkForTerminate"));
         if (mCheck) {
             method_setImplementation(mCheck, (IMP)hooked_app_check_for_terminate);
-            write_str("[Quadra] Neutralized NSApplication _checkForTerminate\n");
+            write_str("[Quinta] Neutralized NSApplication _checkForTerminate\n");
         }
         Method mDel = class_getInstanceMethod(appCls, sel_registerName("setDelegate:"));
         if (mDel) {
             orig_app_setDelegate = (void (*)(id, SEL, id))method_getImplementation(mDel);
             method_setImplementation(mDel, (IMP)hooked_app_setDelegate);
-            write_str("[Quadra] Hooked NSApplication setDelegate:\n");
+            write_str("[Quinta] Hooked NSApplication setDelegate:\n");
         }
     }
 
@@ -6913,7 +6913,7 @@ static void install_swizzles(void) {
         if (mNib) {
             orig_loadNibNamed = (signed char (*)(id, SEL, id, id))method_getImplementation(mNib);
             method_setImplementation(mNib, (IMP)hooked_loadNibNamed);
-            write_str("[Quadra] Hooked NSBundle loadNibNamed:owner:\n");
+            write_str("[Quinta] Hooked NSBundle loadNibNamed:owner:\n");
         }
     }
 
@@ -6923,7 +6923,7 @@ static void install_swizzles(void) {
         if (mInst) {
             orig_instantiateNib = (signed char (*)(id, SEL, id))method_getImplementation(mInst);
             method_setImplementation(mInst, (IMP)hooked_instantiateNib);
-            write_str("[Quadra] Hooked NSNib instantiateNibWithExternalNameTable:\n");
+            write_str("[Quinta] Hooked NSNib instantiateNibWithExternalNameTable:\n");
         }
     }
 
@@ -6933,7 +6933,7 @@ static void install_swizzles(void) {
         if (m) {
             orig_decodeObjectForKey = (id (*)(id, SEL, id))method_getImplementation(m);
             method_setImplementation(m, (IMP)hooked_decodeObjectForKey);
-            write_str("[Quadra] Hooked NSKeyedUnarchiver decodeObjectForKey:\n");
+            write_str("[Quinta] Hooked NSKeyedUnarchiver decodeObjectForKey:\n");
         }
     }
 
@@ -6945,7 +6945,7 @@ static void install_swizzles(void) {
         if (mWT) {
             orig_wt_initWithCoder = (id (*)(id, SEL, id))method_getImplementation(mWT);
             method_setImplementation(mWT, (IMP)hooked_wt_initWithCoder);
-            write_str("[Quadra] Hooked NSWindowTemplate initWithCoder:\n");
+            write_str("[Quinta] Hooked NSWindowTemplate initWithCoder:\n");
         }
     }
 
@@ -6955,13 +6955,13 @@ static void install_swizzles(void) {
         if (mOD) {
             orig_od_initWithCoder = (id (*)(id, SEL, id))method_getImplementation(mOD);
             method_setImplementation(mOD, (IMP)hooked_od_initWithCoder);
-            write_str("[Quadra] Hooked NSIBObjectData initWithCoder:\n");
+            write_str("[Quinta] Hooked NSIBObjectData initWithCoder:\n");
         }
         Method mODE = class_getInstanceMethod(odCls, sel_registerName("establishConnections"));
         if (mODE) {
             orig_od_establish = (void (*)(id, SEL))method_getImplementation(mODE);
             method_setImplementation(mODE, (IMP)hooked_od_establish);
-            write_str("[Quadra] Hooked NSIBObjectData establishConnections\n");
+            write_str("[Quinta] Hooked NSIBObjectData establishConnections\n");
         }
     }
 
@@ -6971,7 +6971,7 @@ static void install_swizzles(void) {
         if (mC) {
             orig_conn_establish = (void (*)(id, SEL))method_getImplementation(mC);
             method_setImplementation(mC, (IMP)hooked_conn_establish);
-            write_str("[Quadra] Hooked NSNibConnector establishConnection\n");
+            write_str("[Quinta] Hooked NSNibConnector establishConnection\n");
         }
     }
 
@@ -6981,7 +6981,7 @@ static void install_swizzles(void) {
         if (mW) {
             orig_win_init = (id (*)(id, SEL, QuadraRect, unsigned long, unsigned long, QuadraBool))method_getImplementation(mW);
             method_setImplementation(mW, (IMP)hooked_win_init);
-            write_str("[Quadra] Hooked NSWindow initWithContentRect:...\n");
+            write_str("[Quinta] Hooked NSWindow initWithContentRect:...\n");
         }
     }
 }
@@ -7054,7 +7054,7 @@ static void quadra_initialize_keyboard_source(void) {
         __sync_synchronize();
         quadra_keyboard_source = source;
         if (source && quadra_keyboard_layout_data)
-            write_str("[Quadra] Carbon key labels use a valid ANSI fallback layout\n");
+            write_str("[Quinta] Carbon key labels use a valid ANSI fallback layout\n");
     }
     __sync_synchronize();
     state = 2;

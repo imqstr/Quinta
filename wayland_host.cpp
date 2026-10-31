@@ -185,7 +185,7 @@ bool map_background(Window &window,int width,int height) {
     wl_surface_damage(window.wl_surface_handle,0,0,width,height);
     wl_surface_commit(window.wl_surface_handle);
     window.background_width=width;window.background_height=height;
-    if(getenv("QUADRA_TRACE_WAYLAND"))std::fprintf(stderr,"[Quadra Wayland] Committed background (%dx%d)\n",width,height);
+    if(getenv("QUADRA_TRACE_WAYLAND"))std::fprintf(stderr,"[Quinta Wayland] Committed background (%dx%d)\n",width,height);
     return true;
 }
 void resize_backgrounds() {
@@ -195,7 +195,7 @@ void resize_backgrounds() {
         if(!window.pending_width || !window.pending_height)continue;
         /* Coalesce all size events in this SDL batch into one allocation. */
         if(!map_background(window,window.pending_width,window.pending_height))
-            std::fprintf(stderr,"[Quadra Wayland] Could not resize window background (%dx%d)\n",window.pending_width,window.pending_height);
+            std::fprintf(stderr,"[Quinta Wayland] Could not resize window background (%dx%d)\n",window.pending_width,window.pending_height);
         else committed=true;
         window.pending_width=window.pending_height=0;
     }
@@ -301,7 +301,7 @@ void capture(Window &window,unsigned id,bool enabled) {
     if(next){window.anchor_x=window.x;window.anchor_y=window.y;}
     if(SDL_SetRelativeMouseMode(next?SDL_TRUE:SDL_FALSE)<0) {
         next=false;
-        std::fprintf(stderr,"[Quadra Wayland] Relative pointer unavailable: %s\n",SDL_GetError());
+        std::fprintf(stderr,"[Quinta Wayland] Relative pointer unavailable: %s\n",SDL_GetError());
     }
     window.capture=next;
     quadra_drag_cursor_capture(&window.drag_cursor,next);
@@ -397,7 +397,7 @@ void translate(const SDL_Event &input) {
         case SDL_WINDOWEVENT_CLOSE:event.type=MW_CLOSE;break;
         default:return;
         }
-        if(getenv("QUADRA_TRACE_WAYLAND"))std::fprintf(stderr,"[Quadra Wayland] Window event %u for %u\n",event.type,found->first);
+        if(getenv("QUADRA_TRACE_WAYLAND"))std::fprintf(stderr,"[Quinta Wayland] Window event %u for %u\n",event.type,found->first);
         break;
     default:return;
     }
@@ -405,7 +405,7 @@ void translate(const SDL_Event &input) {
 }
 unsigned create_window(int width,int height,bool bootstrap=false) {
     if(width<1 || height<1 || width>16384 || height>16384)return 0;
-    SDL_Window *window=SDL_CreateWindow("Quadra",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,
+    SDL_Window *window=SDL_CreateWindow("Quinta",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,
                                       width,height,SDL_WINDOW_RESIZABLE|(bootstrap?SDL_WINDOW_HIDDEN:0));
     SDL_SysWMinfo info{};SDL_VERSION(&info.version);
     if(!window || !SDL_GetWindowWMInfo(window,&info) || info.subsystem!=SDL_SYSWM_WAYLAND || !info.info.wl.surface) {
@@ -429,7 +429,7 @@ unsigned create_window(int width,int height,bool bootstrap=false) {
         }
         wl_display_flush((wl_display *)native_display);
     }
-    std::fprintf(stderr,"[Quadra Wayland] Created window %u (%dx%d)\n",id,width,height);
+    std::fprintf(stderr,"[Quinta Wayland] Created window %u (%dx%d)\n",id,width,height);
     return id;
 }
 void *display(){return native_display;}
@@ -478,7 +478,7 @@ unsigned create_subwindow(unsigned parent_id,int x,int y,int width,int height) {
             wl_egl_window_destroy(egl_window);wl_surface_destroy(child_surface);subwindows.erase(id);return 0;
         }
         static unsigned reported;
-        if(reported++<24)std::fprintf(stderr,"[Quadra Wayland] Created GL view %u for window %u at %d,%d (%dx%d)\n",id,parent_id,x,y,width,height);
+        if(reported++<24)std::fprintf(stderr,"[Quinta Wayland] Created GL view %u for window %u at %d,%d (%dx%d)\n",id,parent_id,x,y,width,height);
         return id;
     });
 }
@@ -648,7 +648,7 @@ extern "C" const quadra_wayland_api *quadra_wayland_host_api() {
             if(!bootstrap){initialized.set_value(false);return;}
             initialize_cursor_surfaces();
             SDL_StartTextInput();initialized.set_value(true);
-            std::fprintf(stderr,"[Quadra Wayland] Native Wayland display connected\n");
+            std::fprintf(stderr,"[Quinta Wayland] Native Wayland display connected\n");
             while(!stopping.load()) {
                 std::deque<std::function<void()>> batch;
                 {std::lock_guard<std::mutex> guard(queue_mutex);batch.swap(commands);}

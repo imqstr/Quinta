@@ -195,7 +195,7 @@ pub fn register(device: &Device) {
             Ok(trace) => Some(trace),
             Err(error) => {
                 crate::util::log_once(&format!(
-                    "[Quadra Metal] performance trace unavailable: {error}"
+                    "[Quinta Metal] performance trace unavailable: {error}"
                 ));
                 None
             }

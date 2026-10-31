@@ -15,17 +15,17 @@ class MetalFallbackTests(unittest.TestCase):
         with patch.object(graphics, "validate_metal", return_value="Test GPU") as validate:
             env, name = session._validated_metal({"MACOBLOX_METAL": "1"})
         validate.assert_called_once()
-        self.assertEqual((env, name), ({"MACOBLOX_METAL": "1"}, "Quadra M2VK (Test GPU)"))
+        self.assertEqual((env, name), ({"MACOBLOX_METAL": "1"}, "Quinta M2VK (Test GPU)"))
         self.assertEqual(session.settings["renderer"], "metal")
         self.assertFalse(hasattr(session, "metal_fallback_reason"))
 
     def test_a_failed_device_plays_with_opengl_this_once(self):
         session = self.session()
-        problem = RuntimeError("Quadra M2VK is unavailable: no Vulkan device. Select OpenGL in Settings.")
+        problem = RuntimeError("Quinta M2VK is unavailable: no Vulkan device. Select OpenGL in Settings.")
         with patch.object(graphics, "validate_metal", side_effect=problem), \
                 patch.object(session, "environment", return_value={"OPENGL": "1"}) as environment:
             env, name = session._validated_metal({"MACOBLOX_METAL": "1"})
-        self.assertEqual((env, name), ({"OPENGL": "1"}, "OpenGL (Quadra M2VK could not start)"))
+        self.assertEqual((env, name), ({"OPENGL": "1"}, "OpenGL (Quinta M2VK could not start)"))
         environment.assert_called_once()
         self.assertEqual(session.settings["renderer"], "opengl", "the session's copy only")
         self.assertIn("no Vulkan device", session.metal_fallback_reason)

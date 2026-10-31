@@ -180,7 +180,7 @@ fn llvm() -> Result<&'static Llvm, String> {
                 std::mem::transmute::<*mut c_void, $signature>(symbol($name)?)
             };
         }
-        crate::util::log_once(&format!("[Quadra Metal] AIR upgrades through {}", path.display()));
+        crate::util::log_once(&format!("[Quinta Metal] AIR upgrades through {}", path.display()));
         Ok(Llvm {
             context_create: load!(c"LLVMContextCreate", unsafe extern "C" fn() -> Ref),
             context_dispose: load!(c"LLVMContextDispose", unsafe extern "C" fn(Ref)),

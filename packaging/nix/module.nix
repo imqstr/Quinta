@@ -10,12 +10,12 @@ let
 in
 {
   options.programs.quadrahq = {
-    enable = lib.mkEnableOption "Quadra, the Roblox launcher";
+    enable = lib.mkEnableOption "Quinta, the Roblox launcher";
     package = lib.mkOption {
       type = lib.types.package;
       default = flake.packages.x86_64-linux.quadrahq;
       defaultText = lib.literalExpression "quadra.packages.x86_64-linux.quadrahq";
-      description = "Quadra package, including its pinned Darling runtime.";
+      description = "Quinta package, including its pinned Darling runtime.";
     };
     runtime = lib.mkOption {
       type = lib.types.enum [
@@ -31,7 +31,7 @@ in
     assertions = [
       {
         assertion = pkgs.stdenv.hostPlatform.system == "x86_64-linux";
-        message = "Quadra and Darling require x86_64 Linux.";
+        message = "Quinta and Darling require x86_64 Linux.";
       }
     ];
     environment.systemPackages = [ (cfg.package.override { inherit (cfg) runtime withStudio; }) ];

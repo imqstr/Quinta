@@ -36,7 +36,7 @@ impl Budget {
         let bytes = recommended_working_set(device, hint.as_deref());
         if cached.is_none() {
             crate::util::log_once(&format!(
-                "[Quadra Metal] graphics memory budget: {} MiB (unified memory {}; refreshed during play)",
+                "[Quinta Metal] graphics memory budget: {} MiB (unified memory {}; refreshed during play)",
                 bytes / MIB,
                 device.properties().has_unified_memory
             ));

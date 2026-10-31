@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quadra launcher entry point."""
+"""Quinta launcher entry point."""
 import sys
 from pathlib import Path
 
@@ -46,7 +46,7 @@ if sys.argv[1:2] == ["--collect-diagnostics"]:
     try:
         from quadra import diagnostics  # noqa: E402
     except ImportError as error:
-        print(f"Diagnostics are unavailable in this Quadra build: {error}", file=sys.stderr)
+        print(f"Diagnostics are unavailable in this Quinta build: {error}", file=sys.stderr)
         sys.exit(1)
     sys.exit(diagnostics.collect_cli(sys.argv[2:]))
 

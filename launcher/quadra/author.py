@@ -58,7 +58,7 @@ def _get(url, provider, timeout=10):
         connection = _PinnedHTTPS(parts.hostname, address, timeout)
         try:
             path = parts.path + ("?" + parts.query if parts.query else "")
-            connection.request("GET", path, headers={"User-Agent": "Quadra"})
+            connection.request("GET", path, headers={"User-Agent": "Quinta"})
             response = connection.getresponse()
             if response.status == 200:
                 return response.read()
@@ -101,7 +101,7 @@ def tinytosha_avatar(max_age=86400):
     except OSError:
         pass
     try:
-        req = urllib.request.Request(TINYTOSHA_AVATAR_URL, headers={"User-Agent": "Quadra"})
+        req = urllib.request.Request(TINYTOSHA_AVATAR_URL, headers={"User-Agent": "Quinta"})
         with urllib.request.urlopen(req, timeout=5) as response:
             image = response.read()
         core.CACHE_DIR.mkdir(parents=True, exist_ok=True)

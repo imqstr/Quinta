@@ -5,7 +5,7 @@ edition = "2021"
 rust-version = "1.98"
 license = "GPL-3.0-only"
 publish = false
-description = "Host side of Quadra's Metal on Vulkan: metal2vulkan-runtime behind the C table of ../quadra_metal.h"
+description = "Host side of Quinta's Metal on Vulkan: metal2vulkan-runtime behind the C table of ../quadra_metal.h"
 
 [lib]
 name = "quadra_metal_host"
@@ -13,7 +13,7 @@ crate-type = ["cdylib", "rlib"]
 path = "src/lib.rs"
 
 [dependencies]
-# GPL-2.0-or-later OR LGPL-3.0-or-later. Pin the reviewed Quadra M2VK runtime.
+# GPL-2.0-or-later OR LGPL-3.0-or-later. Pin the reviewed Quinta M2VK runtime.
 metal2vulkan-runtime = { git = "https://github.com/QuadraHQ/QuadraM2VK", rev = "f44f1b213bc7d4c00e2d13c3b5489d4375ce3849" }
 metal2vulkan = { git = "https://github.com/QuadraHQ/QuadraM2VK", rev = "f44f1b213bc7d4c00e2d13c3b5489d4375ce3849", features = ["ash", "serde"] }
 ash = { version = "0.38", default-features = false, features = ["std", "loaded"] }

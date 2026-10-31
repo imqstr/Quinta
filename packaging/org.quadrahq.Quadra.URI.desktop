@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=Quadra Roblox Link Handler
-Comment=Open Roblox links in Quadra
+Name=Quinta Roblox Link Handler
+Comment=Open Roblox links in Quinta
 Exec=quadrahq %u
 Icon=quadrahq
 Terminal=false

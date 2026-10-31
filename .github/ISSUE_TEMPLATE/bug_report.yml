@@ -1,12 +1,12 @@
 name: Bug report
-description: Report a Quadra problem with the diagnostics archive from the failed run.
+description: Report a Quinta problem with the diagnostics archive from the failed run.
 title: "[Bug]: "
 labels: [bug]
 body:
   - type: markdown
     attributes:
       value: |
-        Attach the **diagnostics .tar.gz from the run that failed**. In Quadra, use the menu → **Collect diagnostics** after reproducing.
+        Attach the **diagnostics .tar.gz from the run that failed**. In Quinta, use the menu → **Collect diagnostics** after reproducing.
         For a crash, enable **Settings → Environment → Diagnostics → Crash diagnostics** and **Allow freeze diagnostics** before starting Roblox. For a freeze, collect while the game is still frozen.
         Reports and attachments are public. Review the archive before uploading; do not paste cookies or unredacted join links.
   - type: dropdown
@@ -26,7 +26,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Quadra version
+      label: Quinta version
       description: Copy the version shown in the launcher or at the start of the matching launch log.
       placeholder: e.g. 0.35.p2
     validations:
@@ -37,7 +37,7 @@ body:
       label: Steps to reproduce
       description: Include what you clicked or pressed, when it fails, and whether it happens every time. For HTTP 403, include the failing download URL if available.
       placeholder: |
-        1. Start Quadra with…
+        1. Start Quinta with…
         2. Join a game / start setup / press…
         3. The problem happens when…
     validations:
@@ -47,7 +47,7 @@ body:
     id: actual
     attributes:
       label: What happened?
-      description: Include the exact error and whether Quadra, Roblox, or both closed.
+      description: Include the exact error and whether Quinta, Roblox, or both closed.
     validations:
       required: true
   - type: textarea
@@ -63,7 +63,7 @@ body:
       options:
         - OpenGL
         - Vulkan (Zink)
-        - Quadra M2VK (Metal)
+        - Quinta M2VK (Metal)
         - Not sure / setup did not complete
     validations:
       required: true

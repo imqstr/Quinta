@@ -36,7 +36,7 @@ pkgbase = quadrahq
 	depends = shared-mime-info
 	depends = desktop-file-utils
 	optdepends = darling: regular Darling runtime
-	optdepends = ciderdarling-bin: QuadraHQ Darling runtime (also available from the launcher)
+	optdepends = ciderdarling-bin: Quinta Darling runtime (also available from the launcher)
 	optdepends = mangohud: performance overlay
 	optdepends = mesa: Mesa EGL and Zink for the Vulkan renderer
 	optdepends = vulkan-driver: hardware Vulkan driver for the Vulkan renderer
@@ -50,7 +50,7 @@ pkgbase = quadrahq
 	conflicts = macoblox-git
 	replaces = ciderhq
 	replaces = macoblox
-	source = quadrahq-0.37.p4.tar.gz::https://github.com/QuadraHQ/Quadra/releases/download/v0.37.p4/quadrahq-0.37.p4-source.tar.gz
+	source = quadrahq-0.37.p4.tar.gz::https://github.com/imqstr/Quinta/releases/download/v0.37.p4/quadrahq-0.37.p4-source.tar.gz
 	sha256sums = b522dde65d89c204f2e9a97db2f7d3b586ad447164a13af9fac081b1fa0c064a
 
 pkgname = quadrahq

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Quadra inside the Flatpak: a Darling prefix of its own, Darling
+# Quinta inside the Flatpak: a Darling prefix of its own, Darling
 # without root (darling-noroot.c) and the shim built with the package.
 export DPREFIX="${DPREFIX:-$XDG_DATA_HOME/darling}"
 export QUADRA_NOROOT_LIB=/app/lib/quadrahq/darling-noroot.so

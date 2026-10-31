@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install development checkout shortcuts without replacing Quadra's entries.
+# Install development checkout shortcuts without replacing Quinta's entries.
 set -euo pipefail
 launcher_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 data_dir=${XDG_DATA_HOME:-$HOME/.local/share}
@@ -19,7 +19,7 @@ entry = entry.replace('%', '%%')
 icon = launcher.parent / 'branding/icons/quadrahq-256.png'
 (data / 'applications/io.github.imqstr.Quinta.desktop').write_text(
     '[Desktop Entry]\nType=Application\nName=Quinta\n'
-    'Comment=Roblox on Linux through Darling; a fork of Quadra\n'
+    'Comment=Roblox on Linux through Darling\n'
     f'Exec="{entry}"\nIcon={icon}\nTerminal=false\n'
     'Categories=Game;\nKeywords=roblox;darling;quinta;\nStartupNotify=true\n')
 PY

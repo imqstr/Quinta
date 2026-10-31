@@ -1,4 +1,4 @@
-# Quadra Roblox deployment mirror
+# Quinta Roblox deployment mirror
 
 The launcher tries Roblox first. An HTTP **403** on the public MacPlayer
 version endpoint retries the identical channel on `clientsettings.roblox.com`.

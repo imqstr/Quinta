@@ -1,15 +1,15 @@
 Source: quadrahq
 Section: games
 Priority: optional
-Maintainer: Quadra maintainers <noreply@aubree.wtf>
+Maintainer: Quinta maintainers <noreply@aubree.wtf>
 Build-Depends: debhelper-compat (= 13), dh-python, python3, clang, lld,
  cargo (>= 1.98) <!pkg.quadrahq.prebuilt-metal>, rustc (>= 1.98) <!pkg.quadrahq.prebuilt-metal>,
  pkg-config, libsdl2-dev, libwayland-dev, libvulkan-dev
 Standards-Version: 4.7.2
 Rules-Requires-Root: no
 Homepage: https://quadrahq.org
-Vcs-Git: https://github.com/QuadraHQ/Quadra.git
-Vcs-Browser: https://github.com/QuadraHQ/Quadra
+Vcs-Git: https://github.com/imqstr/Quinta.git
+Vcs-Browser: https://github.com/imqstr/Quinta
 
 Package: quadrahq
 Provides: ciderhq, macoblox
@@ -25,7 +25,7 @@ Depends: ${misc:Depends}, ${shlibs:Depends}, ${python3:Depends},
 Recommends: pipewire-bin
 Suggests: darling, mangohud, mesa-vulkan-drivers, libvulkan1
 Description: Run the macOS Roblox client on Linux through Darling
- Quadra provides a GTK launcher and compatibility shims for the macOS
+ Quinta provides a GTK launcher and compatibility shims for the macOS
  Roblox player. The package includes prebuilt shims, desktop shortcuts and
  Roblox link handlers. Roblox itself is downloaded on first setup.
  .

@@ -36,7 +36,7 @@ __pycache__/
 # Local Vercel project settings
 /.vercel/
 
-# Local QuadraM2VK checkout used by the Metal bridge.
+# Local Quinta M2VK checkout used by the Metal bridge.
 /vendor/metal2vulkan
 
 # Nix build outputs

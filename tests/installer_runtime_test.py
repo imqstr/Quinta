@@ -111,7 +111,7 @@ printf '%s|%s|%s|%s' "$CIDER_DARLING_REVISION" "$CIDER_DARLING_INSTALL" "$CIDER_
     def test_earlier_repository_urls_move_to_the_quadrahq_repository(self):
         checkout = self.base / 'data/QuadraHQ'
         subprocess.run(['git', 'init', '-q', str(checkout)], check=True)
-        current = 'https://github.com/QuadraHQ/Quadra.git'
+        current = 'https://github.com/imqstr/Quinta.git'
         for url, moves in [('https://github.com/CiderHQ-org/Cider.git', True),
                            ('https://github.com/CiderHQ-org/Cider', True),
                            ('git@github.com:CiderHQ-org/Cider.git', True),

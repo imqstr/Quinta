@@ -3,17 +3,17 @@
 Collected without stopping the game: every Roblox thread's state and kernel
 wait channel, sampled twice a few seconds apart (a frozen thread keeps the
 same wait), the recent launcher, Roblox and darlingserver logs, the runtime
-selection and the Quadra/Darling environment variables of the game.
+selection and the Quinta and Darling environment variables of the game.
 
 Reading where a thread is in user space (its system call, instruction pointer
 and stack) needs ptrace permission. Under Yama (kernel.yama.ptrace_scope=1,
 the usual default) only an ancestor may read that, and Roblox is a child of
-darlingserver, not of Quadra, so the game must allow it: the shim does when
+darlingserver, not of Quinta, so the game must allow it: the shim does when
 QUADRA_ALLOW_DEBUGGER=1 (Settings, or the environment). Then each thread's
 instruction pointer and the likely return addresses on its stack are given as
 library + offset; `--gdb` adds gdb's backtraces (gdb briefly stops the game).
 
-Credentials stay out: environment variables are filtered to Quadra, Darling
+Credentials stay out: environment variables are filtered to Quinta, Darling
 and graphics settings, and join tickets and cookies in logs are redacted.
 """
 import io
@@ -406,7 +406,7 @@ def collect(output_dir=None, *, gdb=False, symbolize=True, interval=SAMPLE_INTER
     stamp = time.strftime("%Y%m%d-%H%M%S")
     output_dir = Path(output_dir) if output_dir else core.CACHE_DIR / "diagnostics"
     files = {}
-    summary = [f"Quadra {__version__}", f"Collected {time.strftime('%Y-%m-%d %H:%M:%S %z')}",
+    summary = [f"Quinta {__version__}", f"Collected {time.strftime('%Y-%m-%d %H:%M:%S %z')}",
                f"Kernel {platform.release()} ({platform.machine()}); CPUs {os.cpu_count()}",
                f"Darling {core.DARLING_EXECUTABLE}; sysroot {core.DARLING_SYSROOT}; prefix {core.DARLING_PREFIX}"]
     metadata = core.DARLING_RUNTIME.get("metadata") or {}
@@ -492,7 +492,7 @@ def collect(output_dir=None, *, gdb=False, symbolize=True, interval=SAMPLE_INTER
 def collect_cli(argv):
     import argparse
     parser = argparse.ArgumentParser(prog="quadrahq --collect-diagnostics", description=__doc__.split("\n")[0])
-    parser.add_argument("--output", type=Path, help="directory for the archive (default: Quadra's cache)")
+    parser.add_argument("--output", type=Path, help="directory for the archive (default: Quinta's cache)")
     parser.add_argument("--gdb", action="store_true", help="also attach gdb for backtraces (briefly stops the game)")
     parser.add_argument("--no-symbols", action="store_true", help="skip symbol lookup")
     parser.add_argument("--interval", type=float, default=SAMPLE_INTERVAL, help="seconds between the two samples")

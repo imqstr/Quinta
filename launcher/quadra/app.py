@@ -1,4 +1,4 @@
-"""GTK 4 / libadwaita interface of the Quadra launcher."""
+"""GTK 4 / libadwaita interface of the Quinta launcher."""
 
 import json
 import os
@@ -76,7 +76,7 @@ def _restart_launcher():
     environment = dict(os.environ, QUADRA_PAGE="settings")
     entry = core.PROJECT / "launcher/quinta-launcher"
     if not entry.is_file():
-        raise FileNotFoundError(_("Quadra's launcher files are missing. Reinstall Quadra before restarting."))
+        raise FileNotFoundError(_("Quinta's launcher files are missing. Reinstall Quinta before restarting."))
     os.execve(sys.executable, [sys.executable, str(entry)], environment)
 
 
@@ -131,7 +131,7 @@ def _error_dialog(window, heading, details):
     people can send it. Also kept in ~/.cache/quadrahq/last-error.txt."""
     try:
         core.CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        core.LAST_ERROR.write_text(f"Quadra {__version__}\n{heading}\n\n{details}\n")
+        core.LAST_ERROR.write_text(f"Quinta {__version__}\n{heading}\n\n{details}\n")
     except OSError:
         pass
     dialog = Adw.AlertDialog(heading=heading)
@@ -148,7 +148,7 @@ def _error_dialog(window, heading, details):
 
     def response(_dialog, result):
         if result == "copy":
-            window.get_clipboard().set(f"Quadra {__version__}\n{heading}\n\n{details}")
+            window.get_clipboard().set(f"Quinta {__version__}\n{heading}\n\n{details}")
 
     dialog.connect("response", response)
     dialog.present(window)
@@ -735,7 +735,7 @@ class PlayPage(Adw.Bin):
 
         status = Adw.StatusPage()
         status.set_icon_name("quadrahq")
-        status.set_title("Quadra")
+        status.set_title("Quinta")
         self.status = status
 
         center_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12,
@@ -830,7 +830,7 @@ class PlayPage(Adw.Bin):
         logo.set_pixel_size(48)
         identity.append(logo)
         titles = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3, hexpand=True)
-        titles.append(Gtk.Label(label="Quadra", xalign=0, css_classes=["play-title"]))
+        titles.append(Gtk.Label(label="Quinta", xalign=0, css_classes=["play-title"]))
         identity.append(titles)
         head.append(identity)
         self.dashboard_state = Gtk.Label(xalign=0, halign=Gtk.Align.START, css_classes=["play-badge"])
@@ -990,7 +990,7 @@ class PlayPage(Adw.Bin):
             parts.append(_("Sign in with Quick Login"))
         self.status.set_description(" · ".join(parts))
         self.dashboard_facts["client"].set_label(version or _("Not installed"))
-        renderer = {"opengl": "OpenGL", "vulkan": "Vulkan / Zink", "metal": "Quadra M2VK"}.get(
+        renderer = {"opengl": "OpenGL", "vulkan": "Vulkan / Zink", "metal": "Quinta M2VK"}.get(
             self.window.settings.get("renderer", "opengl"), "OpenGL")
         self.dashboard_facts["renderer"].set_label(renderer)
         self.dashboard_facts["runtime"].set_label("CiderDarling" if core.DARLING_RUNTIME["runtime"] == "ciderdarling" else "Darling")
@@ -1615,7 +1615,7 @@ class StudioPage(Adw.Bin):
 
         status = Adw.PreferencesGroup(
             title="Roblox Studio",
-            description=_("The Windows version of Studio, run through Wine. Quadra keeps Wine and Studio "
+            description=_("The Windows version of Studio, run through Wine. Quinta keeps Wine and Studio "
                           "up to date when you start it."))
         self.version_row = Adw.ActionRow(title=_("Installed version"))
         self.wine_status_row = Adw.ActionRow(title="Wine")
@@ -1849,7 +1849,7 @@ class SettingsPage(Adw.Bin):
 
         self._runtime_codes = runtime.VARIANTS
         self._runtime_labels = {"regular": _("DarlingHQ's Darling"),
-                                "ciderdarling": _("QuadraHQ's CiderDarling")}
+                                "ciderdarling": _("CiderDarling")}
         bundled = runtime.is_bundled()
         release = window.cider_release
         self._cider_pin = None if bundled else (runtime_updates.pin(release) if release else runtime.pinned_ciderdarling())
@@ -1866,7 +1866,7 @@ class SettingsPage(Adw.Bin):
         self.runtime_row.set_selected(self._runtime_codes.index(active))
         darling_group.add(self.runtime_row)
         self.runtime_active_row = Adw.ActionRow(title=_("Active runtime"), subtitle=self._runtime_labels[active])
-        self.runtime_apply_button = Gtk.Button(label=_("Apply and restart Quadra"),
+        self.runtime_apply_button = Gtk.Button(label=_("Apply and restart Quinta"),
                                                valign=Gtk.Align.CENTER, visible=not bundled)
         self.runtime_apply_button.add_css_class("suggested-action")
         self.runtime_apply_button.connect("clicked", lambda *_args: self.apply_runtime())
@@ -2020,7 +2020,7 @@ class SettingsPage(Adw.Bin):
 
         self.env_page.add(game)
 
-        # Quadra M2VK has a tab of its own: the renderer and graphics card to choose it with, then its settings.
+        # Quinta M2VK has a tab of its own: the renderer and graphics card to choose it with, then its settings.
         self.m2vk_page = Adw.PreferencesPage()
         graphics_group = Adw.PreferencesGroup(title=_("Renderer"))
         graphics_group.add(self._renderer_row())
@@ -2085,7 +2085,7 @@ class SettingsPage(Adw.Bin):
 
         self.discord_icon = Adw.SwitchRow(
             title=_("Show experience thumbnail in Discord"),
-            subtitle=_("Replace the Quadra icon with the game's icon"),
+            subtitle=_("Replace the Quinta icon with the game's icon"),
             active=settings.get("discord_rpc_icon", False),
         )
         self.discord_icon.set_sensitive(settings.get("discord_rpc", True))
@@ -2152,7 +2152,7 @@ class SettingsPage(Adw.Bin):
                            ("trace_gl", "OpenGL tracing"),
                            ("trace_keys", "Keyboard tracing"),
                            ("fps_log", "Frame rate in the log")]:
-            row = Adw.SwitchRow(title=_(title), subtitle=core.TRACE_ENV[key], active=settings[key])
+            row = Adw.SwitchRow(title=_(title), subtitle=_("Applies on next launch."), active=settings[key])
             row.connect("notify::active", lambda r, _pspec, k=key: window.set_setting(k, r.get_active()))
             diagnostics.add(row)
         self._synced_switches = {}
@@ -2176,7 +2176,7 @@ class SettingsPage(Adw.Bin):
         self.env_page.add(diagnostics)
 
         self.stack.add_titled_with_icon(self.env_page, "env", _("Environment"), "preferences-system-symbolic")
-        self.stack.add_titled_with_icon(self.m2vk_page, "m2vk", "Quadra M2VK", "video-display-symbolic")
+        self.stack.add_titled_with_icon(self.m2vk_page, "m2vk", "Quinta M2VK", "video-display-symbolic")
 
         # 2. Roblox page (Download, updates, version, account)
         self.roblox_page = Adw.PreferencesPage()
@@ -2326,7 +2326,7 @@ class SettingsPage(Adw.Bin):
         elif selected == "ciderdarling" and choice is None:
             subtitle = _("Install CiderDarling in a separate terminal, then apply the switch.")
         elif choice is None:
-            subtitle = _("Install this runtime with Quadra's installer before switching.")
+            subtitle = _("Install this runtime with Quinta's installer before switching.")
         else:
             subtitle = _("Each runtime keeps its own Roblox sign-in.")
         self.runtime_group.set_description(subtitle)
@@ -2368,7 +2368,7 @@ class SettingsPage(Adw.Bin):
             choice = self._installed_runtime_choices().get(selected)
             if choice is None:
                 self.refresh_runtime_choices()
-                raise RuntimeError(_("Install this runtime with Quadra's installer before switching."))
+                raise RuntimeError(_("Install this runtime with Quinta's installer before switching."))
             self.flush()
             core.save_settings(self.window.settings)
             runtime.save_selection(choice, current=core.DARLING_RUNTIME)
@@ -2380,7 +2380,7 @@ class SettingsPage(Adw.Bin):
             self.window.end(resume_pending=False)
             details = str(error)
             if saved:
-                details = _("Runtime saved. Close and reopen Quadra to apply it.") + "\n\n" + details
+                details = _("Runtime saved. Close and reopen Quinta to apply it.") + "\n\n" + details
             _error_dialog(self.window, _("Could not switch Darling runtime"), details)
 
     def rollback_runtime(self):
@@ -2404,12 +2404,12 @@ class SettingsPage(Adw.Bin):
         except (OSError, RuntimeError, ValueError) as error:
             details = str(error)
             if saved:
-                details = _("Runtime saved. Close and reopen Quadra to apply it.") + '\n\n' + details
+                details = _("Runtime saved. Close and reopen Quinta to apply it.") + '\n\n' + details
             _error_dialog(self.window, _("Could not switch Darling runtime"), details)
         finally:
             self.window.end(resume_pending=False)
 
-    # Keep the stored Metal key so existing selections follow Quadra M2VK.
+    # Keep the stored Metal key so existing selections follow Quinta M2VK.
     RENDERER_CODES = ("opengl", "vulkan", "metal")
 
     # (code, label, subtitle) of the choices; the first is the default.
@@ -2448,12 +2448,12 @@ class SettingsPage(Adw.Bin):
         return row
 
     def _build_m2vk_group(self, settings):
-        """Quadra M2VK's settings: the host library reads them at the next launch."""
+        """Quinta M2VK's settings: the host library reads them at the next launch."""
         window = self.window
         self._m2vk_defaults = {}
         group = Adw.PreferencesGroup(
-            title=_("Quadra M2VK"),
-            description=_("Applies on next launch, and only while the renderer is Quadra M2VK. "
+            title=_("Quinta M2VK"),
+            description=_("Applies on next launch, and only while the renderer is Quinta M2VK. "
                           "The defaults suit most computers."))
         self.m2vk_group = group
 
@@ -2508,7 +2508,7 @@ class SettingsPage(Adw.Bin):
             0, 1024, 32, 256))
 
         fallback = Adw.SwitchRow(
-            title=_("Fall back to OpenGL if Quadra M2VK cannot start"),
+            title=_("Fall back to OpenGL if Quinta M2VK cannot start"),
             subtitle=_("Play with OpenGL this time instead of stopping, when no working GPU driver is found."),
             active=settings.get("metal_fallback", True))
         fallback.connect("notify::active", lambda row, *_args: window.set_setting(
@@ -2517,14 +2517,14 @@ class SettingsPage(Adw.Bin):
         group.add(fallback)
 
         diagnostics = Adw.SwitchRow(
-            title=_("Quadra M2VK performance diagnostics"),
+            title=_("Quinta M2VK performance diagnostics"),
             subtitle=_("Record compilation, encoding, GPU timing and memory use for performance reports."),
             active=settings.get("metal_diagnostics", False))
         diagnostics.connect("notify::active", lambda row, *_args: window.set_setting(
             "metal_diagnostics", row.get_active()))
         group.add(diagnostics)
 
-        reset = _button_row(_("Reset Quadra M2VK settings"))
+        reset = _button_row(_("Reset Quinta M2VK settings"))
         reset.connect("activated", lambda *_args: self._reset_m2vk())
         group.add(reset)
         self._update_m2vk(settings.get("renderer", "opengl"))
@@ -2538,10 +2538,10 @@ class SettingsPage(Adw.Bin):
                 row.set_active(bool(default))
             else:
                 row.set_value(default)
-        _toast(self.window.toasts, _("Quadra M2VK settings reset"))
+        _toast(self.window.toasts, _("Quinta M2VK settings reset"))
 
     def _update_m2vk(self, renderer):
-        """The group applies only while Quadra M2VK is the renderer."""
+        """The group applies only while Quinta M2VK is the renderer."""
         group = getattr(self, "m2vk_group", None)
         if group is not None:
             group.set_sensitive(renderer == "metal")
@@ -2549,9 +2549,9 @@ class SettingsPage(Adw.Bin):
     def _renderer_row(self):
         row = ComboRow(
             title=_("Renderer"),
-            subtitle=_("Applies on next launch. Zink uses Roblox's OpenGL renderer; Quadra M2VK uses its Metal renderer on Vulkan. VR uses OpenGL or Zink."),
+            subtitle=_("Applies on next launch. Zink uses Roblox's OpenGL renderer; Quinta M2VK uses its Metal renderer on Vulkan. VR uses OpenGL or Zink."),
             model=Gtk.StringList.new([_("OpenGL"), _("Vulkan (Zink, experimental)"),
-                                      _("Quadra M2VK (experimental)")]))
+                                      _("Quinta M2VK (experimental)")]))
         selected = self.window.settings.get("renderer", "opengl")
         row.set_selected(self.RENDERER_CODES.index(selected) if selected in self.RENDERER_CODES else 0)
         self._renderer_rows.append((row, row.connect("notify::selected", self._select_renderer)))
@@ -2573,13 +2573,13 @@ class SettingsPage(Adw.Bin):
         if selected == "metal":
             if core.PREBUILT_SHIM and not core.metal_built():
                 self._show_renderer(window.settings.get("renderer", "opengl"))
-                _error_dialog(window, _("Quadra M2VK is unavailable"),
-                              _("Quadra M2VK is not part of this package"))
+                _error_dialog(window, _("Quinta M2VK is unavailable"),
+                              _("Quinta M2VK is not part of this package"))
                 return
             missing = graphics.missing_metal_dependencies()
             if missing:
                 self._show_renderer(window.settings.get("renderer", "opengl"))
-                _error_dialog(window, _("Quadra M2VK is unavailable"),
+                _error_dialog(window, _("Quinta M2VK is unavailable"),
                               _("Install these first: {programs}", programs=", ".join(missing)))
                 return
             window.set_setting("renderer", selected)
@@ -2672,7 +2672,7 @@ class SettingsPage(Adw.Bin):
     def _allow_debugger_row(self):
         return self._synced_switch(
             "allow_debugger", _("Allow freeze diagnostics"),
-            _("QUADRA_ALLOW_DEBUGGER. Lets Collect diagnostics read the game's thread stacks; "
+            _("Lets Collect diagnostics read the game's thread stacks; "
               "keeps the crash handler available. Turn on before starting the game."))
 
     def _text_input_trace_row(self):
@@ -2721,7 +2721,7 @@ class SettingsPage(Adw.Bin):
         threads = Adw.PreferencesGroup(title=_("Threads"))
         kicks = Adw.SwitchRow(
             title=_("Watchdog thread kicks"),
-            subtitle=_("QUADRA_KICK. Interrupts threads stuck in long waits. Off by default: "
+            subtitle=_("Interrupts threads stuck in long waits. Off by default: "
                        "each kick costs time. Applies on next launch."),
             active=settings.get("cider_thread_kicks", False))
         kicks.connect("notify::active", lambda row, _pspec: window.set_setting(
@@ -2842,7 +2842,7 @@ class SettingsPage(Adw.Bin):
                 _toast(self.window.toasts, _("Update {version} available", version=tag))
             else:
                 self.check_launcher_btn.set_label(_("Check for updates"))
-                _toast(self.window.toasts, _("Quadra is up to date"))
+                _toast(self.window.toasts, _("Quinta is up to date"))
 
         self._in_thread(core.check_launcher_update, done)
 
@@ -3112,14 +3112,13 @@ class SettingsPage(Adw.Bin):
         self._in_thread(core.restart_darling, done)
 
 
-ABOUT = ("Quinta is imqstr's fork of Quadra. It runs the Roblox client for macOS on Linux through Darling. "
+ABOUT = ("Quinta runs the Roblox client for macOS on Linux through Darling. Maintained by imqstr. "
          "It is not made by Roblox and is not affiliated with it.")
 
 
 def _links():
     """(title, icon, uri) of the project's community pages."""
-    links = [("Website", "quadra-web-symbolic", "https://quadrahq.org"),
-             ("Discord", "quadra-discord-symbolic", author.DISCORD_URL)]
+    links = [("Report a problem", "quadra-web-symbolic", "https://github.com/imqstr/Quinta/issues")]
     if author.GITHUB_URL:
         links.append(("GitHub", "quadra-github-symbolic", author.GITHUB_URL))
     return links
@@ -3814,7 +3813,7 @@ class LauncherWindow(Adw.ApplicationWindow):
     def _show_launcher_update_dialog(self, tag):
         dialog = Adw.AlertDialog(
             heading=_("Update available"),
-            body=_("A new version of Quadra ({version}) is available. Update now?", version=tag)
+            body=_("A new version of Quinta ({version}) is available. Update now?", version=tag)
         )
         dialog.add_response("later", _("Later"))
         dialog.add_response("update", _("Update"))
@@ -3914,7 +3913,7 @@ class LauncherWindow(Adw.ApplicationWindow):
         return False
 
     def install_ciderdarling(self):
-        """Install CiderDarling, or update it to the build Quadra's installer
+        """Install CiderDarling, or update it to the build Quinta's installer
         pins, in a separate terminal (runtime_install.TERMINAL_SCRIPT)."""
         if runtime.is_bundled():
             return
@@ -3987,7 +3986,7 @@ class LauncherWindow(Adw.ApplicationWindow):
             threading.Thread(target=self._sync_ciderdarling_shortcut, daemon=True).start()
             page.runtime_row.set_selected(page._runtime_codes.index("ciderdarling"))
             if core.DARLING_RUNTIME["runtime"] == "ciderdarling" and page.runtime_apply_button.get_sensitive():
-                _toast(self.toasts, _("CiderDarling updated. Apply and restart Quadra to use it."))
+                _toast(self.toasts, _("CiderDarling updated. Apply and restart Quinta to use it."))
             else:
                 _toast(self.toasts, _("CiderDarling installed. Apply the runtime choice to switch."))
         return False
@@ -4083,7 +4082,7 @@ class LauncherWindow(Adw.ApplicationWindow):
             return
         dialog = Adw.AlertDialog(
             heading=_("Install Roblox Studio?"),
-            body=_("Studio runs in its Windows version through Wine. Quadra downloads Wine, "
+            body=_("Studio runs in its Windows version through Wine. Quinta downloads Wine, "
                    "DXVK, Microsoft's WebView2 and Studio, about 800 MB."))
         dialog.add_response("cancel", _("Cancel"))
         dialog.add_response("install", _("Install"))
@@ -4268,10 +4267,10 @@ class LauncherWindow(Adw.ApplicationWindow):
             else None
         )
         info = getattr(self, "current_game_info", None)
-        brand = f"Quadra {__version__}"
+        brand = f"Quinta {__version__}"
         large_image, large_text = discord.LOGO, brand
         small_image = small_text = None
-        buttons = [(_("Get Quadra"), discord.WEBSITE_URL)]
+        buttons = [(_("Get Quinta"), discord.WEBSITE_URL)]
 
         if info and not info.get("loading") and self.settings.get("discord_rpc_game", True):
             details = info.get("name", _("Playing Roblox"))
@@ -4348,7 +4347,7 @@ class LauncherWindow(Adw.ApplicationWindow):
         self.session = session
         reason = getattr(session, "metal_fallback_reason", None)
         if reason:
-            _toast(self.toasts, _("Quadra M2VK could not start; playing with OpenGL this time. {reason}",
+            _toast(self.toasts, _("Quinta M2VK could not start; playing with OpenGL this time. {reason}",
                                   reason=reason.splitlines()[0][:160]))
         if self._transport_warning_dialog is not None:
             self._transport_warning_dialog.close()
@@ -4387,9 +4386,9 @@ class LauncherWindow(Adw.ApplicationWindow):
         dialog = Adw.AlertDialog(
             heading=_("Roblox update broke game compatibility"),
             body=_("Roblox is no longer using RakNet. The latest Roblox update has broken "
-                   "game connection compatibility with Quadra. Games might not work or may "
-                   "show Error 256.\n\nCheck for a Quadra update. If a fix is not available yet, "
-                   "wait for a Quadra compatibility patch."))
+                   "game connection compatibility with Quinta. Games might not work or may "
+                   "show Error 256.\n\nCheck for a Quinta update. If a fix is not available yet, "
+                   "wait for a Quinta compatibility patch."))
         self._transport_warning_dialog = dialog
         dialog.add_response("close", _("Close"))
         dialog.add_response("logs", _("View log"))
@@ -4537,13 +4536,13 @@ class LauncherWindow(Adw.ApplicationWindow):
 
     def _roblox_update_required_dialog(self, target=None):
         self._update_required_dialog_active = True
-        body = _("Roblox closed to install a required update. Let Quadra download the current client, then try launching again.")
+        body = _("Roblox closed to install a required update. Let Quinta download the current client, then try launching again.")
         if target and target.get("upload"):
             if "channel" in target:
-                body = _("Roblox requires version {version} on channel {channel}. Quadra will download that exact client, then try launching again.",
+                body = _("Roblox requires version {version} on channel {channel}. Quinta will download that exact client, then try launching again.",
                          version=target["version"], channel=target["channel"] or _("Production"))
             else:
-                body = _("Roblox requires version {version}. Quadra will download that exact client, then try launching again.",
+                body = _("Roblox requires version {version}. Quinta will download that exact client, then try launching again.",
                          version=target["version"])
         dialog = Adw.AlertDialog(
             heading=_("Roblox needs an update"),
@@ -4659,7 +4658,7 @@ class LauncherApp(Adw.Application):
         if window:
             # The game watcher may queue a pending join as the game ends.
             window.stopping = True
-        print(f"Signal {signal_number}: closing Quadra")
+        print(f"Signal {signal_number}: closing Quinta")
 
         def finish():
             try:
@@ -4734,7 +4733,7 @@ def main(page=None):
         try:
             application.register(None)
         except GLib.Error as error:
-            print("Could not register Quadra:", error)
+            print("Could not register Quinta:", error)
         if application.get_is_remote():
             application.activate_action("ciderdarling-settings", None)
             connection = application.get_dbus_connection()

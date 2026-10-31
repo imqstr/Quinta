@@ -1,4 +1,4 @@
-"""Quinta, a Linux Roblox launcher forked from Quadra."""
+"""Quinta, a Linux Roblox launcher forked from Quinta."""
 
 # Launcher release, shown in the play window. The update check compares it with
 # the latest release tag number by number (for example 0.21 or 0.21patch1).

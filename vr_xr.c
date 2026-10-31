@@ -1,4 +1,4 @@
-/* OpenXR session for Quadra's VR device: an EGL-bound session on the GL
+/* OpenXR session for Quinta's VR device: an EGL-bound session on the GL
  * renderer's own context (XR_MNDX_egl_enable), one swapchain per eye, eye
  * images copied in with glBlitFramebuffer. See vr_device.c. */
 #include "vr_xr.h"
@@ -155,7 +155,7 @@ static void (*glColorMask_)(unsigned char, unsigned char, unsigned char, unsigne
 static void vr_xr_log(const char *what, XrResult result) {
     char name[64] = "", line[256];
     if (instance && xrResultToString_) xrResultToString_(instance, result, name);
-    snprintf(line, sizeof line, "[Quadra VR] OpenXR %s: %s (%d)\n", what, name[0] ? name : "error", (int)result);
+    snprintf(line, sizeof line, "[Quinta VR] OpenXR %s: %s (%d)\n", what, name[0] ? name : "error", (int)result);
     vr_host->log(line);
 }
 
@@ -163,7 +163,7 @@ static int vr_xr_function(const char *name, void *slot) {
     PFN_xrVoidFunction function = 0;
     if (gipa(instance, name, &function) != XR_SUCCESS || !function) {
         char line[160];
-        snprintf(line, sizeof line, "[Quadra VR] OpenXR runtime lacks %s\n", name);
+        snprintf(line, sizeof line, "[Quinta VR] OpenXR runtime lacks %s\n", name);
         vr_host->log(line);
         return 0;
     }
@@ -207,11 +207,11 @@ static int vr_xr_instance(void) {
         refresh_extension |= vr_xr_strings_equal(extensions[index].extensionName, "XR_FB_display_refresh_rate");
     }
     if (!opengl || !egl) {
-        vr_host->log("[Quadra VR] OpenXR runtime cannot take OpenGL frames over EGL (needs XR_KHR_opengl_enable and XR_MNDX_egl_enable)\n");
+        vr_host->log("[Quinta VR] OpenXR runtime cannot take OpenGL frames over EGL (needs XR_KHR_opengl_enable and XR_MNDX_egl_enable)\n");
         return -1;
     }
     const char *enabled[] = {"XR_KHR_opengl_enable", "XR_MNDX_egl_enable", "XR_FB_display_refresh_rate"};
-    XrInstanceCreateInfo create = {XR_TYPE_INSTANCE_CREATE_INFO, 0, 0, {"Roblox (Quadra)", 1, "Quadra", 1, XR_MAKE_VERSION(1, 0, 0)},
+    XrInstanceCreateInfo create = {XR_TYPE_INSTANCE_CREATE_INFO, 0, 0, {"Roblox (Quinta)", 1, "Quinta", 1, XR_MAKE_VERSION(1, 0, 0)},
                                    0, 0, refresh_extension ? 3u : 2u, enabled};
     result = xrCreateInstance_(&create, &instance);
     if (result != XR_SUCCESS) {
@@ -352,7 +352,7 @@ static int vr_xr_session(void *display, void *context, void *(*get_proc_address)
     int config_id = 0, configs = 0;
     void *config = 0;
     if (!query_context(display, context, EGL_CONFIG_ID, &config_id)) {
-        vr_host->log("[Quadra VR] The game's EGL context has no config\n");
+        vr_host->log("[Quinta VR] The game's EGL context has no config\n");
         return -1;
     }
     const int attributes[] = {EGL_CONFIG_ID, config_id, EGL_NONE};
@@ -391,7 +391,7 @@ static int vr_xr_session(void *display, void *context, void *(*get_proc_address)
     for (uint32_t index = 0; index < format_count && !format; ++index)
         if (formats[index] == GL_RGBA8) format = GL_RGBA8;
     if (!format) {
-        vr_host->log("[Quadra VR] OpenXR runtime offers no 8-bit RGBA swapchain format\n");
+        vr_host->log("[Quinta VR] OpenXR runtime offers no 8-bit RGBA swapchain format\n");
         return -1;
     }
     for (int eye = 0; eye < 2; ++eye) {
@@ -418,11 +418,11 @@ static int vr_xr_session(void *display, void *context, void *(*get_proc_address)
          !refresh_rate_count))
         refresh_extension = 0;
     char line[200];
-    snprintf(line, sizeof line, "[Quadra VR] OpenXR session created: %dx%d per eye, %s swapchain, %s\n",
+    snprintf(line, sizeof line, "[Quinta VR] OpenXR session created: %dx%d per eye, %s swapchain, %s\n",
              eye_width, eye_height, format == GL_SRGB8_ALPHA8 ? "sRGB" : "RGBA8",
              stage_space ? "stage space available" : "no stage space");
     vr_host->log(line);
-    snprintf(line, sizeof line, "[Quadra VR] Controllers: %s\n",
+    snprintf(line, sizeof line, "[Quinta VR] Controllers: %s\n",
              action_set ? "Touch, Index and generic profiles bound" : "unavailable");
     vr_host->log(line);
     return 1;
@@ -438,11 +438,11 @@ int vr_xr_start(const VrXrHost *host, void *display, void *context, void *(*get_
         if (!loader) loader = host->open("libopenxr_loader.so");
         gipa = loader ? (PFN_xrGetInstanceProcAddr)host->symbol(loader, "xrGetInstanceProcAddr") : 0;
         if (!gipa) {
-            host->log("[Quadra VR] The OpenXR loader (libopenxr_loader.so.1) is not installed\n");
+            host->log("[Quinta VR] The OpenXR loader (libopenxr_loader.so.1) is not installed\n");
             return -1;
         }
         if (!vr_xr_load_gl()) {
-            host->log("[Quadra VR] OpenGL framebuffer functions are missing\n");
+            host->log("[Quinta VR] OpenGL framebuffer functions are missing\n");
             return -1;
         }
     }
@@ -473,7 +473,7 @@ int vr_xr_start(const VrXrHost *host, void *display, void *context, void *(*get_
         if (eye_width > (int)views[0].maxImageRectWidth) eye_width = (int)views[0].maxImageRectWidth;
         if (eye_height > (int)views[0].maxImageRectHeight) eye_height = (int)views[0].maxImageRectHeight;
         char line[160];
-        snprintf(line, sizeof line, "[Quadra VR] Headset recommends %ux%u per eye; rendering %dx%d\n",
+        snprintf(line, sizeof line, "[Quinta VR] Headset recommends %ux%u per eye; rendering %dx%d\n",
                  views[0].recommendedImageRectWidth, views[0].recommendedImageRectHeight, eye_width, eye_height);
         vr_host->log(line);
     }
@@ -549,7 +549,7 @@ static void vr_xr_poll(void) {
         static const char *const names[] = {"unknown", "idle", "ready", "synchronized", "visible",
                                             "focused", "stopping", "loss pending", "exiting"};
         char line[96];
-        snprintf(line, sizeof line, "[Quadra VR] OpenXR session %s\n",
+        snprintf(line, sizeof line, "[Quinta VR] OpenXR session %s\n",
                  changed->state >= 0 && changed->state <= 8 ? names[changed->state] : "state changed");
         vr_host->log(line);
         session_state = changed->state;
@@ -588,11 +588,11 @@ static void vr_xr_refresh_rate(void) {
         if (refresh_rates[index] <= requested + 0.5f && refresh_rates[index] > best) best = refresh_rates[index];
     char line[160];
     if (!follow_requested_rate || best <= 0 || best == display_rate) {
-        snprintf(line, sizeof line, "[Quadra VR] Roblox asked for %.0f Hz; keeping the headset's %.0f Hz\n",
+        snprintf(line, sizeof line, "[Quinta VR] Roblox asked for %.0f Hz; keeping the headset's %.0f Hz\n",
                  (double)requested, (double)display_rate);
     } else {
         XrResult result = xrRequestDisplayRefreshRateFB_(session, best);
-        snprintf(line, sizeof line, "[Quadra VR] Roblox asked for %.0f Hz; requesting %.0f Hz (%s)\n",
+        snprintf(line, sizeof line, "[Quinta VR] Roblox asked for %.0f Hz; requesting %.0f Hz (%s)\n",
                  (double)requested, (double)best, result == XR_SUCCESS ? "ok" : "refused");
     }
     vr_host->log(line);
@@ -679,7 +679,7 @@ static void vr_xr_recenter_now(XrTime time) {
     if (retired && retired != local_space && retired != submitted_space) xrDestroySpace_(retired);
     retired = base_space;
     base_space = recentered;
-    vr_host->log("[Quadra VR] Recentered on the headset's current position and heading\n");
+    vr_host->log("[Quinta VR] Recentered on the headset's current position and heading\n");
 }
 
 static void vr_xr_input(VrXrViews *views, XrTime time) {
