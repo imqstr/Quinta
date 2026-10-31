@@ -16,7 +16,7 @@ entry = str(launcher / 'quinta-launcher')
 for char in ('\\', '"', '`', '$'):
     entry = entry.replace(char, '\\' + char)
 entry = entry.replace('%', '%%')
-icon = launcher.parent / 'branding/icons/quadrahq-256.png'
+icon = launcher.parent / 'branding/icons/quinta-256.png'
 (data / 'applications/io.github.imqstr.Quinta.desktop').write_text(
     '[Desktop Entry]\nType=Application\nName=Quinta\n'
     'Comment=Roblox on Linux through Darling\n'

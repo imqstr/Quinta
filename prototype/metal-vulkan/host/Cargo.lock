@@ -135,7 +135,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "quadra-metal-host"
+name = "quinta-metal-host"
 version = "0.1.0"
 dependencies = [
  "ash",

@@ -8,41 +8,41 @@
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
-      quadrahq = pkgs.callPackage ./packaging/nix { };
+      quinta = pkgs.callPackage ./packaging/nix { };
       runtimeCheck = package: {
         type = "app";
         program = "${
-          pkgs.callPackage ./packaging/nix/check-runtime.nix { quadrahq = package; }
-        }/bin/quadrahq-runtime-check";
+          pkgs.callPackage ./packaging/nix/check-runtime.nix { quinta = package; }
+        }/bin/quinta-runtime-check";
         meta.description = "Check Quinta's ${package.runtime} runtime in a disposable prefix";
       };
     in
     {
       packages.${system} = {
-        inherit quadrahq;
-        default = quadrahq;
-        quadrahq-regular = quadrahq.override { runtime = "regular"; };
+        inherit quinta;
+        default = quinta;
+        quinta-regular = quinta.override { runtime = "regular"; };
       };
 
       apps.${system} = {
         default = {
           type = "app";
-          program = "${quadrahq}/bin/quadrahq";
-          meta.description = quadrahq.meta.description;
+          program = "${quinta}/bin/quinta";
+          meta.description = quinta.meta.description;
         };
-        check-runtime = runtimeCheck quadrahq;
-        check-runtime-regular = runtimeCheck self.packages.${system}.quadrahq-regular;
+        check-runtime = runtimeCheck quinta;
+        check-runtime-regular = runtimeCheck self.packages.${system}.quinta-regular;
       };
 
       overlays.default = final: prev: {
-        quadrahq = final.callPackage ./packaging/nix { };
+        quinta = final.callPackage ./packaging/nix { };
       };
 
       nixosModules.default = import ./packaging/nix/module.nix self;
 
       checks.${system} = {
-        inherit quadrahq;
-        regular = self.packages.${system}.quadrahq-regular;
+        inherit quinta;
+        regular = self.packages.${system}.quinta-regular;
       };
 
       formatter.${system} = pkgs.nixfmt;

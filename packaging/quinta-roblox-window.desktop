@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Roblox (Quinta)
+Exec=quinta
+Icon=quinta
+NoDisplay=true
+StartupWMClass=RobloxPlayer

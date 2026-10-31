@@ -18,10 +18,10 @@ os.environ.update(XDG_CONFIG_HOME=str(base / 'config'), XDG_CACHE_HOME=str(base 
                   XDG_DATA_HOME=str(base / 'data'))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'launcher'))
 threading.Thread.start = lambda self: None
-from quadra import app, core
+from quinta import app, core
 from gi.repository import Adw, Gio
 
-application = Adw.Application(application_id='org.quadrahq.Quadra.UpdateTest',
+application = Adw.Application(application_id='io.github.imqstr.Quinta.UpdateTest',
                               flags=Gio.ApplicationFlags.NON_UNIQUE)
 application.register(None)
 release = {'version': '0.744.0.7441080', 'clientVersionUpload': 'version-212bac6bdccd4673'}

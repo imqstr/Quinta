@@ -4,7 +4,7 @@
   llvmPackages,
 }:
 rustPlatform.buildRustPackage {
-  pname = "quadrahq-metal-host";
+  pname = "quinta-metal-host";
   version = "0.1.0";
   src = lib.fileset.toSource {
     root = ../../prototype/metal-vulkan/host;

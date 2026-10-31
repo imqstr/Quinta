@@ -1,5 +1,5 @@
 /* Optional real-driver regression, against an X11 EGL display:
- * clang -O2 tests/shader_driver_test.c shader_compat.c -lEGL -lGL -o /tmp/shader-driver-test
+ * clang -O2 tests/shader_driver_test.c native/shader_compat.c -lEGL -lGL -o /tmp/shader-driver-test
  * EGL_PLATFORM=x11 /tmp/shader-driver-test [optional shader files...]
  */
 #include <assert.h>
@@ -10,7 +10,7 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glext.h>
-extern char *quadra_fix_shader_indices(char *, unsigned long *);
+extern char *quinta_fix_shader_indices(char *, unsigned long *);
 
 static int compile(const char *source) {
     GLuint shader = glCreateShader(strstr(source, "gl_Position") ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
@@ -46,13 +46,13 @@ int main(int argc, char **argv) {
     const char *input = "#version 150\nin vec4 POSITION; uniform vec4 CB12[256]; void main(){gl_Position=CB12[((uint(POSITION.w) >> 8u) & 255u) * 1 + 0];}";
     char *source = strdup(input);
     unsigned long length = strlen(source);
-    source = quadra_fix_shader_indices(source, &length);
+    source = quinta_fix_shader_indices(source, &length);
     assert(compile(source));
     free(source);
     assert(compile("#version 150\nin vec4 POSITION; void main(){uint i=((uint(POSITION.w) >> 8u) & 255u); gl_Position=vec4(float(i));}"));
     source = strdup("#version 150\nuniform vec4 CB3[64]; in vec4 NORMAL; void main(){uint _500=uint(NORMAL.w); gl_Position=CB3[(_500 & 63u) * 1 + 0];}");
     length = strlen(source);
-    source = quadra_fix_shader_indices(source, &length);
+    source = quinta_fix_shader_indices(source, &length);
     assert(compile(source));
     free(source);
     for (int index = 1; index < argc; index++) {
@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
         fclose(file);
         source[size] = 0;
         length = size;
-        source = quadra_fix_shader_indices(source, &length);
+        source = quinta_fix_shader_indices(source, &length);
         if (!compile(source)) {
             fprintf(stderr, "FAIL: corrected shader %s\n", argv[index]);
             return 1;

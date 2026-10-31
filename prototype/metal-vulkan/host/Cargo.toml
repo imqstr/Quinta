@@ -1,14 +1,14 @@
 [package]
-name = "quadra-metal-host"
+name = "quinta-metal-host"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.98"
 license = "GPL-3.0-only"
 publish = false
-description = "Host side of Quinta's Metal on Vulkan: metal2vulkan-runtime behind the C table of ../quadra_metal.h"
+description = "Host side of Quinta's Metal on Vulkan: metal2vulkan-runtime behind the C table of ../quinta_metal.h"
 
 [lib]
-name = "quadra_metal_host"
+name = "quinta_metal_host"
 crate-type = ["cdylib", "rlib"]
 path = "src/lib.rs"
 

@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import patch
 
-from quadra import core, graphics
+from quinta import core, graphics
 from session_fixture import bare_session
 
 
@@ -10,7 +10,7 @@ class MetalFallbackTests(unittest.TestCase):
     def session(self, **settings):
         return bare_session(dict(core.DEFAULT_SETTINGS, renderer="metal", **settings))
 
-    def test_a_working_device_keeps_quadra_m2vk(self):
+    def test_a_working_device_keeps_quinta_m2vk(self):
         session = self.session()
         with patch.object(graphics, "validate_metal", return_value="Test GPU") as validate:
             env, name = session._validated_metal({"MACOBLOX_METAL": "1"})
@@ -42,7 +42,7 @@ class MetalFallbackTests(unittest.TestCase):
 class ProbeSelfTestTests(unittest.TestCase):
     def test_the_probe_calls_the_host_self_test_when_it_has_one(self):
         source = open(graphics.__file__).read()
-        self.assertIn("quadra_metal_host_self_test", source)
+        self.assertIn("quinta_metal_host_self_test", source)
         self.assertIn("release(device)\n            raise RuntimeError", source)
 
 

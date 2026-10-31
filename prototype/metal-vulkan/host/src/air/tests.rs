@@ -114,7 +114,7 @@ fn library(bitcode: &[u8]) -> Vec<u8> {
 #[test]
 fn concurrent_cache_requests_upgrade_once_and_corrupt_entries_rebuild() {
     use std::sync::atomic::Ordering;
-    let directory = std::env::temp_dir().join(format!("quadra-air-cache-{}", std::process::id()));
+    let directory = std::env::temp_dir().join(format!("quinta-air-cache-{}", std::process::id()));
     let cache = UpgradeCache::new(directory.clone()).unwrap();
     let original = library(&bitcode(SCATTER));
     let before = UPGRADES.load(Ordering::Relaxed);

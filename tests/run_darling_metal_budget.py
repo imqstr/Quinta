@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check the real Metal.framework budget in a disposable Darling prefix.
 
-Requires a built Metal.framework and libquadra_metal_host.so in --metal-dir.
+Requires a built Metal.framework and libquinta_metal_host.so in --metal-dir.
 No compositor, game, account, installed framework or existing prefix is used.
 """
 import argparse
@@ -13,7 +13,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'launcher'))
-from quadra import runtime
+from quinta import runtime
 
 
 def main():
@@ -27,7 +27,7 @@ def main():
     sysroot = args.sysroot or Path(selected['sysroot'])
     client = args.darling or selected['executable']
     metal = args.metal_dir.resolve()
-    output = (args.output_dir or Path(tempfile.mkdtemp(prefix='quadra-metal-budget-'))).resolve()
+    output = (args.output_dir or Path(tempfile.mkdtemp(prefix='quinta-metal-budget-'))).resolve()
     output.mkdir(parents=True, exist_ok=True)
     binary = output / 'metal-budget-test'
     subprocess.run(['clang', '-target', 'x86_64-apple-darwin', '-fuse-ld=lld',
@@ -35,12 +35,12 @@ def main():
                     '-F' + str(metal), str(ROOT / 'tests/darling_metal_budget_test.m'),
                     '-framework', 'Metal', '-framework', 'Foundation', '-o', str(binary)],
                    check=True, timeout=30)
-    prefix = Path(tempfile.mkdtemp(prefix='quadra-metal-budget-prefix-')) / 'prefix'
+    prefix = Path(tempfile.mkdtemp(prefix='quinta-metal-budget-prefix-')) / 'prefix'
     values = {'DYLD_FRAMEWORK_PATH': '/Volumes/SystemRoot' + str(metal),
-              'MACOBLOX_METAL_HOST_LIBRARY': str(metal / 'libquadra_metal_host.so'),
+              'MACOBLOX_METAL_HOST_LIBRARY': str(metal / 'libquinta_metal_host.so'),
               'MACOBLOX_METAL_SHADER_CACHE': str(output / 'shader-cache'),
               'MACOBLOX_METAL_PRELOAD_IN_PROCESS': '0',
-              'QUADRA_VRAM_BYTES': '134217728'}
+              'QUINTA_VRAM_BYTES': '134217728'}
     environment = {key: value for key, value in os.environ.items()
                    if key not in ('DPREFIX', 'DYLD_INSERT_LIBRARIES', 'DYLD_FRAMEWORK_PATH', 'LD_PRELOAD')}
     environment.update(values, DPREFIX=str(prefix))

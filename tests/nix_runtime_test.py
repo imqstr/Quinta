@@ -16,7 +16,7 @@ spec.loader.exec_module(relocation)
 class NixRuntimeTests(unittest.TestCase):
     def test_relocation_keeps_offsets_and_nested_guest_paths(self):
         prefix = '/opt/ciderdarling/' + 'a' * 40
-        replacement = '/usr/lib64/quadrahq-runtime/' + 'a' * 30
+        replacement = '/usr/lib64/quinta-runtime/' + 'a' * 32
         server = (prefix + '/bin/darlingserver').encode()
         loader = (prefix + '/libexec/darling/usr/libexec/darling/mldr').encode()
         original = b'\x7fELF\0' + server + b'\0' + loader + b'\0untouched\0'
@@ -29,7 +29,7 @@ class NixRuntimeTests(unittest.TestCase):
     def test_guest_install_names_are_preserved(self):
         original = b'/System/Library/Frameworks/AppKit.framework/AppKit\0/usr/lib/libSystem.B.dylib\0'
         self.assertEqual(relocation.relocate(original, '/opt/ciderdarling/' + 'a' * 40,
-                                            '/usr/lib64/quadrahq-runtime/' + 'a' * 30), original)
+                                            '/usr/lib64/quinta-runtime/' + 'a' * 32), original)
 
     def test_shortening_paths_would_break_compiled_string_lengths(self):
         with self.assertRaises(ValueError):
@@ -41,7 +41,7 @@ class NixRuntimeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             library = root / 'noroot.so'
-            subprocess.run(['clang', '-shared', '-fPIC', '-O2', '-DQUADRA_NIX_STORE',
+            subprocess.run(['clang', '-shared', '-fPIC', '-O2', '-DQUINTA_NIX_STORE',
                             str(source), '-ldl', '-o', str(library)], check=True, capture_output=True)
             probe = root / 'permissions.c'
             probe.write_text('''

@@ -6,15 +6,15 @@ flake:
   ...
 }:
 let
-  cfg = config.programs.quadrahq;
+  cfg = config.programs.quinta;
 in
 {
-  options.programs.quadrahq = {
+  options.programs.quinta = {
     enable = lib.mkEnableOption "Quinta, the Roblox launcher";
     package = lib.mkOption {
       type = lib.types.package;
-      default = flake.packages.x86_64-linux.quadrahq;
-      defaultText = lib.literalExpression "quadra.packages.x86_64-linux.quadrahq";
+      default = flake.packages.x86_64-linux.quinta;
+      defaultText = lib.literalExpression "quinta.packages.x86_64-linux.quinta";
       description = "Quinta package, including its pinned Darling runtime.";
     };
     runtime = lib.mkOption {

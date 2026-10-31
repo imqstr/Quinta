@@ -8,7 +8,7 @@
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <X11/extensions/Xfixes.h>
-#include "../cursor_selection.h"
+#include "../native/cursor_selection.h"
 
 static int opaque_pixels(Display *display) {
     XFixesCursorImage *image = XFixesGetCursorImage(display);
@@ -35,13 +35,13 @@ int main(void) {
     XWarpPointer(display, None, child, 0, 0, 0, 0, 80, 90); XSync(display, False);
     assert(!opaque_pixels(display)); /* Reproduce the stale child cursor. */
 
-    QuadraCursorApplyAPI api = {(void *)XUndefineCursor, (void *)XQueryTree,
+    QuintaCursorApplyAPI api = {(void *)XUndefineCursor, (void *)XQueryTree,
                                  (void *)XFree, (void *)XSync};
-    assert(quadra_cursor_selection_apply(&api, display, game));
+    assert(quinta_cursor_selection_apply(&api, display, game));
     assert(opaque_pixels(display) > 0);
     /* A newer hide wins even when an older worker update runs afterward. */
     XDefineCursor(display, game, blank); XSync(display, False);
-    assert(quadra_cursor_selection_apply(&api, display, game));
+    assert(quinta_cursor_selection_apply(&api, display, game));
     assert(!opaque_pixels(display));
     XDefineCursor(display, game, arrow); XSync(display, False);
     assert(opaque_pixels(display) > 0); /* Unhide follows the parent immediately. */

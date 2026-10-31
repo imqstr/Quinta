@@ -15,12 +15,12 @@ temporary = tempfile.TemporaryDirectory()
 base = Path(temporary.name)
 os.environ.update(HOME=str(base), XDG_CONFIG_HOME=str(base / "config"),
                   XDG_CACHE_HOME=str(base / "cache"), XDG_DATA_HOME=str(base / "data"))
-for key in ("DPREFIX", "FLATPAK_ID", "QUADRA_PAGE", "QUADRA_BUNDLED_DARLING"):
+for key in ("DPREFIX", "FLATPAK_ID", "QUINTA_PAGE", "QUINTA_BUNDLED_DARLING"):
     os.environ.pop(key, None)
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "launcher"))
 # Do not run startup update checks, author avatars or other unrelated workers.
 threading.Thread.start = lambda self: None
-from quadra import app, core, runtime, runtime_install
+from quinta import app, core, runtime, runtime_install
 from runtime_update_fixture import release_fixture
 from gi.repository import Adw, Gio
 
@@ -48,7 +48,7 @@ def discovery(current, pinned=None):
                               cider_directory=base / "versions", pinned=pinned)
 
 
-application = Adw.Application(application_id="org.quadrahq.Quadra.RuntimeTest",
+application = Adw.Application(application_id="io.github.imqstr.Quinta.RuntimeTest",
                               flags=Gio.ApplicationFlags.NON_UNIQUE)
 application.register(None)
 errors, restarts = [], []
@@ -149,7 +149,7 @@ with context:
     assert page.runtime_row.get_selected() == 0 and page.runtime_apply_button.get_sensitive()
     assert page.runtime_row.get_model().get_string(0) == "DarlingHQ's Darling"
 
-with patch.dict(os.environ, FLATPAK_ID="org.quadrahq.Quadra"):
+with patch.dict(os.environ, FLATPAK_ID="io.github.imqstr.Quinta"):
     context, window = fixture("regular")
     with context:
         page = window.settings_page
@@ -158,7 +158,7 @@ with patch.dict(os.environ, FLATPAK_ID="org.quadrahq.Quadra"):
         page.apply_runtime()
         assert len(restarts) == 2
 
-with patch.dict(os.environ, QUADRA_BUNDLED_DARLING=str(base / 'ciderdarling')):
+with patch.dict(os.environ, QUINTA_BUNDLED_DARLING=str(base / 'ciderdarling')):
     context, window = fixture()
     with context, patch.object(runtime_install.Installation, 'create') as install:
         page = window.settings_page
@@ -226,7 +226,7 @@ with context:
     assert selection_file.read_bytes() == before and "cancelled" in errors[-1][-1]
     assert page.runtime_install_button.get_sensitive()
 
-with patch.dict(os.environ, FLATPAK_ID="org.quadrahq.Quadra"):
+with patch.dict(os.environ, FLATPAK_ID="io.github.imqstr.Quinta"):
     context, window = fixture("regular")
     with context, patch.object(app, "_launch_runtime_terminal") as launch_terminal:
         assert not window.settings_page.runtime_install_row.get_visible()
@@ -237,8 +237,8 @@ with patch.object(app.os, "execve") as execute, patch.object(app.sys, "argv", ["
     app._restart_launcher()
     command, arguments, environment = execute.call_args.args
     assert command == sys.executable
-    assert arguments == [sys.executable, str(core.PROJECT / "launcher/quadrahq-launcher")]
-    assert environment["QUADRA_PAGE"] == "settings" and "roblox:old-link" not in arguments
+    assert arguments == [sys.executable, str(core.PROJECT / "launcher/quinta-launcher")]
+    assert environment["QUINTA_PAGE"] == "settings" and "roblox:old-link" not in arguments
 
 # A published descendant is offered without changing an active Regular
 # Darling selection, and its exact release is passed to the terminal job.

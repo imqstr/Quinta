@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#000000">
   <meta name="description" content="Report a Quinta bug with reproduction steps and the diagnostics archive from the failed run.">
   <link rel="canonical" href="https://github.com/imqstr/Quinta/issues">
-  <link rel="icon" href="/assets/quadrahq-icon.png" type="image/png">
+  <link rel="icon" href="/assets/quinta-icon.png" type="image/png">
   <link rel="preload" href="/assets/fonts/Archivo.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="/style.css">
   <title>Report a bug — Quinta</title>
@@ -21,7 +21,7 @@
     <section class="window" aria-labelledby="report-title">
       <header class="window-bar"><span>Quinta / bug reports</span><a href="/">back to home</a></header>
       <div class="window-body">
-        <img class="brand-logo" src="/assets/quadrahq.webp" width="1024" height="1024" alt="Quinta logo">
+        <img class="brand-logo" src="/assets/quinta.webp" width="1024" height="1024" alt="Quinta logo">
         <h1 id="report-title">Report a bug</h1>
         <p>Describe the problem and attach the diagnostics <strong>.tar.gz</strong> from the run that failed. We’ll check the archive, save the report on Quinta’s server, and send the description, log and file to our Discord report channel.</p>
         <div class="report-actions"><a class="button" href="#report-form">Go to the form</a></div>
@@ -31,7 +31,7 @@
           <li><strong>Turn on both switches:</strong> <strong>Crash diagnostics</strong> and <strong>Allow freeze diagnostics</strong>. Do this before starting Roblox; the archive check below requires both to be enabled.</li>
           <li><strong>Restart Roblox through Quinta.</strong> Fully close the old game, start a new run, and repeat the action that causes the problem. Write down what you clicked or pressed and the error you saw.</li>
           <li><strong>Return to the Quinta launcher.</strong> Open its menu and choose <strong>Collect diagnostics</strong>. For a crash, collect after it happens. For a freeze, leave Roblox frozen while you collect.</li>
-          <li><strong>Click Open folder</strong> in the <strong>Diagnostics collected</strong> dialog. Find the newly created <code>quadra-diagnostics-YYYYMMDD-HHMMSS.tar.gz</code>. Keep this file compressed.</li>
+          <li><strong>Click Open folder</strong> in the <strong>Diagnostics collected</strong> dialog. Find the newly created <code>quinta-diagnostics-YYYYMMDD-HHMMSS.tar.gz</code>. Keep this file compressed.</li>
           <li><strong>Select that file below.</strong> Use the archive from this failed run. The form checks its contents, reads your Quinta version, and verifies both diagnostics settings. If either is off, repeat the steps with both switches enabled.</li>
         </ol>
         <p class="report-note">For a setup or download failure, enable the switches and collect after the error; you can report it even if Roblox never started. Include the failing download URL if the error shows one. If you need help, <a href="https://discord.gg/jpbsf44tBE">ask on Discord</a>.</p>

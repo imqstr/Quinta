@@ -1,7 +1,7 @@
 > This setup guide is inherited and adapted for Quinta. Historical upstream notices are preserved in [the licensing archive](../LICENSES/upstream/README.md).
 
 <p align="center">
-  <img src="branding/quadrahq.webp" alt="Quinta logo" width="160">
+  <img src="branding/quinta.webp" alt="Quinta logo" width="160">
 </p>
 
 <h1 align="center">
@@ -41,18 +41,18 @@ Any derivatives must be also under the GPL v3 license, and cannot remove any cop
 </h1>
 
 Quinta is maintained by **imqstr** and builds on an existing Linux launcher. The terminal
-command and native package name are **`quadrahq`**, the desktop ID is
-`org.quadrahq.Quadra`, and the website is
-[quadrahq.org](https://quadrahq.org). The logo stays the same.
+command and native package name are **`quinta`**, the desktop ID is
+`io.github.imqstr.Quinta`, and the website is
+[quinta.org](https://quadrahq.org). The logo stays the same.
 
 The source installer moves `~/.local/share/CiderHQ` (or the older
-`~/.local/share/MacOBlox`) to `~/.local/share/QuadraHQ`. Settings and cache move
-from `ciderhq` (or `macoblox`) to `quadrahq`, and Darling session files move
-from `Library/CiderHQ` (or `Library/MacOBlox`) to `Library/QuadraHQ`. Existing
+`~/.local/share/MacOBlox`) to `~/.local/share/Quinta`. Settings and cache move
+from `ciderhq` (or `macoblox`) to `quinta`, and Darling session files move
+from `Library/CiderHQ` (or `Library/MacOBlox`) to `Library/Quinta`. Existing
 Quinta data is never replaced; Cider data takes precedence over MacOBlox data.
 
-The launcher's Python package is `quadra`, the shim is `libQuadraShims.dylib`
-and its settings are `QUADRA_*` variables. Names that the Darling runtime and
+The launcher's Python package is `quinta`, the shim is `libQuintaShims.dylib`
+and its settings are `QUINTA_*` variables. Names that the Darling runtime and
 Quinta M2VK read (`CIDER_*`, `MACOBLOX_METAL_*`, CiderDarling's runtime
 identifiers) keep their compatibility names until those projects are renamed.
 The source lives at [Quinta](https://github.com/imqstr/Quinta) (formerly
@@ -116,7 +116,7 @@ CiderDarling uses `~/.ciderdarling` by default; regular Darling uses `~/.darling
 Sign in again the first time you use the separate prefix. Switching keeps both
 prefixes and runtime installations available. An explicit `DPREFIX` overrides
 the prefix. The installer saves the client, matching runtime root and prefix
-in `~/.config/quadrahq/runtime.json` (or your XDG config directory) after setup
+in `~/.config/quinta/runtime.json` (or your XDG config directory) after setup
 succeeds. Restart the launcher after switching. Flatpak continues to use its
 bundled runtime.
 
@@ -147,18 +147,18 @@ with its prefix unchanged, and the active runtime switches to it only if
 CiderDarling was already active. An
 installation interrupted during `sudo` is detected and removed after asking
 (`--replace-incomplete-runtime` skips the question). Build trees are deleted
-after a successful build; the build log stays in `~/.cache/quadrahq/installer/`.
+after a successful build; the build log stays in `~/.cache/quinta/installer/`.
 
 While CiderDarling is installed, **Settings → CiderDarling** (also the
-*CiderDarling Settings* app menu entry, or `quadrahq --ciderdarling-settings`)
+*CiderDarling Settings* app menu entry, or `quinta --ciderdarling-settings`)
 collects its options: renderer and graphics card (shared with Environment →
-Game), watchdog thread kicks (`QUADRA_KICK=1`, off by default), a runtime trace
+Game), watchdog thread kicks (`QUINTA_KICK=1`, off by default), a runtime trace
 (`CIDER_TRACE_FILE`, a private file in the logs folder), a verbose
 darlingserver log (`DSERVER_LOG_LEVEL=debug`), diagnostics and the prefix
 folder. These apply only while CiderDarling is the active runtime.
 
 Run the same command again to update or uninstall. Updates save local source
-changes in `~/.local/share/QuadraHQ-backups` (or your XDG data directory) and
+changes in `~/.local/share/Quinta-backups` (or your XDG data directory) and
 keep settings and sign-in. Without a terminal, or for scripts, the choices
 are options too:
 
@@ -166,7 +166,7 @@ are options too:
 curl -fsSL https://quadrahq.org/install.sh | bash -s -- --uninstall
 ```
 
-Arch package recipes for `quadrahq` and `quadrahq-git` are
+Arch package recipes for `quinta` and `quinta-git` are
 in [packaging/aur](packaging/aur/README.md). They build the shim at package
 creation and install system menu entries. The stable recipe is generated from a checksum-verified source archive.
 The new package names still need submission to the AUR.
@@ -220,8 +220,8 @@ sudo dnf install clang lld unzip pipewire-utils python3-gobject gtk4 libadwaita 
 
 ```bash
 git clone --filter=blob:none --no-checkout --depth 1 --single-branch --branch main \
-  https://github.com/imqstr/Quinta ~/.local/share/QuadraHQ
-git -C ~/.local/share/QuadraHQ sparse-checkout set --no-cone --stdin <<'PATTERNS'
+  https://github.com/imqstr/Quinta ~/.local/share/Quinta
+git -C ~/.local/share/Quinta sparse-checkout set --no-cone --stdin <<'PATTERNS'
 /*
 !/website/
 !/.github/
@@ -229,8 +229,8 @@ git -C ~/.local/share/QuadraHQ sparse-checkout set --no-cone --stdin <<'PATTERNS
 !/.vercel/
 !/.vercelignore
 PATTERNS
-git -C ~/.local/share/QuadraHQ reset --hard HEAD
-~/.local/share/QuadraHQ/launcher/install.sh
+git -C ~/.local/share/Quinta reset --hard HEAD
+~/.local/share/Quinta/launcher/install.sh
 ```
 </details>
 
@@ -249,7 +249,7 @@ Grapejuice and Quinta are inherently similar because Grapejuice used Wine to run
 
 You sign in inside the Roblox client itself, the launcher and we at Quinta **NEVER** see your password since the
 session is stored locally, only on your computer, and not on a server. The cookie is located in
-`~/.darling/Users/$USER/Library/QuadraHQ`. Do not share that folder, it works
+`~/.darling/Users/$USER/Library/Quinta`. Do not share that folder, it works
 like a fancy keycard to your account. We at Quinta will never ask for this folder, and anyone asking for this is a phishing attempt and should be reported, not only to the service you're on, but also ping (Don't DM) anyone with the "Cool and awesome" role in the [Discord](https://discord.gg/jCjHYYNq48) and above, so we can "take care (ban)" them from the server, or make a PSA in the [Discord](https://discord.gg/jCjHYYNq48) to make sure they don't get another persons account.
 **Sign out** in the settings to delete it.
 
@@ -261,7 +261,7 @@ Quinta is ***NOT*** affiliated nor endorsed by the Roblox Corporation, nor any s
 
 In the rare, and *scary* event Roblox does not start, the launcher shows the error with a **Copy**
 button. Send it to the [Discord](https://discord.gg/jCjHYYNq48). The last
-error is also saved in `~/.cache/quadrahq/last-error.txt`.
+error is also saved in `~/.cache/quinta/last-error.txt`.
 You can also send things like bug reports (i.e. Camera issues, and rendering bugs [like artifacting].)
 </details>
 
@@ -334,7 +334,7 @@ presentation and retention fixes; the new launcher stages have no controlled gam
 With [MangoHud](https://github.com/flightlessmango/MangoHud) installed, enable
 **Settings → Environment → Game → MangoHud overlay** and restart Roblox.
 It works with both OpenGL and Vulkan (Zink) and is off by default. You can also
-start the source launcher with `MANGOHUD=1 ./launcher/quadrahq-launcher`.
+start the source launcher with `MANGOHUD=1 ./launcher/quinta-launcher`.
 The launcher also forwards `MANGOHUD_CONFIG` and `MANGOHUD_CONFIGFILE` to Roblox.
 For the Flatpak, install the matching MangoHud extension with
 `flatpak install flathub org.freedesktop.Platform.VulkanLayer.MangoHud//26.08`
@@ -364,7 +364,7 @@ Set **Settings → Environment → Game → Roblox UI scale** to **200%** for a
 display's rendering resolution. Adjust it to suit your monitor.
 
 For a manual settings edit, `"dpi_scale": 2.0` in
-`~/.config/quadrahq/settings.json` selects 200%. The `resolution` key is not
+`~/.config/quinta/settings.json` selects 200%. The `resolution` key is not
 supported. If you previously added `DFFlagDisableDPIScale`, remove it from your
 custom fast flags before testing scaling.
 
@@ -414,11 +414,11 @@ the log. It cannot capture an external kill or every Darling server failure.
 For source installations, the same switch is available as:
 
 ```bash
-QUADRA_DIAGNOSTIC_SIGNALS=1 ./launcher/quadrahq-launcher
+QUINTA_DIAGNOSTIC_SIGNALS=1 ./launcher/quinta-launcher
 ```
 
 Source checkouts write launch logs to their `logs/` directory; read-only
-packages use `~/.local/share/quadrahq/logs/` by default. For Flatpak,
+packages use `~/.local/share/quinta/logs/` by default. For Flatpak,
 use `~/.var/app/wtf.aubree.MacOBlox/data/macoblox/logs/`. Also collect
 `private/var/log/dserver.log` inside the selected Darling prefix: normally
 `~/.darling/`, or `~/.var/app/wtf.aubree.MacOBlox/data/darling/` for Flatpak.
@@ -426,10 +426,10 @@ use `~/.var/app/wtf.aubree.MacOBlox/data/macoblox/logs/`. Also collect
 The lifecycle record describes the observed state before cleanup. A final
 `Broken pipe` can follow cleanup and does not identify the original failure.
 
-**Collect diagnostics** (launcher menu, or `quadrahq --collect-diagnostics`)
+**Collect diagnostics** (launcher menu, or `quinta --collect-diagnostics`)
 writes one archive with the logs, runtime selection and the game's thread
 states. Thread stacks need **Allow freeze diagnostics**
-(`QUADRA_ALLOW_DEBUGGER=1`) turned on before the game starts. Inherited
+(`QUINTA_ALLOW_DEBUGGER=1`) turned on before the game starts. Inherited
 `DSERVER_LOG_*` variables are ignored unless `CIDER_KEEP_DSERVER_LOG=1` is
 set; launch logs are capped at 200 MB in total, and `dserver.log` is rotated
 to `dserver.log.old` past 32 MB while Darling is stopped.
@@ -450,7 +450,7 @@ during the game, play until the stall has happened, then close the game or
 press Ctrl-C:
 
 ```bash
-quadrahq --watch-stalls
+quinta --watch-stalls
 ```
 
 It records, ten times a second, how much CPU each thread of the game uses;
@@ -464,7 +464,7 @@ doing meanwhile, what darlingserver used, and what every blocked thread waited
 on (system call, futex word, timeout). It costs about 2% of one CPU core and
 stops each busy thread, and the main thread while it is not in a futex wait,
 for about a tenth of a millisecond. Send the `.txt` with the launch log;
-`quadrahq --watch-stalls --report FILE.jsonl` prints a report again, and
+`quinta --watch-stalls --report FILE.jsonl` prints a report again, and
 `--all` covers the whole capture instead of the join and leave windows.
 
 Submit bugs through [the report page](https://quadrahq.org/report/). Follow its
@@ -525,7 +525,7 @@ For a source installation, close the launcher and start it with optional
 selection diagnostics:
 
 ```bash
-QUADRA_TRACE_TEXT_INPUT=1 ./launcher/quadrahq-launcher
+QUINTA_TRACE_TEXT_INPUT=1 ./launcher/quinta-launcher
 ```
 
 The trace records text lengths, selection ranges and composition state in
@@ -619,8 +619,8 @@ than the previous GNOME runtime recipe. To build it yourself:
 
 ```bash
 flatpak install --user flathub org.flatpak.Builder org.freedesktop.Platform//26.08 org.freedesktop.Sdk//26.08 org.freedesktop.Sdk.Extension.llvm22//26.08
-cd Quadra/flatpak
-flatpak run --env=FLATPAK_USER_DIR=$HOME/.local/share/flatpak --command=flatpak-builder org.flatpak.Builder --user --install --force-clean build-dir org.quadrahq.Quadra.yml
+cd Quinta/flatpak
+flatpak run --env=FLATPAK_USER_DIR=$HOME/.local/share/flatpak --command=flatpak-builder org.flatpak.Builder --user --install --force-clean build-dir io.github.imqstr.Quinta.yml
 ```
 </details>
 

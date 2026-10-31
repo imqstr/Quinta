@@ -2,8 +2,8 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from quadra import discord, studio_presence
-from quadra.studio_presence import StudioPresence
+from quinta import discord, studio_presence
+from quinta.studio_presence import StudioPresence
 
 
 class Immediate:

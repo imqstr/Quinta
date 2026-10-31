@@ -50,14 +50,14 @@ __attribute__((constructor)) static void setup(void) {
     }
 }
 
-static pid_t quadra_getpid(void) {
+static pid_t quinta_getpid(void) {
     return in_launchd ? 1 : getpid();
 }
-DYLD_INTERPOSE(quadra_getpid, getpid)
+DYLD_INTERPOSE(quinta_getpid, getpid)
 
-static int quadra_kill(pid_t pid, int signal) {
+static int quinta_kill(pid_t pid, int signal) {
     if (pid == 1 && in_launchd)
         pid = launchd_pid;
     return kill(pid, signal);
 }
-DYLD_INTERPOSE(quadra_kill, kill)
+DYLD_INTERPOSE(quinta_kill, kill)

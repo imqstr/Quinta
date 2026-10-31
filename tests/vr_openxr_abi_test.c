@@ -1,6 +1,6 @@
-/* vr_openxr.h must match the Khronos OpenXR headers it was copied from. */
+/* native/vr_openxr.h must match the Khronos OpenXR headers it was copied from. */
 #include <stdio.h>
-#include "../vr_openxr.h"
+#include "../native/vr_openxr.h"
 #include "vr_openxr_fields.h"
 
 extern const unsigned long khronos_sizes[], khronos_offsets[];
@@ -39,6 +39,6 @@ int main(void) {
             ++failures;
         }
     if (failures) return 1;
-    printf("vr_openxr.h matches the Khronos OpenXR headers\n");
+    printf("native/vr_openxr.h matches the Khronos OpenXR headers\n");
     return 0;
 }

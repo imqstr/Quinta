@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from quadra import paths
+from quinta import paths
 
 
 class UserDirectoryMigrationTests(unittest.TestCase):
@@ -35,8 +35,8 @@ class UserDirectoryMigrationTests(unittest.TestCase):
         self.assertEqual((cider / 'settings.json').stat().st_mode & 0o777, 0o600)
         self.assertEqual((older / 'settings.json').read_text(), 'older settings')
 
-    def test_existing_quadra_data_is_never_replaced(self):
-        target = self.directory('quadrahq', 'Quinta settings')
+    def test_existing_quinta_data_is_never_replaced(self):
+        target = self.directory('quinta', 'Quinta settings')
         cider = self.directory('ciderhq', 'Cider settings')
         result = paths.migrate_directories(target, cider, self.base / 'macoblox')
         self.assertEqual(result, target)
@@ -45,7 +45,7 @@ class UserDirectoryMigrationTests(unittest.TestCase):
 
     def test_older_session_migrates_when_cider_session_is_absent(self):
         legacy = self.directory('Library/MacOBlox', 'session')
-        target = self.base / 'Library/QuadraHQ'
+        target = self.base / 'Library/Quinta'
         target.mkdir()
         self.assertEqual(paths.migrate_directories(target, self.base / 'Library/CiderHQ', legacy), target)
         self.assertEqual((target / 'settings.json').read_text(), 'session')
@@ -55,7 +55,7 @@ class UserDirectoryMigrationTests(unittest.TestCase):
         cider = self.directory('ciderhq', 'current settings')
         older = self.directory('macoblox', 'older settings')
         with patch.object(Path, 'rename', side_effect=OSError('permission denied')):
-            result = paths.migrate_directories(self.base / 'quadrahq', cider, older)
+            result = paths.migrate_directories(self.base / 'quinta', cider, older)
         self.assertEqual(result, cider)
         self.assertEqual((cider / 'settings.json').read_text(), 'current settings')
         self.assertEqual((older / 'settings.json').read_text(), 'older settings')
@@ -65,14 +65,14 @@ class EnvironmentMigrationTests(unittest.TestCase):
     def test_variables_set_before_the_rename_are_still_read(self):
         environment = {'MACOBLOX_TRACE_KEYS': '1', 'MACOBLOX_WAYLAND': '0', 'HOME': '/home/user'}
         paths.migrate_environment(environment)
-        self.assertEqual(environment['QUADRA_TRACE_KEYS'], '1')
-        self.assertEqual(environment['QUADRA_WAYLAND'], '0')
+        self.assertEqual(environment['QUINTA_TRACE_KEYS'], '1')
+        self.assertEqual(environment['QUINTA_WAYLAND'], '0')
         self.assertEqual(environment['MACOBLOX_TRACE_KEYS'], '1')
 
     def test_a_variable_that_is_already_renamed_wins(self):
-        environment = {'MACOBLOX_WAYLAND': '0', 'QUADRA_WAYLAND': '1'}
+        environment = {'MACOBLOX_WAYLAND': '0', 'QUINTA_WAYLAND': '1'}
         paths.migrate_environment(environment)
-        self.assertEqual(environment['QUADRA_WAYLAND'], '1')
+        self.assertEqual(environment['QUINTA_WAYLAND'], '1')
 
     def test_metal_variables_keep_their_names_for_the_metal_runtime(self):
         environment = {'MACOBLOX_METAL': '1', 'MACOBLOX_METAL_SHADER_CACHE': '/cache'}

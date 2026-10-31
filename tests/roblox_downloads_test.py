@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 import urllib.error
 
-from quadra import core, roblox_downloads
+from quinta import core, roblox_downloads
 
 VERSION = 'https://clientsettingscdn.roblox.com/v2/client-version/MacPlayer'
 UPLOAD = 'version-212bac6bdccd4673'

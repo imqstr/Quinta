@@ -3,8 +3,8 @@ import tempfile
 import unittest
 from unittest.mock import Mock, patch
 
-from quadra import core
-from quadra.transport_monitor import TransportMonitor
+from quinta import core
+from quinta.transport_monitor import TransportMonitor
 from session_fixture import bare_session
 
 

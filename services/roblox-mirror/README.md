@@ -32,17 +32,17 @@ installed client in place.
 The service listens only on `127.0.0.1:9473`. It allows 16 active requests,
 two archive fetches, 512 MiB per archive and a 2 GiB completed archive cache.
 It has no third-party Python dependencies. The supplied systemd unit uses a
-dynamic user and a private cache at `/var/cache/quadra-roblox`.
+dynamic user and a private cache at `/var/cache/quinta-roblox`.
 
 ## Deployment on korona
 
-Install `server.py` as `/opt/quadra-downloads/server.py`, the unit as
-`/etc/systemd/system/quadra-roblox-mirror.service`, and `route.caddy` as
-`/etc/caddy/quadra-downloads.caddy`. Import the route inside the existing
+Install `server.py` as `/opt/quinta-downloads/server.py`, the unit as
+`/etc/systemd/system/quinta-roblox-mirror.service`, and `route.caddy` as
+`/etc/caddy/quinta-downloads.caddy`. Import the route inside the existing
 `https://` block, ahead of its catchall handler:
 
 ```caddy
-import /etc/caddy/quadra-downloads.caddy
+import /etc/caddy/quinta-downloads.caddy
 ```
 
 Back up `/etc/caddy/Caddyfile`, validate a candidate configuration with
@@ -51,7 +51,7 @@ the service and reload Caddy. Check the public `/healthz` and version paths.
 The deployed configuration preserves the other hosted applications.
 
 For an update, replace the service script and restart only
-`quadra-roblox-mirror.service`. Do not publish an incomplete `.part` file or
+`quinta-roblox-mirror.service`. Do not publish an incomplete `.part` file or
 turn this route into a general URL proxy. No launcher authentication is
 required because all supplied data is public Roblox deployment data.
 Verify the deployed script's checksum against this checkout: the older mirror

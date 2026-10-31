@@ -29,7 +29,7 @@ sha256sums=('f56be4aee19c20bbd7b117adc4a638b69cf553e29a4cd98556174885eac04600')
 
 build() {
   cd "Cider-$_tag"
-  MACOBLOX_BUILD_DIR="$srcdir/native-build" ./build_debug_shim.sh
+  MACOBLOX_BUILD_DIR="$srcdir/native-build" ./scripts/build-native.sh
 }
 
 package() {

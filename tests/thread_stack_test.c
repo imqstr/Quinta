@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
-#include "../thread_stack.h"
+#include "../native/thread_stack.h"
 
 static int fail_setter;
 int pthread_attr_getstackaddr(const darwin_pthread_attr_t *attr, void **address) {
@@ -23,19 +23,19 @@ int main(void) {
     original->opaque[2] = 1234; /* unrelated caller setting */
     assert(!mprotect(original, 4096, PROT_READ));
     darwin_pthread_attr_t copy;
-    assert(quadra_larger_stack_attributes(original, &copy));
+    assert(quinta_larger_stack_attributes(original, &copy));
     assert(copy.opaque[1] == MIN_THREAD_STACK && copy.opaque[2] == 1234);
     assert(original->opaque[1] == 512 * 1024);
     fail_setter = 1;
-    assert(!quadra_larger_stack_attributes(original, &copy));
+    assert(!quinta_larger_stack_attributes(original, &copy));
     fail_setter = 0;
     copy = *original;
     copy.opaque[0] = 1; /* caller owns this stack */
     darwin_pthread_attr_t untouched = copy;
-    assert(!quadra_larger_stack_attributes(&copy, &untouched));
+    assert(!quinta_larger_stack_attributes(&copy, &untouched));
     assert(!memcmp(&copy, &untouched, sizeof copy));
     copy.opaque[0] = 0; copy.opaque[1] = 16 * 1024 * 1024;
-    assert(!quadra_larger_stack_attributes(&copy, &untouched));
+    assert(!quinta_larger_stack_attributes(&copy, &untouched));
     munmap(original, 4096);
     puts("PASS: read-only thread attributes, settings retained, caller stack and setter failure");
 }

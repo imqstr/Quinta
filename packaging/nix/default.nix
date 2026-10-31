@@ -27,7 +27,7 @@ let
   ]);
   version = (builtins.fromJSON (builtins.readFile ../release.json)).version;
   payload = stdenv.mkDerivation {
-    pname = "quadrahq-payload-${runtime}";
+    pname = "quinta-payload-${runtime}";
     inherit version;
     src = lib.fileset.toSource {
       root = ../..;
@@ -41,8 +41,8 @@ let
             )
           )
         ))
-        ../../build_debug_shim.sh
-        ../../patch_startup_throttle.py
+        ../../scripts/build-native.sh
+        ../../scripts/patch-startup-throttle.py
         ../../install.sh
         ../../README.md
         ../../LICENSE
@@ -78,16 +78,16 @@ let
     # Mach-O files are cross compiled against Darling's SDK. The host clang
     # wrapper injects Linux flags, so use unwrapped clang for Darwin only.
     postPatch = ''
-      substituteInPlace build_debug_shim.sh prototype/metal-vulkan/build.sh \
+      substituteInPlace scripts/build-native.sh prototype/metal-vulkan/build.sh \
         --replace-fail 'clang -target' '${llvmPackages.clang-unwrapped}/bin/clang -target'
     '';
     buildPhase = ''
       runHook preBuild
       export DARLING_SYSROOT=${darling}/libexec/darling
-      export QUADRA_BUILD_DIR="$PWD/native-build"
-      bash build_debug_shim.sh
-      QUADRA_METAL_HOST_LIBRARY=${metalHost}/lib/libquadra_metal_host.so bash packaging/build-metal.sh
-      $CC -shared -fPIC -O2 -DQUADRA_NIX_STORE flatpak/darling-noroot.c -ldl -o native-build/darling-noroot.so
+      export QUINTA_BUILD_DIR="$PWD/native-build"
+      bash scripts/build-native.sh
+      QUINTA_METAL_HOST_LIBRARY=${metalHost}/lib/libquinta_metal_host.so bash packaging/build-metal.sh
+      $CC -shared -fPIC -O2 -DQUINTA_NIX_STORE flatpak/darling-noroot.c -ldl -o native-build/darling-noroot.so
       ${llvmPackages.clang-unwrapped}/bin/clang -target x86_64-apple-darwin -fuse-ld=lld \
         -isysroot "$DARLING_SYSROOT" -mmacosx-version-min=11.0 -dynamiclib -O2 \
         flatpak/launchd_pid1.c -o native-build/launchd_pid1.dylib
@@ -98,19 +98,19 @@ let
       bash packaging/install-payload.sh "$PWD" "$PWD/native-build" "$PWD/stage" /usr/lib
       mkdir -p "$out"
       cp -a stage/usr/. "$out/"
-      install -m755 native-build/darling-noroot.so native-build/launchd_pid1.dylib "$out/lib/quadrahq/"
+      install -m755 native-build/darling-noroot.so native-build/launchd_pid1.dylib "$out/lib/quinta/"
       ${lib.optionalString (runtime == "ciderdarling") ''
-        install -m644 packaging/org.quadrahq.Quadra.CiderDarling.desktop "$out/share/applications/"
+        install -m644 packaging/io.github.imqstr.Quinta.CiderDarling.desktop "$out/share/applications/"
       ''}
       runHook postInstall
     '';
     preFixup = ''
-      makeWrapper ${python}/bin/python3 "$out/bin/quadrahq" \
-        --add-flags "$out/share/quadrahq/launcher/quadrahq-launcher" \
-        --set QUADRA_PREBUILT_SHIM "$out/lib/quadrahq/shim" \
-        --set QUADRA_BUNDLED_DARLING ${darling} \
-        --set QUADRA_NOROOT_LIB "$out/lib/quadrahq/darling-noroot.so" \
-        --set QUADRA_PID1_DYLIB "$out/lib/quadrahq/launchd_pid1.dylib" \
+      makeWrapper ${python}/bin/python3 "$out/bin/quinta" \
+        --add-flags "$out/share/quinta/launcher/quinta-launcher" \
+        --set QUINTA_PREBUILT_SHIM "$out/lib/quinta/shim" \
+        --set QUINTA_BUNDLED_DARLING ${darling} \
+        --set QUINTA_NOROOT_LIB "$out/lib/quinta/darling-noroot.so" \
+        --set QUINTA_PID1_DYLIB "$out/lib/quinta/launchd_pid1.dylib" \
         "''${gappsWrapperArgs[@]}"
     '';
     doInstallCheck = true;
@@ -124,7 +124,7 @@ let
   };
 in
 buildFHSEnv {
-  pname = "quadrahq";
+  pname = "quinta";
   inherit version;
   targetPkgs =
     p:
@@ -189,7 +189,7 @@ buildFHSEnv {
       [
         "--ro-bind ${darling}/libexec/darling /usr/libexec/darling"
       ];
-  runScript = "${payload}/bin/quadrahq";
+  runScript = "${payload}/bin/quinta";
   extraInstallCommands = ''
     mkdir -p "$out/share/applications"
     for directory in icons mime licenses; do
@@ -197,7 +197,7 @@ buildFHSEnv {
     done
     cp ${payload}/share/applications/*.desktop "$out/share/applications/"
     substituteInPlace "$out"/share/applications/*.desktop \
-      --replace-fail 'Exec=quadrahq' "Exec=$out/bin/quadrahq"
+      --replace-fail 'Exec=quinta' "Exec=$out/bin/quinta"
   '';
   passthru = {
     inherit
@@ -212,6 +212,6 @@ buildFHSEnv {
     homepage = "https://quadrahq.org";
     license = lib.licenses.gpl3Only;
     platforms = [ "x86_64-linux" ];
-    mainProgram = "quadrahq";
+    mainProgram = "quinta";
   };
 }

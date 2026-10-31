@@ -18,15 +18,15 @@ extern float __exp10f(float);
 #define PAIR_SINE __sinval
 #define PAIR_COSINE __cosval
 #else
-#include "../math_compat.h"
-#define EXP10 quadra_exp10
-#define EXP10F quadra_exp10f
-#define SINCOSF quadra_sincosf
-#define SINCOS quadra_sincos
-#define SINCOSPIF quadra_sincospif
-#define SINCOSPI quadra_sincospi
-#define FloatPair struct QuadraFloat2
-#define DoublePair struct QuadraDouble2
+#include "../native/math_compat.h"
+#define EXP10 quinta_exp10
+#define EXP10F quinta_exp10f
+#define SINCOSF quinta_sincosf
+#define SINCOS quinta_sincos
+#define SINCOSPIF quinta_sincospif
+#define SINCOSPI quinta_sincospi
+#define FloatPair struct QuintaFloat2
+#define DoublePair struct QuintaDouble2
 #define PAIR_SINE sine
 #define PAIR_COSINE cosine
 #endif

@@ -6,9 +6,9 @@ render path, the VR home menu and the client's VR emulator
 (`DebugDeviceVR`). Only the device that talks to a headset is missing: the
 Windows and Quest builds attach an OpenXR device, the Mac build none.
 
-Quinta attaches one. The shim (`vr_device.c`) creates the client's own
+Quinta attaches one. The shim (`native/vr_device.c`) creates the client's own
 `DebugDeviceVR`, swaps in a copy of its vtable whose methods talk to the
-host's OpenXR runtime (`vr_xr.c`), and puts it where `DeviceGL` keeps its VR
+host's OpenXR runtime (`native/vr_xr.c`), and puts it where `DeviceGL` keeps its VR
 device. Everything else is Roblox's code.
 
 ## Where the device goes
@@ -106,23 +106,23 @@ submitting and presenting the game window.
 
 ## Settings and environment
 
-The launcher (`launcher/quadra/vr.py`) finds the host's active OpenXR runtime
+The launcher (`launcher/quinta/vr.py`) finds the host's active OpenXR runtime
 the way the loader would (`XR_RUNTIME_JSON`, `~/.config/openxr/1/`, `/etc/xdg`,
 known WiVRn/Monado manifests) and passes it, because the loader runs inside
 Darling with the guest's HOME:
 
 | Variable | Meaning |
 |---|---|
-| `QUADRA_VR` | `openxr`, or `openxr-headset` without the window mirror |
-| `QUADRA_VR_SCALE` | percent of the headset's recommended eye size (default 70) |
-| `QUADRA_XR_RUNTIME_JSON` | runtime manifest, set as the host's `XR_RUNTIME_JSON` |
-| `QUADRA_VR_FOLLOW_RATE=1` | let Roblox's display-rate requests (90 Hz) reach the headset |
+| `QUINTA_VR` | `openxr`, or `openxr-headset` without the window mirror |
+| `QUINTA_VR_SCALE` | percent of the headset's recommended eye size (default 70) |
+| `QUINTA_XR_RUNTIME_JSON` | runtime manifest, set as the host's `XR_RUNTIME_JSON` |
+| `QUINTA_VR_FOLLOW_RATE=1` | let Roblox's display-rate requests (90 Hz) reach the headset |
 
-Development modes: `QUADRA_VR=1` attaches the emulator with its own head
+Development modes: `QUINTA_VR=1` attaches the emulator with its own head
 (eyes mirrored into the window), `debug` also turns on the client's emulator
 mirror, and `-lag0` submits the views a frame opened with.
 
-`tests/vr_xr_host.c` drives `vr_xr.c` natively against the runtime with a test
+`tests/vr_xr_host.c` drives `native/vr_xr.c` natively against the runtime with a test
 pattern and prints head, hands and inputs (triggers vibrate, A recenters);
-`tests/vr_openxr_abi_test.c` checks the vendored `vr_openxr.h` against the
+`tests/vr_openxr_abi_test.c` checks the vendored `native/vr_openxr.h` against the
 Khronos headers.

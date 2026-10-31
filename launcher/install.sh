@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 # Installs the Quinta launcher for the current user: menu entry, icons
-# and a `quadrahq` command. Run again after moving the project folder.
+# and a `quinta` command. Run again after moving the project folder.
 set -euo pipefail
 launcher_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 project_dir=$(dirname -- "$launcher_dir")
 data_home=${XDG_DATA_HOME:-$HOME/.local/share}
 config_home=${XDG_CONFIG_HOME:-$HOME/.config}
 
-if [[ ( $project_dir == "$data_home/CiderHQ" || $project_dir == "$data_home/MacOBlox" ) && ! -e $data_home/QuadraHQ ]]; then
-  mv -T --no-clobber -- "$project_dir" "$data_home/QuadraHQ"
+if [[ ( $project_dir == "$data_home/CiderHQ" || $project_dir == "$data_home/MacOBlox" ) && ! -e $data_home/Quinta ]]; then
+  mv -T --no-clobber -- "$project_dir" "$data_home/Quinta"
   [[ ! -e $project_dir ]] || { printf '%s\n' 'Quinta migration destination is occupied.' >&2; exit 1; }
-  project_dir=$data_home/QuadraHQ
+  project_dir=$data_home/Quinta
   launcher_dir=$project_dir/launcher
 fi
 for size in 16 22 24 32 48 64 128 256 512 1024; do
-  install -Dm644 "$project_dir/branding/icons/quadrahq-$size.png" \
-    "$data_home/icons/hicolor/${size}x${size}/apps/quadrahq.png"
+  install -Dm644 "$project_dir/branding/icons/quinta-$size.png" \
+    "$data_home/icons/hicolor/${size}x${size}/apps/quinta.png"
 done
 # An earlier release installed a placeholder vector with this icon name.
-rm -f -- "$data_home/icons/hicolor/scalable/apps/quadrahq.svg"
+rm -f -- "$data_home/icons/hicolor/scalable/apps/quinta.svg"
 
 install -d "$HOME/.local/bin"
-ln -sf "$launcher_dir/quadrahq-launcher" "$HOME/.local/bin/quadrahq"
+ln -sf "$launcher_dir/quinta-launcher" "$HOME/.local/bin/quinta"
 if [[ -L $HOME/.local/bin/macoblox && $(readlink "$HOME/.local/bin/macoblox") == */macoblox-launcher ]]; then
   rm -- "$HOME/.local/bin/macoblox"
 fi
@@ -35,10 +35,10 @@ exec_path=${launcher_dir//\\/\\\\\\\\}
 exec_path=${exec_path//\"/\\\\\"}
 exec_path=${exec_path//\`/\\\\\`}
 exec_path=${exec_path//\$/\\\\\$}
-exec_path=\"${exec_path//\%/%%}/quadrahq-launcher\"
+exec_path=\"${exec_path//\%/%%}/quinta-launcher\"
 
 install -d "$data_home/applications"
-cat > "$data_home/applications/org.quadrahq.Quadra.desktop" <<DESKTOP
+cat > "$data_home/applications/io.github.imqstr.Quinta.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=Quinta
@@ -47,7 +47,7 @@ Comment[ru]=Запуск клиента Roblox для macOS на Linux чере�
 GenericName=Roblox launcher
 GenericName[ru]=Лаунчер Roblox
 Exec=$exec_path
-Icon=quadrahq
+Icon=quinta
 Terminal=false
 Categories=Game;
 Keywords=roblox;darling;
@@ -57,13 +57,13 @@ DESKTOP
 # Roblox links are LaunchServices protocol handoffs on macOS.  Keep a
 # separate hidden entry for Linux so the complete URI is substituted into one
 # launcher argument and can reach RobloxPlayer unchanged.
-cat > "$data_home/applications/org.quadrahq.Quadra.URI.desktop" <<DESKTOP
+cat > "$data_home/applications/io.github.imqstr.Quinta.URI.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=Quinta Roblox Link Handler
 Comment=Open Roblox links in Quinta
 Exec=$exec_path %u
-Icon=quadrahq
+Icon=quinta
 Terminal=false
 NoDisplay=true
 MimeType=x-scheme-handler/roblox;x-scheme-handler/roblox-player;
@@ -71,14 +71,14 @@ DESKTOP
 
 # Roblox Studio (Windows version through Wine), also the handler of the
 # roblox-studio: links and of roblox-studio-auth: that signs Studio in.
-cat > "$data_home/applications/org.quadrahq.Quadra.Studio.desktop" <<DESKTOP
+cat > "$data_home/applications/io.github.imqstr.Quinta.Studio.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=Roblox Studio (Quinta)
 Comment=Roblox Studio through Wine
 Comment[ru]=Roblox Studio через Wine
 Exec=$exec_path --studio %u
-Icon=quadrahq
+Icon=quinta
 Terminal=false
 Categories=Development;
 MimeType=x-scheme-handler/roblox-studio;x-scheme-handler/roblox-studio-auth;application/x-roblox-place;
@@ -86,13 +86,13 @@ StartupWMClass=robloxstudiobeta.exe
 DESKTOP
 
 # A shortcut to CiderDarling's settings, only while CiderDarling is installed
-# (packaging/org.quadrahq.Quadra.CiderDarling.desktop; the launcher keeps it in
+# (packaging/io.github.imqstr.Quinta.CiderDarling.desktop; the launcher keeps it in
 # step when runtimes change later). Its marker line identifies our copy.
-ciderdarling_entry=$data_home/applications/org.quadrahq.Quadra.CiderDarling.desktop
+ciderdarling_entry=$data_home/applications/io.github.imqstr.Quinta.CiderDarling.desktop
 ciderdarling_state=0
 PYTHONPATH=$launcher_dir python3 -c '
 import sys
-from quadra import runtime
+from quinta import runtime
 try:
     installed = "ciderdarling" in runtime.installed_runtimes()
 except Exception:
@@ -112,7 +112,7 @@ Name[ru]=Настройки CiderDarling
 Comment=Graphics card, runtime and diagnostics settings for CiderDarling
 Comment[ru]=Видеокарта, среда и диагностика для CiderDarling
 Exec=$exec_path --ciderdarling-settings
-Icon=quadrahq
+Icon=quinta
 Terminal=false
 Categories=Game;
 Keywords=ciderdarling;darling;gpu;
@@ -124,14 +124,14 @@ elif [[ $ciderdarling_state == 1 && -n $ciderdarling_ours && -e $ciderdarling_en
 fi
 # Place files (.rbxl, .rbxlx) as their own type, so file managers open them
 # with Studio: no MIME database defines one.
-install -Dm644 "$project_dir/packaging/org.quadrahq.Quadra.xml" "$data_home/mime/packages/org.quadrahq.Quadra.xml"
+install -Dm644 "$project_dir/packaging/io.github.imqstr.Quinta.xml" "$data_home/mime/packages/io.github.imqstr.Quinta.xml"
 update-mime-database "$data_home/mime" 2>/dev/null || true
 if command -v xdg-mime >/dev/null; then
   for type in x-scheme-handler/roblox-studio x-scheme-handler/roblox-studio-auth application/x-roblox-place; do
-    xdg-mime default org.quadrahq.Quadra.Studio.desktop "$type"
+    xdg-mime default io.github.imqstr.Quinta.Studio.desktop "$type"
   done
   for type in x-scheme-handler/roblox x-scheme-handler/roblox-player; do
-    xdg-mime default org.quadrahq.Quadra.URI.desktop "$type"
+    xdg-mime default io.github.imqstr.Quinta.URI.desktop "$type"
   done
 fi
 
@@ -166,12 +166,12 @@ if [ -f "$config_home/mimeapps.list" ]; then
 fi
 
 # The game window itself (X11 class RobloxPlayer) gets the same icon in docks.
-cat > "$data_home/applications/quadrahq-roblox-window.desktop" <<DESKTOP
+cat > "$data_home/applications/quinta-roblox-window.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=Roblox (Quinta)
 Exec=$exec_path
-Icon=quadrahq
+Icon=quinta
 NoDisplay=true
 StartupWMClass=RobloxPlayer
 DESKTOP
@@ -179,4 +179,4 @@ DESKTOP
 update-desktop-database "$data_home/applications" 2>/dev/null || true
 # No gtk-update-icon-cache: with -t it wrote a cache into the user's icon
 # folder that other apps do not update, which can hide their icons.
-echo "Quinta installed: find it in the app menu or run: quadrahq"
+echo "Quinta installed: find it in the app menu or run: quinta"

@@ -10,7 +10,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from quadra import discord
+from quinta import discord
 
 
 class FakeDiscord:
@@ -82,7 +82,7 @@ class FakeDiscord:
 class DiscordPresenceTests(unittest.TestCase):
     def setUp(self):
         # Unix socket paths are short; avoid long temporary directories.
-        directory = tempfile.mkdtemp(prefix="quadra-rpc-", dir="/tmp" if os.path.isdir("/tmp") else None)
+        directory = tempfile.mkdtemp(prefix="quinta-rpc-", dir="/tmp" if os.path.isdir("/tmp") else None)
         self.addCleanup(shutil.rmtree, directory, True)
         environment = patch.dict(os.environ, {"XDG_RUNTIME_DIR": directory, "TMPDIR": directory})
         environment.start()

@@ -27,12 +27,12 @@ shader pack (only `shaders_glsl3.pack` and `shaders_metal_osx.pack`).
 ```text
 RobloxPlayer (guest, Mach-O)            host (ELF)
   Metal calls ──> framework/  ─ C table ─> host/  (Rust) ──> metal2vulkan-runtime ──> Vulkan
-                  Metal.framework replacement   libquadra_metal_host.so
+                  Metal.framework replacement   libquinta_metal_host.so
                   CAMetalLayer subclass              swapchain on an X11 child window
                                                      or a Wayland subsurface
 ```
 
-- `quadra_metal.h`: the ABI. The guest loads the host library through Darling's `_elfcalls`
+- `quinta_metal.h`: the ABI. The guest loads the host library through Darling's `_elfcalls`
   and gets one function table. Handles are the host's. The host never calls guest code:
   completion and presented blocks run on guest threads.
 - `framework/`: `Metal.framework`, loaded in place of Darling's with `DYLD_FRAMEWORK_PATH`.
@@ -122,7 +122,7 @@ time spent by the caller; these observations are not a frame-time or FPS measure
 are separate. Vulkan driver allocations and wrapped external images are excluded.
 Working-set recommendations come from `host/src/memory.rs`: the device-local heap budget the driver reports,
 polled about once a second, the largest such heap for a discrete card and a low cap for a unified-memory GPU.
-`QUADRA_VRAM_BYTES` can only lower the answer.
+`QUINTA_VRAM_BYTES` can only lower the answer.
 
 Presentation defaults to mailbox when the surface supports it, keeping vblank synchronization
 while replacing obsolete queued frames. It falls back to FIFO when mailbox is unavailable.
@@ -144,8 +144,8 @@ The authored `tests/metal_present_test.c` exercises a native Wayland render surf
 visible, covered by an opaque sibling, restored and resized. Its native driver/compositor
 results must be collected separately from the software offscreen tests.
 
-Native helpers can call `quadra_metal_host_preload` and
-`quadra_metal_host_diagnostics`; these optional exports do not change guest ABI 2.
+Native helpers can call `quinta_metal_host_preload` and
+`quinta_metal_host_diagnostics`; these optional exports do not change guest ABI 2.
 
 ## Tuning, memory pressure and hardware reports
 
@@ -159,7 +159,7 @@ from the environment, and an unset, empty or misspelled value is the default:
 | `MACOBLOX_METAL_MEMORY_PRIORITY` | `0` | leaves memory priority and pageable memory off |
 | `MACOBLOX_METAL_COMPILE_THREADS` | 1-32 (default from CPUs and memory) | pipeline compilations at once |
 | `MACOBLOX_METAL_WARM_STATES` | 0-1024 (default 256) | the most learned states kept warm, within a quarter of the available memory |
-| `QUADRA_VRAM_BYTES` | bytes | a cap on the graphics memory the game is told it has |
+| `QUINTA_VRAM_BYTES` | bytes | a cap on the graphics memory the game is told it has |
 
 The runtime enables `VK_EXT_memory_priority` and `VK_EXT_pageable_device_local_memory` on a device
 that has them and gives its blocks priorities (render targets and buffers above pooled textures).
@@ -169,11 +169,11 @@ demotes textures instead of failing an allocation. The launch log's `[Quinta Met
 vendor and device IDs, driver, whether the runtime has measured that exact combination, the driver
 defects it assumes and the optional extensions taken; a problem report should include it.
 
-Before a launch, the launcher's probe opens the device and runs `quadra_metal_host_self_test`
+Before a launch, the launcher's probe opens the device and runs `quinta_metal_host_self_test`
 (a fill of host memory copied through device-local memory and read back). If either fails, the launch
 uses OpenGL once and says why (the saved renderer is unchanged; the "Fall back to OpenGL" switch turns
-this off). `quadrahq --hardware-report --graphics` adds the host's view of the GPU, from
-`quadra_metal_host_identity`, under `m2vk`: the single file to send for an AMD, Intel or other
+this off). `quinta --hardware-report --graphics` adds the host's view of the GPU, from
+`quinta_metal_host_identity`, under `m2vk`: the single file to send for an AMD, Intel or other
 NVIDIA GPU.
 
 A presenter that waits a second for an image and finds none logs, once per distinct state, how many
@@ -221,15 +221,15 @@ bridge. Recheck them with the modified framework and host before distributing th
 
 | Path | What |
 |---|---|
-| `quadra_metal.h` | Guest/host ABI |
+| `quinta_metal.h` | Guest/host ABI |
 | `framework/` | `Metal.framework` (Objective-C, no SDK headers, like the shim) |
 | `host/src/lib.rs` | The table over metal2vulkan-runtime |
 | `host/src/present.rs` | `CAMetalLayer` drawables: Vulkan swapchains, presenter thread |
 | `host/src/air.rs` | Old AIR upgrade through libLLVM |
 | `host/examples/pack_census.rs` | Every library of a pack as the game loads them (`--compute`: kernels too) |
 | `host/examples/air_census.rs` | AIR decode of `.bc` files |
-| `build.sh` | Builds `build/metal/Metal.framework` and `build/metal/libquadra_metal_host.so` |
-| `../../launcher/quadra/{core,graphics}.py` | Lazy build, host device validation and renderer environment |
+| `build.sh` | Builds `build/metal/Metal.framework` and `build/metal/libquinta_metal_host.so` |
+| `../../launcher/quinta/{core,graphics}.py` | Lazy build, host device validation and renderer environment |
 | `../../wayland_{bridge.h,host.cpp,appkit.m}` | Wayland helper ABI 4, native Metal subsurfaces |
 | `../../tests/metal_host_test.c` | GPU clear, MSAA resolve and exact readback through the C ABI |
 | `tools/run_metal_test.py` | Starts the repository's launcher session (web bridge included) without saving settings |
@@ -250,12 +250,12 @@ tar -xzf /path/to/metal2vulkan-source.tar.gz --strip-components=1 -C vendor/meta
 ```sh
 prototype/metal-vulkan/build.sh            # needs clang, lld, Rust 1.98+
 # The repository is its own data folder when run from source: give it a client.
-rsync -a --exclude Contents/MacOS/ClientSettings ~/.local/share/QuadraHQ/RobloxPlayer.app/ RobloxPlayer.app/
+rsync -a --exclude Contents/MacOS/ClientSettings ~/.local/share/Quinta/RobloxPlayer.app/ RobloxPlayer.app/
 QM_DIAG=1 python3 -I prototype/metal-vulkan/tools/run_metal_test.py wayland 60 metal
 cargo run --release --manifest-path prototype/metal-vulkan/host/Cargo.toml --example pack_census -- \
     RobloxPlayer.app/Contents/Resources/shaders/shaders_metal_osx.pack --compute
-clang -O2 -Wall -Wextra tests/metal_host_test.c -ldl -o /tmp/quadra-metal-host-test
-/tmp/quadra-metal-host-test build/metal/libquadra_metal_host.so
+clang -O2 -Wall -Wextra tests/metal_host_test.c -ldl -o /tmp/quinta-metal-host-test
+/tmp/quinta-metal-host-test build/metal/libquinta_metal_host.so
 ```
 
 The test script sets `renderer=metal`, turns VR, MangoHud and Discord off, and never writes

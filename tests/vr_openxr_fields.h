@@ -1,4 +1,4 @@
-/* Every vendored OpenXR struct and the fields vr_xr.c touches. */
+/* Every vendored OpenXR struct and the fields native/vr_xr.c touches. */
 #define VR_OPENXR_STRUCTS(S) \
     S(XrPosef) S(XrFovf) S(XrRect2Di) S(XrApplicationInfo) S(XrInstanceCreateInfo) S(XrExtensionProperties) \
     S(XrSystemGetInfo) S(XrGraphicsRequirementsOpenGLKHR) S(XrGraphicsBindingEGLMNDX) S(XrSessionCreateInfo) \

@@ -36,7 +36,7 @@ NSError *qm_error(const char *what) {
     return [NSError errorWithDomain:[NSString stringWithUTF8String:"MTLLibraryErrorDomain"] code:3 userInfo:info];
 }
 
-/* The first symbols of Darling's mldr function table (see mangohud_bridge.c). */
+/* The first symbols of Darling's mldr function table (see native/mangohud_bridge.c). */
 struct qm_elf_calls {
     void *(*open)(const char *, int);
     int (*close)(void *);

@@ -4,14 +4,14 @@
  *   $(pkg-config --cflags --libs sdl2 wayland-client wayland-egl wayland-cursor) -o /tmp/wayland-drag-cursor
  */
 #include <cassert>
-#include "../wayland_host.cpp"
+#include "../native/wayland_host.cpp"
 static SDL_Event button(unsigned id,unsigned number,bool down) {
     SDL_Event event{};event.type=down?SDL_MOUSEBUTTONDOWN:SDL_MOUSEBUTTONUP;
     event.button.windowID=id;event.button.button=number;event.button.clicks=1;return event;
 }
 int main() {
     alarm(15);
-    auto host=quadra_wayland_host_api();assert(host);
+    auto host=quinta_wayland_host_api();assert(host);
     unsigned id=host->create(320,240);assert(id);
     host->action(id,MW_TITLE,0,0,"Quinta cursor test");
     bool focused=false;
@@ -46,7 +46,7 @@ int main() {
         blur.window.event=SDL_WINDOWEVENT_FOCUS_LOST;translate(blur);
         assert(!window.cursor_mapped && !window.capture && !window.drag_cursor.buttons);
     });
-    quadra_wayland_event event{};bool delta=false;
+    quinta_wayland_event event{};bool delta=false;
     while(host->poll(&event))if(event.type==MW_MOTION && event.window==id && event.dx==7 && event.dy==-9)delta=true;
     assert(delta);
     host->action(id,MW_DESTROY,0,0,nullptr);sync([]{});

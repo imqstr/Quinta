@@ -5,11 +5,11 @@
  * Metal's own types keep Metal's layouts and raw values. Objects follow
  * Cocoa's conventions: new/alloc/copy return +1, everything else is
  * autoreleased. Every Metal object holds one handle of the host library
- * (../quadra_metal.h) and releases it in -dealloc. */
-#ifndef QUADRA_METAL_FRAMEWORK_H
-#define QUADRA_METAL_FRAMEWORK_H
+ * (../quinta_metal.h) and releases it in -dealloc. */
+#ifndef QUINTA_METAL_FRAMEWORK_H
+#define QUINTA_METAL_FRAMEWORK_H
 
-#include "../quadra_metal.h"
+#include "../quinta_metal.h"
 
 typedef signed char BOOL;
 #define YES ((BOOL)1)

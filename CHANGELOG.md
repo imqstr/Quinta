@@ -60,18 +60,18 @@
     prefix Studio's Local AppData, Documents and Pictures in your own folders; follow the system light/dark theme.
   - Stay on a Kombucha release or use a Wine of your own, stay on one Studio version or channel (the signed-in
     account's own channel by default, found with the saved Roblox login), and edit Studio's fast flags.
-  - Copy the files in `~/.config/quadrahq/studio-overlay` over Studio's at every start.
+  - Copy the files in `~/.config/quinta/studio-overlay` over Studio's at every start.
   - Fetch Studio's packages from Roblox's alternate hosts when `setup.rbxcdn.com` refuses or fails.
-  - Start Studio through a `quadrahq --studio` process that stays until Studio closes (GameMode, presence and the
+  - Start Studio through a `quinta --studio` process that stays until Studio closes (GameMode, presence and the
     backup need one); a second start, such as the browser handing over a sign-in, only launches.
 - Show Quinta's current logo in Discord presence: the application's own `ciderhq` image is still the old apple, so the
-  logo is now served from quadrahq.org.
-- Finish the MacOBlox/Cider to Quinta rename inside the code: the launcher's Python package is `quadra`, the shim is
-  `libQuadraShims.dylib` (native Wayland helper `libquadra-wayland.so`), and the settings variables are `QUADRA_*`.
-  `MACOBLOX_*` variables set by hand are still read as `QUADRA_*`. `MACOBLOX_METAL*` (read by Quinta M2VK) and the
+  logo is now served from quinta.org.
+- Finish the MacOBlox/Cider to Quinta rename inside the code: the launcher's Python package is `quinta`, the shim is
+  `libQuintaShims.dylib` (native Wayland helper `libquinta-wayland.so`), and the settings variables are `QUINTA_*`.
+  `MACOBLOX_*` variables set by hand are still read as `QUINTA_*`. `MACOBLOX_METAL*` (read by Quinta M2VK) and the
   `CIDER_*` names and CiderDarling identifiers that the Darling runtime reads keep their names until those projects
   are renamed.
-- Move to the `QuadraHQ/Quadra` repository. The installer and the updater move an existing checkout's `origin` from
+- Move to the `Quinta/Quinta` repository. The installer and the updater move an existing checkout's `origin` from
   `CiderHQ-org/Cider`, and the installer still recognises checkouts that have `launcher/macoblox`. Runtime update
   feeds that name `CiderHQ-org/CiderDarling` are accepted next to `QuadraHQ/CiderDarling`.
 
@@ -105,8 +105,8 @@
 - Prefer the libLLVM a process already maps and find Debian's `libLLVM.so.1` by its directory, so the legacy shader
   upgrade works with LLVM 18, 19 and 23.
 - Add the GPU and driver, the session type, desktop, Xwayland version, window backend, raw mouse setting and the
-  `[Quinta Input]` lines to `quadrahq --hardware-report`.
-- Add `quadrahq --watch-stalls`, which records the game's per-thread CPU use, stacks of busy threads, what blocked
+  `[Quinta Input]` lines to `quinta --hardware-report`.
+- Add `quinta --watch-stalls`, which records the game's per-thread CPU use, stacks of busy threads, what blocked
   threads wait on (futex words, timeouts, sockets, pipes, timers) and reports them against the launch log's join and
   leave markers. The game must be started with the freeze diagnostics setting on. It never stops the game's threads
   more than 60 times a second.
@@ -199,13 +199,13 @@
   transition. The intermittent 60-to-15 FPS issue (#34) still needs a trace
   captured during a drop; this diagnostic does not change game pacing.
 
-- Rebrand Cider / CiderHQ to **Quinta / Quinta** at **quadrahq.org**, keeping
-  the existing logo. The command is `quadrahq` and the app ID is
-  `org.quadrahq.Quadra`.
+- Rebrand Cider / CiderHQ to **Quinta / Quinta** at **quinta.org**, keeping
+  the existing logo. The command is `quinta` and the app ID is
+  `io.github.imqstr.Quinta`.
 - Migrate Cider and MacOBlox settings, cache, source installs and Darling
   session files without replacing existing Quinta data. Keep CiderDarling's
   runtime identifiers and the current GitHub repositories compatible.
-- Release native packages under `quadrahq` and update Flatpak packaging. The
+- Release native packages under `quinta` and update Flatpak packaging. The
   legacy Cider 0.30 AUR recipe remains pinned; the Quinta release source and
   stable AUR recipe are published with checksums.
 

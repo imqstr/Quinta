@@ -4,12 +4,12 @@ Quinta uses two package names for AUR repositories:
 
 | Package | Recipe | Source |
 | --- | --- | --- |
-| `quadrahq` | `quadrahq/PKGBUILD` and `.SRCINFO` | Verified Quinta release |
+| `quinta` | `quinta/PKGBUILD` and `.SRCINFO` | Verified Quinta release |
 | `ciderhq` (legacy) | `ciderhq/PKGBUILD` and `.SRCINFO` | Published Cider 0.30 release |
-| `quadrahq-git` | `PKGBUILD` and `.SRCINFO` | Current GitHub checkout |
+| `quinta-git` | `PKGBUILD` and `.SRCINFO` | Current GitHub checkout |
 
 Use `--local` below to package unreleased source changes.
-Source preparation can also generate a local recipe from `quadrahq/PKGBUILD.in`.
+Source preparation can also generate a local recipe from `quinta/PKGBUILD.in`.
 The recipes build the Darling shim, native Wayland helper and Metal on Vulkan
 bridge during package creation. Source builds need Rust 1.98 or newer. They install the launcher, icons, desktop entries, MIME definition
 and startup-patch helper. Roblox itself is downloaded by the launcher on first
@@ -25,8 +25,8 @@ Darling installation is insufficient. Install the provider with an AUR helper,
 then build the stable package from this checkout:
 
 ```bash
-./packaging/prepare-source.sh "$PWD/work/quadrahq-packages" --local
-cd work/quadrahq-packages/aur/quadrahq
+./packaging/prepare-source.sh "$PWD/work/quinta-packages" --local
+cd work/quinta-packages/aur/quinta
 makepkg -si
 ```
 
@@ -36,7 +36,7 @@ playback. PulseAudio-compatible playback is included through `libpulse`.
 
 ## Submit or update
 
-The names are `quadrahq` and `quadrahq-git`; they still need AUR submission.
+The names are `quinta` and `quinta-git`; they still need AUR submission.
 The recipes replace/conflict with the old Cider and MacOBlox packages. An AUR account
 and SSH key are required to submit a package. Do not upload the `.in` template
 as a finished PKGBUILD; source preparation fills its verified SHA256.

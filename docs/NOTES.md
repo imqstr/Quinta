@@ -6,37 +6,37 @@ Roblox Client for macOS (x86_64) on Linux via Darling. As of
 ## Launch
 
 Launcher: `launcher/install.sh` adds the “Mac O Blox” entry to the Applications menu
-and the `quadra` command. That includes game launching, fast flags, and DNS specifically for Roblox,
+and the `quinta` command. That includes game launching, fast flags, and DNS specifically for Roblox,
 Camera sensitivity, client update, diagnostics. The settings are located in
-`~/.config/quadrahq/settings.json`, logs in `logs/`.
+`~/.config/quinta/settings.json`, logs in `logs/`.
 
 Priorities: Darling runs with a nice value of −4, while darlingserver, the Darling daemons, and
 pw-cat inherits the launcher's nice value (+10 if the desktop launches it that way) and
 They remain idle while the game uses all the cores. The launcher starts darlingserver with
 daemons to -5 and pw-cat to -11, as far as RLIMIT_NICE allows.
 
-## What does the shim (build/libQuadraShims.dylib) do?
+## What does the shim (build/libQuintaShims.dylib) do?
 
-`build_debug_shim.sh` is built from:
+`scripts/build-native.sh` is built from:
 
-- `libQuadraShims.m` — AppKit/GL/input: returns the GL context after
+- `native/libQuintaShims.m` — AppKit/GL/input: returns the GL context after
   CALayerContext, macOS-style mouse button numbers, mouse capture for the camera,
   cursors, missing methods for NSEvent/NSTextView/NSButton/CNContactStore,
-  a cookie saved to disk (`~/Library/QuadraHQ/Cookies.plist` inside
+  a cookie saved to disk (`~/Library/Quinta/Cookies.plist` inside
   the Darling prefix), hiding the menu bar, window icon.
-- `missing_symbols.c` — functions that Roblox imports but Darling does not.
-- `net_trace.c` — reliable UDP reception and a watchdog for frozen RakNet threads.
-- `darling_fixes.c` — mutexes without Darling wake-up losses; `usleep` and
+- `native/missing_symbols.c` — functions that Roblox imports but Darling does not.
+- `native/net_trace.c` — reliable UDP reception and a watchdog for frozen RakNet threads.
+- `native/darling_fixes.c` — mutexes without Darling wake-up losses; `usleep` and
   `nanosleep` run directly on Linux (in Darling, each one involves two requests to `darlingserver`).
-- `memory_stats.c` — system and game memory (`phys_footprint` for “Mem”).
-- `thread_kick.c` — “kick” (SIGURG) for threads stuck waiting for Darling:
+- `native/memory_stats.c` — system and game memory (`phys_footprint` for “Mem”).
+- `native/thread_kick.c` — “kick” (SIGURG) for threads stuck waiting for Darling:
   UDP watchdog and long mutex waits; the location of the deadlock is logged.
-- `xfixes_raw.c` — hiding the cursor via XFixes over its own X11 socket.
-- `dns_override.c` — DNS for Roblox via the launcher’s local proxy.
-- `xattr_compat.c`, `exit_compat.c` — from previous stages.
+- `native/xfixes_raw.c` — hiding the cursor via XFixes over its own X11 socket.
+- `native/dns_override.c` — DNS for Roblox via the launcher’s local proxy.
+- `native/xattr_compat.c`, `native/exit_compat.c` — from previous stages.
 
-The `QUADRA_*` variables (tracing, DNS, sensitivity) are set by
-the launcher. `run_debug.sh` is still there for manual debugging.
+The `QUINTA_*` variables (tracing, DNS, sensitivity) are set by
+the launcher. `scripts/run-debug.sh` is still there for manual debugging.
 
 ## Important Note About Darling
 
@@ -52,16 +52,16 @@ From a regular Linux terminal:
 
 ```bash
 cd Quinta
-./run_debug.sh
+./scripts/run-debug.sh
 ```
 
-The script compiles the library from `libQuadraShims.m` in `build/`, launches
+The script compiles the library from `native/libQuintaShims.m` in `build/`, launches
 the client from the project folder within an existing Darling prefix, and writes
 the output to a separate file in `logs/launch-*.log`. Arguments are passed to the client.
 The launch itself requires a running Darling outside the restricted Codex environment.
 The launch script has not yet been tested in a running Darling instance.
 
-Build only: `./build_debug_shim.sh`. You can set `DARLING_SYSROOT`.
+Build only: `./scripts/build-native.sh`. You can set `DARLING_SYSROOT`.
 The old libraries in the root directory and inside `.app` are preserved; the new one is selected
 via `DYLD_INSERT_LIBRARIES` and `DYLD_LIBRARY_PATH`.
 
@@ -86,7 +86,7 @@ Verified using a test suite under Darling (network, mutexes, waits, sound,
 cookies); the old build fails the new tests, while the new one passes them all.
 
 - Timeout waits in Darling return 0 instead of ETIMEDOUT (100 ms
-  wait — 0 after 100 ms). Therefore, the wait intervals in `darling_fixes.c`
+  wait — 0 after 100 ms). Therefore, the wait intervals in `native/darling_fixes.c`
   never increased (each 50-ms interval — a request to darlingserver), and
   the caller never saw a timeout. Now, the elapsed time is determined by the clock;
   for `pthread_cond_timedwait_relative_np` (which Roblox imports), the time
@@ -121,11 +121,11 @@ cookies); the old build fails the new tests, while the new one passes them all.
 - Exception handlers, `makeCurrentContext`, `flushBuffer`: `getenv` and `dlsym` are called once,
   rather than for every `throw` or frame (Lua errors in games are C++ exceptions).
 - Shaders: the Mesa fix applies to all shaders (not just the
-  first 8192); source code is stored only with `QUADRA_TRACE_GL=1`.
-- `fast_libc.c`: SSE loops instead of `rep movsb/stosb` where those are slower
+  first 8192); source code is stored only with `QUINTA_TRACE_GL=1`.
+- `native/fast_libc.c`: SSE loops instead of `rep movsb/stosb` where those are slower
   (short copies, 4K aliasing, more L2), fast memchr/strlen/strcmp,
   memset_pattern4/8/16 have been reimplemented.
-- `QUADRA_*=0` flags now mean “disabled.”
+- `QUINTA_*=0` flags now mean “disabled.”
 
 ## Changes September 26, 2026, evening: locks without darlingserver
 
@@ -135,7 +135,7 @@ cookies); the old build fails the new tests, while the new one passes them all.
   variables break (the timeout arrives as a wake-up, the counters
   diverging, followed by “psync_cvwait; invalid sequence numbers” and EINVAL on
   every wait—12,874 times in 7 minutes in the server log).
-- Now, in `darling_fixes.c`, a busy mutex waits on a Linux futex (the table
+- Now, in `native/darling_fixes.c`, a busy mutex waits on a Linux futex (the table
   at the mutex’s address, woken by `pthread_mutex_unlock`), while the condition variables
   are separate: a queue of waiters, each with its own futex; a signal wakes exactly one,
   a broadcast wakes exactly the number of waiters, and process signals do not interrupt the wait.
@@ -156,7 +156,7 @@ cookies); the old build fails the new tests, while the new one passes them all.
   with a fallback option for libadwaita < 1.9, an FPS limit as a launcher setting
   (the launch script writes FramerateCap to GlobalBasicSettings_13.xml already inside
   Darling before the game starts), and launcher updates are now fast-forward only.
-- Thread stacks (`darling_fixes.c`): Darling allocates 512 KB to a thread if the creator
+- Thread stacks (`native/darling_fixes.c`): Darling allocates 512 KB to a thread if the creator
   did not request more; the NVIDIA shader compiler used to overflow such a stack. Now
   the minimum is 8 MB, as in Linux, including threads without attributes and GCD worker threads
   (Darling creates them via `darling_thread_create` from the elfcalls table, which is
@@ -164,25 +164,25 @@ cookies); the old build fails the new tests, while the new one passes them all.
   (Darling jumps into `_start_wqthread` with the old stack pointer: +140 KB for
   every 250 tasks); the `start_wqthread` pointer in `__common` libsystem_kernel
   has been replaced with a jump that starts at the top of the stack.
-- `CGDisplayScreenSize` (`gpu_info.c`): Darling returned the size in pixels as
+- `CGDisplayScreenSize` (`native/gpu_info.c`): Darling returned the size in pixels as
   millimeters, and 0x0 for an unknown display ID; Roblox divides the width in pixels
   by it without checking (DPI = infinity), which caused
   infinite recursion in `updateSurfaceLuaApp` for a user on Fedora KDE. The size is now set to 96 DPI.
 - Embedded Roblox web pages (password login with CAPTCHA, purchases, links):
-  `web_bridge.m` replaces WKWebView with placeholders that use a Unix socket
-  (`QUADRA_WEB_SOCKET`, JSON line-by-line) to the launcher window running
-  WebKitGTK 6.0 (`launcher/quadra/web.py`). Cookies are passed back and forth, so
+  `native/web_bridge.m` replaces WKWebView with placeholders that use a Unix socket
+  (`QUINTA_WEB_SOCKET`, JSON line-by-line) to the launcher window running
+  WebKitGTK 6.0 (`launcher/quinta/web.py`). Cookies are passed back and forth, so
   the client remains logged in after signing in on the page. The protocol and some of the code are from the
   spidercraft port (Roblox Mac Linux Port), with their permission. The replacement is applied only
   when the launcher is listening on the socket; without WebKitGTK, everything works as before. Site data is stored in
-  `~/.config/quadrahq/web`; clicking “Log Out” deletes it.
+  `~/.config/quinta/web`; clicking “Log Out” deletes it.
 - New application ID `wtf.aubree.MacOBlox` (Flatpak, .desktop, MIME, launcher,
   packages); installers remove the old `xyz.narez.*` files. Version 0.15.
-- Microphone for voice chat (`audio_hal.c`): Roblox treats the AUHAL unit as
+- Microphone for voice chat (`native/audio_hal.c`): Roblox treats the AUHAL unit as
   WebRTC—enables input on bus 1 (`kAudioOutputUnitProperty_EnableIO`),
   sets the client format (scope 2, element 1, typically 48 kHz mono float32), and
   the input callback (2005), within which `AudioUnitRender` retrieves frames.
-  The shim reads float32 from the second FIFO (`QUADRA_AUDIO_INPUT_FIFO`, in 10 ms blocks
+  The shim reads float32 from the second FIFO (`QUINTA_AUDIO_INPUT_FIFO`, in 10 ms blocks
   into a ring buffer) and calls the callback for each block; `AudioUnitRender` on bus 1 outputs
   frames in the client’s format (float32/int16, interleaved or not). Recording on the host
   continues only as long as the game is listening: at startup, the shim writes the file `<fifo>.request`
@@ -194,7 +194,7 @@ cookies); the old build fails the new tests, while the new one passes them all.
   3 seconds, RMS 0.353 from a tone of 0.5 (0.354 was expected). In Darling, the process with the shim
   crashes after returning from `main` (and in the build before the microphone as well)—a separate
   exit issue that does not affect gameplay.
-- Raw mouse motion for the lock (`raw_mouse.c`, "Raw motion" in the shim): the
+- Raw mouse motion for the lock (`native/raw_mouse.c`, "Raw motion" in the shim): the
   camera deltas during mouse lock come from XInput 2 raw events (device
   counts, before pointer acceleration, at the mouse's report rate; warps make
   none) instead of Darling's position-based deltas. Selected on the event
@@ -203,9 +203,9 @@ cookies); the old build fails the new tests, while the new one passes them all.
   the last queued one; MotionNotify only keeps the pointer within 100 px of
   its anchor and is not delivered. Falls back to pointer deltas when XI2 is
   missing or no raw event arrives while the pointer moves. Launcher switch
-  "Raw mouse input" (QUADRA_RAW_MOUSE=0). After spidercraft's RbxRawMotion.
+  "Raw mouse input" (QUINTA_RAW_MOUSE=0). After spidercraft's RbxRawMotion.
   Verified in Darling against Xvfb: raw deltas equal the xdotool moves; the
-  in-game camera is to be checked by hand. QUADRA_TRACE_XEVENTS=1 logs the
+  in-game camera is to be checked by hand. QUINTA_TRACE_XEVENTS=1 logs the
   first 80 X events reaching postXEvent:.
 - Flatpak: “Cannot determine your user name” on startup. `darling` retrieves the
   username via `getpwuid(geteuid())`, and darling-noroot.so returns
@@ -216,15 +216,15 @@ cookies); the old build fails the new tests, while the new one passes them all.
 
 ## Changes 2026-10-01: the launcher as a desktop
 
-The launcher's interface is redone after aubree.wtf (`launcher/quadra/theme.py`
+The launcher's interface is redone after aubree.wtf (`launcher/quinta/theme.py`
 holds the look, `app.py` the new shell; every settings page keeps its widgets):
 
 - Dark monochrome, square corners, no hue: state is filled against hollow,
   brightness, and a text label. Archivo for the interface, JetBrains Mono for
-  titles and small facts; both ship in `launcher/quadra/assets/fonts`
+  titles and small facts; both ship in `launcher/quinta/assets/fonts`
   (SIL OFL, cut down to the weights used) and are registered with Pango at
   start, so nothing is installed on the system.
-- A top bar (`quadra@darling`, the game's state, the time in the running
+- A top bar (`quinta@darling`, the game's state, the time in the running
   game, a clock, the window buttons) over a "desktop": the play window and
   the menu window on the left, the open page in a window on the right
   (console, settings with its three tabs, mods, logs, info). Below 860 px
@@ -239,8 +239,8 @@ holds the look, `app.py` the new shell; every settings page keeps its widgets):
   in the system it appears finished.
 - The log viewer's highlighting is monochrome too (level by brightness and
   weight). The old sidebar and its `show_sidebar` setting are gone.
-- For screenshots: `QUADRA_PAGE` (play, env, roblox, flags, mods, logs,
-  info) and `QUADRA_WINDOW_SIZE=WxH`.
+- For screenshots: `QUINTA_PAGE` (play, env, roblox, flags, mods, logs,
+  info) and `QUINTA_WINDOW_SIZE=WxH`.
 
 ## Changes 2026-10-01, evening: a report from another Darling build
 
@@ -253,7 +253,7 @@ had `NSApplication got exception: -[MTLDev...` before the crash.
   On the tested Darling release (and here, NVIDIA) `MTLCreateSystemDefaultDevice`
   returns nil, which is the only reason OpenGL ran. That user's Darling
   returned a device, Roblox started its Metal renderer, and Darling cannot
-  carry it. `gpu_info.c` now interposes `MTLCreateSystemDefaultDevice` (nil)
+  carry it. `native/gpu_info.c` now interposes `MTLCreateSystemDefaultDevice` (nil)
   and `MTLCopyAllDevices` (empty array); `MACOBLOX_METAL=1` keeps Darling's
   answer for the Vulkan work. The interposers are verified to be called; a
   Darling that returns a device could not be reproduced here.
@@ -273,7 +273,7 @@ had `NSApplication got exception: -[MTLDev...` before the crash.
   styling from before the custom desktop layout. The launcher follows the
   system appearance and does not load the custom theme or its fonts.
 - Camera capture still hides the hardware pointer for Xwayland's relative
-  motion. `cursor_overlay.c` displays the current cursor in an input-transparent
+  motion. `native/cursor_overlay.c` displays the current cursor in an input-transparent
   child window at the lock position, preserving its pixels and hotspot. AppKit
   hide/unhide requests control the visible copy independently. Focus loss
   releases capture and removes the copy. All X requests run on the cursor
@@ -283,7 +283,7 @@ had `NSApplication got exception: -[MTLDev...` before the crash.
   spinning indefinitely. The shim builds with optimization and frame pointers.
 - Normal shader compilation no longer immediately queries `GL_COMPILE_STATUS`:
   that query forces asynchronous driver compilation to finish. The extra check
-  and first-failed-source capture are now enabled only with `QUADRA_TRACE_GL=1`.
+  and first-failed-source capture are now enabled only with `QUINTA_TRACE_GL=1`.
   NVIDIA gets a persistent host shader-cache path, like Mesa already did.
 - Preserve one `glGetError` query after AppKit's first `glDrawArrays` call when
   tracing is off. Without it, isolated startup repeatedly aborts before Roblox
@@ -298,7 +298,7 @@ had `NSApplication got exception: -[MTLDev...` before the crash.
   the actual failing source: `CB3[(_500 & 63u) * 1 + 0]`. The earlier workaround
   matched only a particular CB12 expression and missed Grass's CB3 indices.
   Generated array indices mix unsigned values with signed `1` and `0`, which
-  GLSL 1.50 forbids. `shader_compat.c` removes the redundant ` * 1 + 0` at the
+  GLSL 1.50 forbids. `native/shader_compat.c` removes the redundant ` * 1 + 0` at the
   end of an array index, preserving both signed and unsigned indices without
   casts. All 897 extracted sources from client 0.741.0.7411056 compile with
   this correction on NVIDIA 615.71.09, including the 39 CB12 vertex sources
@@ -591,7 +591,7 @@ counted 1,882 close callbacks taking 1,815.6 ms in the first three reporting
 buckets. This identifies a cost in the initial menu-binding delay; the later
 frameless phase is measured separately.
 
-`launcher/quadra/darling_patches.py` prepares app-prefix copies of these
+`launcher/quinta/darling_patches.py` prepares app-prefix copies of these
 known x86_64 implementations:
 
 | Library | Complete original SHA-256 | Complete repaired SHA-256 |
@@ -619,8 +619,8 @@ partial patches, custom prefix overrides and symlinks are preserved. Copies
 are written atomically, retain permissions and are checked again before
 replacement; the installed Darling source library is read-only.
 
-`darling_sparse_map.c` documents the ISC-licensed reference behavior;
-`darling_sparse_map.S` provides the exact position-independent replacement
+`native/darling_sparse_map.c` documents the ISC-licensed reference behavior;
+`native/darling_sparse_map.S` provides the exact position-independent replacement
 instructions while preserving the original functions' frames and epilog
 offsets for their unwind metadata. Native C/assembly fixtures cover aliases,
 deletion, descriptor reuse, callbacks changing later entries, failed CAS,
@@ -650,7 +650,7 @@ preserving errno. Invalid-operation waits and wakes similarly returned
 `-1`/2070 instead of `-22` with unchanged errno. Ordinary error calls and
 the changed-value success path behaved correctly.
 
-`darling_fixes.c` now interposes thin adapters from `ulock_compat.h`: when
+`native/darling_fixes.c` now interposes thin adapters from `native/ulock_compat.h`: when
 NO_ERRNO is requested, call the original ordinary-error API with that flag
 cleared, convert its `-1` into the negative Darwin errno, then restore the
 caller's errno. Other calls pass through directly. The original futex
@@ -731,7 +731,7 @@ is not registered in /proc/filesystems, and `modinfo overlay` fails.
 This explains the `Cannot mount overlay: No such device` error before Roblox starts.
 The update log confirms that the new kernel’s initramfs was successfully generated.
 The next step is a normal reboot into the installed kernel, followed by running
-`run_debug.sh`. An automatic reboot did not occur.
+`scripts/run-debug.sh`. An automatic reboot did not occur.
 The script now detects this situation before Darling starts.
 
 ## Post-reboot check, September 21, 2026, 4:21–4:29 PM
@@ -742,7 +742,7 @@ Window/image display and game engine functionality NOT confirmed.
 
 Next blocker: `Failed to initialize crash reporter`, std::runtime_error
 from RobloxPlayer at return address 0x105606b21, called from 0x10002f4aa.
-This was initially preceded by getxattr/setxattr errors. In xattr_compat.c
+This was initially preceded by getxattr/setxattr errors. In native/xattr_compat.c
 an adapter has been added only for org.chromium.crashpad.* and com.googlecode.crashpad.*:
 Linux namespace user., access via fd, ENODATA is converted to ENOATTR.
 Other names and non-zero position/options remain with Darling.

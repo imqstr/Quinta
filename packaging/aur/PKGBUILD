@@ -1,5 +1,5 @@
 # Maintainer: aubree.wtf <https://aubree.wtf/>
-pkgname=quadrahq-git
+pkgname=quinta-git
 _name=Quinta
 pkgver=0.37.4.r0
 pkgrel=1
@@ -19,8 +19,8 @@ optdepends=('darling: regular Darling runtime'
             'mesa: Mesa EGL and Zink for the Vulkan renderer'
             'vulkan-driver: hardware Vulkan driver for the Vulkan renderer'
             'pipewire-audio: native PipeWire audio playback')
-provides=('quadrahq' 'ciderhq' 'macoblox')
-conflicts=('quadrahq' 'ciderhq' 'ciderhq-git' 'macoblox' 'macoblox-git')
+provides=('quinta' 'ciderhq' 'macoblox')
+conflicts=('quinta' 'ciderhq' 'ciderhq-git' 'macoblox' 'macoblox-git')
 replaces=('ciderhq-git' 'macoblox-git')
 source=("$_name::git+$_repo.git")
 sha256sums=('SKIP')
@@ -34,12 +34,12 @@ pkgver() {
 
 build() {
   cd "$_name"
-  QUADRA_BUILD_DIR="$srcdir/native-build" ./build_debug_shim.sh
-  QUADRA_BUILD_DIR="$srcdir/native-build" bash packaging/build-metal.sh
+  QUINTA_BUILD_DIR="$srcdir/native-build" ./scripts/build-native.sh
+  QUINTA_BUILD_DIR="$srcdir/native-build" bash packaging/build-metal.sh
 }
 
 package() {
   cd "$_name"
   bash packaging/install-payload.sh "$PWD" "$srcdir/native-build" "$pkgdir" /usr/lib
-  python -m compileall -q -d /usr/share/quadrahq/launcher "$pkgdir/usr/share/quadrahq/launcher"
+  python -m compileall -q -d /usr/share/quinta/launcher "$pkgdir/usr/share/quinta/launcher"
 }

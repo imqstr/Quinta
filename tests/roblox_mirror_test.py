@@ -11,7 +11,7 @@ from unittest.mock import patch
 import urllib.error
 import zipfile
 
-spec = importlib.util.spec_from_file_location('quadra_mirror', Path(__file__).resolve().parents[1] / 'services/roblox-mirror/server.py')
+spec = importlib.util.spec_from_file_location('quinta_mirror', Path(__file__).resolve().parents[1] / 'services/roblox-mirror/server.py')
 mirror = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mirror)
 UPLOAD = 'version-212bac6bdccd4673'

@@ -11,7 +11,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from quadra.runtime_install import Installation
+from quinta.runtime_install import Installation
 
 
 class RuntimeInstallationTests(unittest.TestCase):
@@ -31,7 +31,7 @@ class RuntimeInstallationTests(unittest.TestCase):
     def test_missing_installer_unknown_variant_and_flatpak_do_not_start(self):
         with self.assertRaises(ValueError):
             Installation.create(self.project, "ciderdarling; echo bad", self.root)
-        with patch.dict(os.environ, FLATPAK_ID="org.quadrahq.Quadra"):
+        with patch.dict(os.environ, FLATPAK_ID="io.github.imqstr.Quinta"):
             with self.assertRaises(RuntimeError):
                 self.create()
         self.installer.unlink()

@@ -1,10 +1,10 @@
 # Imported inside the existing https:// site block on korona.
-@quadra_downloads {
+@quinta_downloads {
     host vps.korona.lat
-    path /quadra/roblox/*
+    path /quinta/roblox/*
 }
-handle @quadra_downloads {
-    uri strip_prefix /quadra/roblox
+handle @quinta_downloads {
+    uri strip_prefix /quinta/roblox
     reverse_proxy 127.0.0.1:9473 {
         header_up -Authorization
         header_up -Cookie

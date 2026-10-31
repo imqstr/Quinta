@@ -81,7 +81,7 @@ body:
     id: diagnostics
     attributes:
       label: Diagnostics archive
-      description: Upload the matching quadra-diagnostics-*.tar.gz from Collect diagnostics (up to 25 MB). Keep it compressed. A hardware-report JSON or an older launch archive does not contain this run's crash details.
+      description: Upload the matching quinta-diagnostics-*.tar.gz from Collect diagnostics (up to 25 MB). Keep it compressed. A hardware-report JSON or an older launch archive does not contain this run's crash details.
     validations:
       required: true
       accept: ".tar.gz"

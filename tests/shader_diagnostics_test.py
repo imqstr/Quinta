@@ -4,7 +4,7 @@ import struct
 import tempfile
 import unittest
 
-from quadra.shader_diagnostics import dump, gradient_sources
+from quinta.shader_diagnostics import dump, gradient_sources
 
 
 def fixture(name=b"UIFS", source=b"uniform sampler2D GradientAtlasTexture;\nvoid main(){}"):

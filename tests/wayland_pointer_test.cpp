@@ -11,7 +11,7 @@ static void warp_pointer(SDL_Window *,int x,int y){warp_count++;warp_x=x;warp_y=
 #define SDL_SetRelativeMouseMode set_relative
 #define SDL_GetWindowSize window_size
 #define SDL_WarpMouseInWindow warp_pointer
-#include "../wayland_host.cpp"
+#include "../native/wayland_host.cpp"
 
 static void command(unsigned id,int operation,double x=0,double y=0) {
     action(id,operation,x,y,nullptr);
@@ -25,7 +25,7 @@ static void button(unsigned id,bool down) {
     SDL_Event event{};event.type=down?SDL_MOUSEBUTTONDOWN:SDL_MOUSEBUTTONUP;
     event.button.windowID=id;event.button.button=3;translate(event);
 }
-static void clear_events(){quadra_wayland_event event{};while(poll(&event)){};}
+static void clear_events(){quinta_wayland_event event{};while(poll(&event)){};}
 int main() {
     const unsigned id=17;
     auto &window=windows.emplace(id,decltype(windows)::mapped_type{}).first->second;
@@ -35,7 +35,7 @@ int main() {
     SDL_Event motion{};motion.type=SDL_MOUSEMOTION;motion.motion.windowID=id;
     motion.motion.xrel=7;motion.motion.yrel=-9;translate(motion);
     command(id,MW_WARP,160,120);
-    quadra_wayland_event event{};
+    quinta_wayland_event event{};
     assert(poll(&event) && event.type==MW_MOTION && event.x==160 && event.y==120);
     assert(event.dx==7 && event.dy==-9 && !poll(&event));
     assert(window.anchor_x==160 && window.anchor_y==120 && warp_count==1);

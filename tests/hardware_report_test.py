@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from quadra import core, graphics, hardware_report
+from quinta import core, graphics, hardware_report
 
 
 class HardwareReportTests(unittest.TestCase):

@@ -1,5 +1,5 @@
 # Maintainer: aubree.wtf <https://aubree.wtf/>
-pkgname=quadrahq
+pkgname=quinta
 # Keep the release tag separate from pacman's package version.
 _tag=0.37.p4
 pkgver=0.37.p4
@@ -21,19 +21,19 @@ optdepends=('darling: regular Darling runtime'
             'vulkan-driver: hardware Vulkan driver for the Vulkan renderer'
             'pipewire-audio: native PipeWire audio playback')
 provides=('ciderhq' 'macoblox')
-conflicts=('quadrahq-git' 'ciderhq' 'ciderhq-git' 'macoblox' 'macoblox-git')
+conflicts=('quinta-git' 'ciderhq' 'ciderhq-git' 'macoblox' 'macoblox-git')
 replaces=('ciderhq' 'macoblox')
-source=("$pkgname-$_tag.tar.gz::$_repo/releases/download/v$_tag/quadrahq-$_tag-source.tar.gz")
+source=("$pkgname-$_tag.tar.gz::$_repo/releases/download/v$_tag/quinta-$_tag-source.tar.gz")
 sha256sums=('@RELEASE_SHA256@')
 
 build() {
   cd "Quinta-$_tag"
-  QUADRA_BUILD_DIR="$srcdir/native-build" ./build_debug_shim.sh
-  QUADRA_BUILD_DIR="$srcdir/native-build" bash packaging/build-metal.sh
+  QUINTA_BUILD_DIR="$srcdir/native-build" ./scripts/build-native.sh
+  QUINTA_BUILD_DIR="$srcdir/native-build" bash packaging/build-metal.sh
 }
 
 package() {
   cd "Quinta-$_tag"
   bash packaging/install-payload.sh "$PWD" "$srcdir/native-build" "$pkgdir" /usr/lib
-  python -m compileall -q -d /usr/share/quadrahq/launcher "$pkgdir/usr/share/quadrahq/launcher"
+  python -m compileall -q -d /usr/share/quinta/launcher "$pkgdir/usr/share/quinta/launcher"
 }

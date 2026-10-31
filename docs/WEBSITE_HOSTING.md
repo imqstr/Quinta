@@ -9,30 +9,30 @@ mirror files remain tracked.
 
 A signed GitHub push webhook at
 `https://vps.korona.lat/quadra/site-hook` queues a deployment for
-`QuadraHQ/Quadra`, branch `main`. The receiver verifies the SHA-256 HMAC and
+`Quinta/Quinta`, branch `main`. The receiver verifies the SHA-256 HMAC and
 the repository and branch before accepting it. The secret is stored only in
-`/etc/quadra-reports.env` and the GitHub hook configuration.
+`/etc/quinta-reports.env` and the GitHub hook configuration.
 
-`quadra-site-sync.path` starts `quadra-site-sync.service` after a valid push.
-`quadra-site-sync.timer` also checks every minute so missed deliveries recover.
+`quinta-site-sync.path` starts `quinta-site-sync.service` after a valid push.
+`quinta-site-sync.timer` also checks every minute so missed deliveries recover.
 The sync service fetches the trusted main branch from
 `https://github.com/imqstr/Quinta.git` (the repository was `CiderHQ-org/Cider`
 before the organization move; the webhook payload names the repository, so the
 receiver accepts only the current name), prepares static files in a
-new release directory, and atomically switches `/var/www/quadrahq/current`.
+new release directory, and atomically switches `/var/www/quinta/current`.
 It copies the root `install.sh` over the site's installer copy. It never runs
 repository build scripts or changes private report data. An invalid deployment
 leaves the preceding site in place; the five newest static releases are kept.
 A fetch killed at its 60 second limit leaves a Git lock in
-`/var/lib/quadra-site-sync/repository.git`; the next run removes locks older than
+`/var/lib/quinta-site-sync/repository.git`; the next run removes locks older than
 five minutes instead of failing on them for ever.
 
 The deployed commit is visible at `/deployment.json`. To inspect or retry:
 
 ```sh
-systemctl status quadra-site-sync.path quadra-site-sync.timer
-journalctl -u quadra-site-sync.service -n 30 --no-pager
-systemctl start quadra-site-sync.service
+systemctl status quinta-site-sync.path quinta-site-sync.timer
+journalctl -u quinta-site-sync.service -n 30 --no-pager
+systemctl start quinta-site-sync.service
 ```
 
 Vercel Git deployments are disabled in `vercel.json`. The old deployment can
@@ -45,7 +45,7 @@ For the korona host used by this deployment:
 | Record | Name | Value |
 | --- | --- | --- |
 | A | `@` | `23.164.52.24` |
-| CNAME | `www` | `quadrahq.org` |
+| CNAME | `www` | `quinta.org` |
 
 Replace the root's Vercel A records and the `www` Vercel CNAME. Do not retain
 an AAAA record pointing to the old host. Caddy manages HTTPS on demand for
@@ -54,8 +54,8 @@ the same static files and API routes can be checked locally on the VPS at
 `http://127.0.0.1:9481/`. The API's configured browser origin remains
 `https://quadrahq.org`.
 
-Caddy imports `/etc/caddy/quadra-site.caddy` at top level and
-`/etc/caddy/quadra-site-hook.caddy` inside its existing HTTPS catchall. Reload
+Caddy imports `/etc/caddy/quinta-site.caddy` at top level and
+`/etc/caddy/quinta-site-hook.caddy` inside its existing HTTPS catchall. Reload
 the running Caddy through its admin endpoint after validating a candidate
 configuration; korona's main Caddy process is managed by PM2.
 
@@ -74,7 +74,7 @@ not store a report. Submission requires the description, reproduction steps,
 issue type, a verified archive and the sharing acknowledgement. Repeating the
 same submission key returns the existing report rather than creating a second.
 
-Reports are stored privately under `/var/lib/quadra-reports/`:
+Reports are stored privately under `/var/lib/quinta-reports/`:
 
 | Path | Contents |
 | --- | --- |
@@ -92,19 +92,19 @@ rate limits honor Discord's retry delay. Archive storage is capped at 5 GiB
 without automatically deleting existing reports.
 
 Set `DISCORD_BOT_TOKEN` in the root-owned, mode-0600 file
-`/etc/quadra-reports.env`. Channel and mention IDs are configured there too.
-`quadra-reports-config.path` restarts the service when this file changes.
+`/etc/quinta-reports.env`. Channel and mention IDs are configured there too.
+`quinta-reports-config.path` restarts the service when this file changes.
 Tokens do not belong in Git or chat. To inspect reports over SSH:
 
 ```sh
-python3 /opt/quadra-reports/server.py list
-python3 /opt/quadra-reports/server.py show REPORT_ID
-journalctl -u quadra-reports.service -n 30 --no-pager
+python3 /opt/quinta-reports/server.py list
+python3 /opt/quinta-reports/server.py show REPORT_ID
+journalctl -u quinta-reports.service -n 30 --no-pager
 ```
 
 The private source, deployment units and tests are installed in
-`/opt/quadra-reports/`. Run the service tests without sending real messages:
+`/opt/quinta-reports/`. Run the service tests without sending real messages:
 
 ```sh
-python3 -m unittest discover -s /opt/quadra-reports/tests -p 'test_*.py'
+python3 -m unittest discover -s /opt/quinta-reports/tests -p 'test_*.py'
 ```

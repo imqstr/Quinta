@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from unittest.mock import Mock
 
-from quadra import studio_webview as webview
+from quinta import studio_webview as webview
 
 INSTALLER = b'MZ the WebView2 runtime installer'
 SHA256 = hashlib.sha256(INSTALLER).hexdigest()

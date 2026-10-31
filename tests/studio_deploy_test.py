@@ -4,7 +4,7 @@ import json
 import unittest
 import urllib.error
 
-from quadra import studio_deploy as deploy
+from quinta import studio_deploy as deploy
 
 GUID = 'version-7aaa6838d36c4448'
 

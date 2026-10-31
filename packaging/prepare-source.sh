@@ -24,9 +24,9 @@ fi
 output=$(realpath -m -- "$1")
 [[ ! -e $output ]] || { printf 'Output already exists: %s\n' "$output" >&2; exit 1; }
 mkdir -p -- "$(dirname -- "$output")"
-staging=$(mktemp -d "$(dirname -- "$output")/.quadrahq-sources.XXXXXX")
+staging=$(mktemp -d "$(dirname -- "$output")/.quinta-sources.XXXXXX")
 trap 'rm -rf -- "$staging"' EXIT
-archive=$staging/quadrahq_$version.orig.tar.gz
+archive=$staging/quinta_$version.orig.tar.gz
 if [[ ${2:-} == --local ]]; then
   python3 - "$project_dir" "$archive" "$version" <<'PY'
 import gzip, subprocess, sys, tarfile
@@ -40,7 +40,7 @@ new_files = subprocess.check_output(['git', '-C', str(root), 'ls-files', '-z',
                                     '--others', '--exclude-standard', '--', *directories])
 public_extensions = {'.py', '.sh', '.c', '.m', '.h', '.cpp', '.rs', '.toml', '.lock', '.svg', '.desktop', '.xml', '.json', '.yml', '.in', '.md', '.spec',
                      '.png', '.webp', '.jpg', '.ttf', '.mp3'}
-public_names = {'.SRCINFO', 'PKGBUILD', 'quadrahq-launcher', 'ciderhq-launcher', 'macoblox-launcher'}
+public_names = {'.SRCINFO', 'PKGBUILD', 'quinta-launcher', 'ciderhq-launcher', 'macoblox-launcher'}
 paths.update(path for name in new_files.split(b'\0') if name
              for path in [Path(name.decode())]
              if path.suffix in public_extensions or path.name in public_names)
@@ -69,19 +69,19 @@ else
 fi
 printf '%s  %s\n' "$checksum" "$archive" | sha256sum --check --status
 tar -xzf "$archive" -C "$staging"
-source_root=$staging/Quadra-$version
+source_root=$staging/Quinta-$version
 cp -r --no-preserve=ownership "$packaging_dir/debian" "$source_root/debian"
 install -m755 "$packaging_dir/install-payload.sh" "$source_root/debian/install-payload.sh"
-install -d "$staging/rpm/SOURCES" "$staging/rpm/SPECS" "$staging/aur/quadrahq"
-cp -- "$archive" "$staging/rpm/SOURCES/quadrahq-$version.tar.gz"
-install -m755 "$packaging_dir/install-payload.sh" "$staging/rpm/SOURCES/quadrahq-install-payload.sh"
-install -m644 "$packaging_dir/rpm/quadrahq.spec" "$staging/rpm/SPECS/quadrahq.spec"
-sed "s/@RELEASE_SHA256@/$checksum/g" "$packaging_dir/aur/quadrahq/PKGBUILD.in" > "$staging/aur/quadrahq/PKGBUILD"
-cp -- "$archive" "$staging/aur/quadrahq/quadrahq-$version.tar.gz"
+install -d "$staging/rpm/SOURCES" "$staging/rpm/SPECS" "$staging/aur/quinta"
+cp -- "$archive" "$staging/rpm/SOURCES/quinta-$version.tar.gz"
+install -m755 "$packaging_dir/install-payload.sh" "$staging/rpm/SOURCES/quinta-install-payload.sh"
+install -m644 "$packaging_dir/rpm/quinta.spec" "$staging/rpm/SPECS/quinta.spec"
+sed "s/@RELEASE_SHA256@/$checksum/g" "$packaging_dir/aur/quinta/PKGBUILD.in" > "$staging/aur/quinta/PKGBUILD"
+cp -- "$archive" "$staging/aur/quinta/quinta-$version.tar.gz"
 if command -v makepkg >/dev/null && (( EUID != 0 )); then
-  (cd "$staging/aur/quadrahq" && makepkg --printsrcinfo > .SRCINFO)
+  (cd "$staging/aur/quinta" && makepkg --printsrcinfo > .SRCINFO)
 fi
 mv --no-clobber -T -- "$staging" "$output"
 [[ ! -d $staging ]] || { printf 'Output was created by another process: %s\n' "$output" >&2; exit 1; }
 printf 'Debian source: %s\nRPM top directory: %s\nStable AUR recipe: %s\n' \
-  "$output/Quadra-$version" "$output/rpm" "$output/aur/quadrahq"
+  "$output/Quinta-$version" "$output/rpm" "$output/aur/quinta"

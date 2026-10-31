@@ -4,10 +4,10 @@
  * Compile:
  * clang -target x86_64-apple-darwin -fuse-ld=lld -isysroot /usr/libexec/darling \
  *   -mmacosx-version-min=11.0 -fobjc-exceptions tests/darling_ui_scale_test.m \
- *   -framework AppKit -framework Foundation -o /tmp/quadra-ui-scale-native
- * Inject the shim, set QUADRA_DPI_SCALE=1 or 2, and pass the same integer.
+ *   -framework AppKit -framework Foundation -o /tmp/quinta-ui-scale-native
+ * Inject the shim, set QUINTA_DPI_SCALE=1 or 2, and pass the same integer.
  */
-#include "../ui_scale.h"
+#include "../native/ui_scale.h"
 extern int printf(const char *, ...), fflush(void *), memcmp(const void *, const void *, unsigned long);
 extern void *memset(void *, int, unsigned long);
 extern unsigned int alarm(unsigned int);
@@ -37,7 +37,7 @@ typedef struct Settings {
     _Bool other_enabled;
     unsigned int first_flags, second_flags;
 } Settings;
-_Static_assert(sizeof(Settings) == sizeof(QuadraSurfaceSettings), "fixture return size");
+_Static_assert(sizeof(Settings) == sizeof(QuintaSurfaceSettings), "fixture return size");
 static Settings baseline;
 static int original_calls, should_throw;
 static id exception_object;
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     unsigned int requested = (unsigned int)(argv[1][0] - '0');
     Method method = class_getInstanceMethod(objc_getClass("RobloxPlayerAppDelegate"),
                                             sel_registerName("getSurfaceSettings"));
-    if (!method || !quadra_surface_settings_abi_matches(method_getTypeEncoding(method))) return 3;
+    if (!method || !quinta_surface_settings_abi_matches(method_getTypeEncoding(method))) return 3;
     [[NSApplication sharedApplication] finishLaunching];
     RobloxPlayerAppDelegate *delegate = [[RobloxPlayerAppDelegate alloc] init];
     memset(&baseline, 0xa5, sizeof baseline);

@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 import urllib.error
 
-from quadra import core, studio
+from quinta import core, studio
 
 RELEASES = 'https://github.com/vinegarhq/kombucha'
 TAG = 'stable+20261018103513'

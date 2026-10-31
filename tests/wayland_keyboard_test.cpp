@@ -1,7 +1,7 @@
 /* Host keyboard regression: synthetic SDL events only, no display or input
  * injection. Compile with the same SDL/Wayland libraries as wayland_host.cpp. */
 #include <cassert>
-#include "../wayland_host.cpp"
+#include "../native/wayland_host.cpp"
 
 static SDL_Event key(unsigned id, SDL_Scancode scan, SDL_Keycode symbol,
                      SDL_Keymod mods, bool down=true, bool repeat=false) {
@@ -15,7 +15,7 @@ int main() {
     const unsigned id=17;
     windows.emplace(id,decltype(windows)::mapped_type{});
     SDL_SetModState(KMOD_NONE);
-    quadra_wayland_event event{};
+    quinta_wayland_event event{};
     translate(key(id,SDL_SCANCODE_LCTRL,SDLK_LCTRL,KMOD_LCTRL));
     assert(poll(&event) && event.type==MW_KEY_DOWN && event.key==59);
     assert((event.modifiers&(1u<<18)) && !(event.modifiers&(1u<<20)));

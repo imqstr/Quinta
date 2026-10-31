@@ -7,7 +7,7 @@ static int wayland, services, single, multiple, released_matching, fail_strings;
 static int platform_services;
 static const char *provider;
 static const int matching_dictionary;
-int quadra_wayland_enabled(void) { return wayland; }
+int quinta_wayland_enabled(void) { return wayland; }
 void IOHIDManagerSetDeviceMatching(void *m, const void *d) {
     assert(m == (void *)1 && d == &matching_dictionary); single++;
 }
@@ -35,7 +35,7 @@ unsigned long CFGetTypeID(const void *v) { return v == &matching_dictionary ? 7 
 unsigned long CFDictionaryGetTypeID(void) { return 7; }
 unsigned char CFEqual(const void *a, const void *b) { return !strcmp(a, b); }
 void CFRelease(const void *v) { if (v == &matching_dictionary) released_matching++; }
-#include "../hid_compat.c"
+#include "../native/hid_compat.c"
 
 int main(void) {
     unsigned iterator = 123;

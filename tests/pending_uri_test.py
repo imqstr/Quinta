@@ -6,7 +6,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from quadra import uri
+from quinta import uri
 
 
 class PendingUriTests(unittest.TestCase):

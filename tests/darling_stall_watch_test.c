@@ -1,4 +1,4 @@
-// Fixture for `quadrahq --watch-stalls`: one thread spins inside nested functions, one waits
+// Fixture for `quinta --watch-stalls`: one thread spins inside nested functions, one waits
 // on a pipe and the main thread sleeps; the process ends after argv[1] seconds. Built as
 // Mach-O with frame pointers, like the game, so the watcher can name the functions.
 typedef struct _opaque_pthread_t *pthread_t;

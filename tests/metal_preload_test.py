@@ -9,7 +9,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from quadra import core, graphics, metal_preload
+from quinta import core, graphics, metal_preload
 from session_fixture import bare_session
 
 FAKE = r'''
@@ -47,7 +47,7 @@ class MetalPreloadTests(unittest.TestCase):
         self.environment = dict(os.environ, MACOBLOX_METAL_SHADER_CACHE=str(self.root),
                                 MACOBLOX_METAL_PRELOAD="1", MACOBLOX_METAL_PRELOAD_KEY="client-one")
         scope = hashlib.sha256(b"client-one").hexdigest()
-        directory = self.root / "quadra-preload-v1"
+        directory = self.root / "quinta-preload-v1"
         directory.mkdir()
         for index in range(2):
             (directory / f"pipeline-{scope}-{index:064x}.qmc").write_bytes(b"authored stub")

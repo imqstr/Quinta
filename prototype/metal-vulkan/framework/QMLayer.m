@@ -21,7 +21,7 @@ extern void *class_getInstanceMethod(Class cls, SEL name);
 extern void *class_getClassMethod(Class cls, SEL name);
 extern void (*method_setImplementation(void *method, void (*imp)(void)))(void);
 
-/* The shim's native Wayland views (wayland_appkit.m), when it has them. */
+/* The shim's native Wayland views (native/wayland_appkit.m), when it has them. */
 typedef unsigned (*wayland_view_create)(id window, CGRect frame, void **display, void **surface);
 typedef void (*wayland_view_frame)(unsigned view, id window, CGRect frame);
 typedef void (*wayland_view_destroy)(unsigned view);
@@ -158,7 +158,7 @@ static void *make_surface(qm_layer_state *state, id window, int wayland, CGRect 
     qm_surface_target target;
     memset(&target, 0, sizeof target);
     if (wayland) {
-        wayland_view_create create = (wayland_view_create)dlsym(QM_RTLD_DEFAULT, "quadra_wayland_metal_view");
+        wayland_view_create create = (wayland_view_create)dlsym(QM_RTLD_DEFAULT, "quinta_wayland_metal_view");
         if (!create) {
             qm_log("[Quinta Metal] this shim has no native Wayland Metal views");
             return 0;
@@ -233,7 +233,7 @@ static id layer_next_drawable(id self, SEL _cmd) {
     unsigned width = size.width >= 1 ? (unsigned)size.width : 1, height = size.height >= 1 ? (unsigned)size.height : 1;
     id view = hosting_view(self, state);
     id window = view ? [(id<QMViewMethods>)view window] : nil;
-    const char *wayland_setting = getenv("QUADRA_WAYLAND");
+    const char *wayland_setting = getenv("QUINTA_WAYLAND");
     int wayland = wayland_setting && !strcmp(wayland_setting, "1");
     int x = 0, y = 0;
     unsigned view_width = width, view_height = height;
@@ -265,7 +265,7 @@ static id layer_next_drawable(id self, SEL _cmd) {
         if (state->config.drawable_width != width || state->config.drawable_height != height)
             qm_log("[Quinta Metal] drawable %ux%u at %d,%d (view %ux%u)", width, height, x, y, view_width, view_height);
         if (wayland && state->wayland_view) {
-            wayland_view_frame move = (wayland_view_frame)dlsym(QM_RTLD_DEFAULT, "quadra_wayland_metal_view_frame");
+            wayland_view_frame move = (wayland_view_frame)dlsym(QM_RTLD_DEFAULT, "quinta_wayland_metal_view_frame");
             if (move)
                 move(state->wayland_view, window, frame);
         }
@@ -354,7 +354,7 @@ static void layer_dealloc(id self, SEL _cmd) {
     if (state->surface)
         qm->release(state->surface);
     if (state->wayland_view) {
-        wayland_view_destroy destroy = (wayland_view_destroy)dlsym(QM_RTLD_DEFAULT, "quadra_wayland_metal_view_destroy");
+        wayland_view_destroy destroy = (wayland_view_destroy)dlsym(QM_RTLD_DEFAULT, "quinta_wayland_metal_view_destroy");
         if (destroy)
             destroy(state->wayland_view);
     }

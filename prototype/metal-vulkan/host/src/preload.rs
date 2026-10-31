@@ -147,7 +147,7 @@ pub fn root() -> Option<PathBuf> {
         return None;
     }
     std::env::var_os("MACOBLOX_METAL_SHADER_CACHE")
-        .map(|root| PathBuf::from(root).join("quadra-preload-v1"))
+        .map(|root| PathBuf::from(root).join("quinta-preload-v1"))
 }
 
 fn recorder() -> Option<&'static Recorder> {

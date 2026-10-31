@@ -1,5 +1,5 @@
 //! The host half of Quinta's Metal on Vulkan: metal2vulkan-runtime behind the C table that
-//! `../quadra_metal.h` describes. The guest Metal.framework (`../framework`) holds the handles
+//! `../quinta_metal.h` describes. The guest Metal.framework (`../framework`) holds the handles
 //! this file gives out; see the header for the rules both sides keep.
 #![allow(clippy::missing_safety_doc, clippy::too_many_arguments)]
 
@@ -41,7 +41,7 @@ use util::{fail, guard, log_once, set_error};
 pub use present::{Drawable, Surface};
 
 // ---------------------------------------------------------------------------------------------
-// The C types of quadra_metal.h.
+// The C types of quinta_metal.h.
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -2695,7 +2695,7 @@ static API: QmApi = QmApi {
 
 /// Check the dynamically loaded LLVM shader upgrader before starting the game.
 #[no_mangle]
-pub extern "C" fn quadra_metal_host_check_air() -> c_int {
+pub extern "C" fn quinta_metal_host_check_air() -> c_int {
     guard(0, || match air::check_llvm() {
         Ok(()) => 1,
         Err(error) => {
@@ -2712,7 +2712,7 @@ pub extern "C" fn quadra_metal_host_check_air() -> c_int {
 #[no_mangle]
 /// # Safety
 /// `device` is null or a live handle from `device_create`.
-pub unsafe extern "C" fn quadra_metal_host_self_test(device: *mut c_void) -> c_int {
+pub unsafe extern "C" fn quinta_metal_host_self_test(device: *mut c_void) -> c_int {
     let device = get_or!(device, Device, 0);
     guard(0, || match self_test(device) {
         Ok(()) => 1,
@@ -2789,7 +2789,7 @@ fn self_test(device: &Device) -> Result<(), String> {
 /// # Safety
 /// `device` is null or a live handle from `device_create`.
 #[no_mangle]
-pub unsafe extern "C" fn quadra_metal_host_identity(device: *mut c_void) -> *const c_char {
+pub unsafe extern "C" fn quinta_metal_host_identity(device: *mut c_void) -> *const c_char {
     thread_local! {
         static TEXT: std::cell::RefCell<std::ffi::CString> = std::cell::RefCell::default();
     }
@@ -2807,7 +2807,7 @@ pub unsafe extern "C" fn quadra_metal_host_identity(device: *mut c_void) -> *con
 /// Recreate locally recorded pipeline states in the launcher's isolated helper process.
 /// Returns the successful count, or -1 with `last_error` set. Progress is counts only.
 #[no_mangle]
-pub extern "C" fn quadra_metal_host_preload(
+pub extern "C" fn quinta_metal_host_preload(
     progress: Option<preload::Progress>,
     context: *mut c_void,
     maximum: u32,
@@ -2835,7 +2835,7 @@ pub extern "C" fn quadra_metal_host_preload(
 /// # Safety
 /// `device` must be a live host device handle throughout this call. Progress must not release it.
 #[no_mangle]
-pub unsafe extern "C" fn quadra_metal_host_preload_device(
+pub unsafe extern "C" fn quinta_metal_host_preload_device(
     device: *mut c_void,
     progress: Option<preload::Progress>,
     context: *mut c_void,
@@ -2860,7 +2860,7 @@ pub unsafe extern "C" fn quadra_metal_host_preload_device(
 /// `device` must be a live host device handle. A non-null `buffer` must be writable for
 /// `capacity` bytes and must not overlap the device handle.
 #[no_mangle]
-pub unsafe extern "C" fn quadra_metal_host_diagnostics(
+pub unsafe extern "C" fn quinta_metal_host_diagnostics(
     device: *mut c_void,
     buffer: *mut c_char,
     capacity: u64,
@@ -2883,9 +2883,9 @@ pub unsafe extern "C" fn quadra_metal_host_diagnostics(
     })
 }
 
-/// The table of quadra_metal.h, or null for another version.
+/// The table of quinta_metal.h, or null for another version.
 #[no_mangle]
-pub extern "C" fn quadra_metal_host_api(version: u32) -> *const QmApi {
+pub extern "C" fn quinta_metal_host_api(version: u32) -> *const QmApi {
     if version == API.version {
         &API
     } else {
@@ -2919,7 +2919,7 @@ mod self_test_tests {
             CStr::from_ptr(util::last_error())
         });
         assert_eq!(
-            unsafe { quadra_metal_host_self_test(device) },
+            unsafe { quinta_metal_host_self_test(device) },
             1,
             "{:?}",
             unsafe { CStr::from_ptr(util::last_error()) }
@@ -2930,7 +2930,7 @@ mod self_test_tests {
     #[test]
     fn a_null_device_fails_the_self_test_with_a_message() {
         assert_eq!(
-            unsafe { quadra_metal_host_self_test(std::ptr::null_mut()) },
+            unsafe { quinta_metal_host_self_test(std::ptr::null_mut()) },
             0
         );
     }

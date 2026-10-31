@@ -1,20 +1,82 @@
 #!/usr/bin/env python3
-"""Quinta entry point; retain the upstream package and runtime ABI names."""
-import runpy
+"""Quinta launcher entry point."""
 import sys
 from pathlib import Path
 
-directory = Path(__file__).resolve().parent
-sys.path.insert(0, str(directory))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from quinta import paths  # noqa: E402
+paths.migrate_environment()
+
+# Quinta-only command-line tools run without initializing GTK.
 if sys.argv[1:2] == ["--dump-gradient-shaders"]:
-    from quadra.shader_diagnostics import main
+    from quinta.shader_diagnostics import main
     sys.exit(main(sys.argv[2:]))
-
 if sys.argv[1:2] == ["--macos-studio"]:
-    experiment = directory.parent / "experimental/macos-studio/run.py"
+    import runpy
+    experiment = Path(__file__).resolve().parents[1] / "experimental/macos-studio/run.py"
     sys.argv = [str(experiment), *sys.argv[2:]]
     runpy.run_path(str(experiment), run_name="__main__")
     sys.exit(0)
 
-runpy.run_path(str(directory / "quadrahq-launcher"), run_name="__main__")
+# `quinta --studio [link or file]` opens Roblox Studio directly; the system
+# calls it for roblox-studio: and roblox-studio-auth: links (sign in).
+if sys.argv[1:2] == ["--studio"]:
+    from quinta import studio  # noqa: E402
+    if not studio.needs_install():
+        # This process stays until Studio closes: it looks after GameMode, Discord
+        # presence and the sign-in backup. The launcher window starts it with
+        # --no-update after it has updated Studio itself.
+        arguments = sys.argv[2:]
+        update = arguments[:1] != ["--no-update"]
+        try:
+            sys.exit(studio.run(arguments if update else arguments[1:], update=update))
+        except (OSError, RuntimeError) as error:
+            print(f"Roblox Studio could not start: {error}", file=sys.stderr)
+            sys.exit(1)
+
+# Linux has no LaunchServices. Keep the browser's Roblox argument opaque and
+# let the normal launcher process consume it once Darling is ready. Writing it
+# before starting GTK also covers a second protocol click while the first
+# launch is still preparing the prefix. Desktop entries pass the URI directly;
+# retain --uri as a compatibility spelling for older local entries.
+if len(sys.argv) == 2 and not sys.argv[1].startswith("-"):
+    from quinta import uri  # noqa: E402
+    uri.receive(sys.argv[1])
+
+if sys.argv[1:2] == ["--uri"]:
+    if len(sys.argv) != 3:
+        print("quinta --uri requires one URI", file=sys.stderr)
+        sys.exit(2)
+    from quinta import uri  # noqa: E402
+    uri.receive(sys.argv[2])
+
+# `quinta --collect-diagnostics [options]` writes a report archive without
+# the interface (see `quinta --collect-diagnostics --help`).
+if sys.argv[1:2] == ["--collect-diagnostics"]:
+    try:
+        from quinta import diagnostics  # noqa: E402
+    except ImportError as error:
+        print(f"Diagnostics are unavailable in this Quinta build: {error}", file=sys.stderr)
+        sys.exit(1)
+    sys.exit(diagnostics.collect_cli(sys.argv[2:]))
+
+# `quinta --watch-stalls` records what the game's threads do while it hangs
+# (see `quinta --watch-stalls --help`); start it before or during the game.
+if sys.argv[1:2] == ["--watch-stalls"]:
+    from quinta import stallwatch  # noqa: E402
+    sys.exit(stallwatch.cli(sys.argv[2:]))
+
+if sys.argv[1:2] == ['--hardware-report']:
+    from quinta import hardware_report
+    sys.exit(hardware_report.cli(sys.argv[2:]))
+
+# `quinta --ciderdarling-settings` opens Settings -> CiderDarling, also in an
+# already running launcher (the CiderDarling Settings menu entry).
+page = None
+if sys.argv[1:2] == ["--ciderdarling-settings"]:
+    page = "ciderdarling"
+
+from quinta.app import main  # noqa: E402
+
+sys.exit(main(page))

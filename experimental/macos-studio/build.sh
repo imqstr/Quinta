@@ -3,7 +3,7 @@ set -euo pipefail
 experiment_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 project_dir=$(dirname -- "$(dirname -- "$experiment_dir")")
 studio_sysroot=$(PYTHONPATH="$project_dir/launcher" python3 - <<'PY'
-from quadra.runtime import resolve_runtime
+from quinta.runtime import resolve_runtime
 print(resolve_runtime()['sysroot'])
 PY
 )

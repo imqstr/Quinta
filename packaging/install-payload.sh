@@ -13,14 +13,14 @@ libdir=$4
   printf '%s\n' 'Use a package staging directory and an absolute /usr/lib path.' >&2
   exit 2
 }
-for file in libQuadraShims.dylib libquadra-wayland.so metal/libquadra_metal_host.so metal/Metal.framework/Metal; do
+for file in libQuintaShims.dylib libquinta-wayland.so metal/libquinta_metal_host.so metal/Metal.framework/Metal; do
   [[ -f $build_dir/$file ]] || {
     printf 'Missing build artifact: %s\n' "$build_dir/$file" >&2
     exit 1
   }
 done
-share=$destdir/usr/share/quadrahq
-shim=$destdir$libdir/quadrahq/shim
+share=$destdir/usr/share/quinta
+shim=$destdir$libdir/quinta/shim
 install -d "$share/branding" "$shim" "$destdir/usr/bin"
 cp -r --no-preserve=ownership "$source_root/launcher" "$share/"
 rm -f "$share/launcher/install.sh"
@@ -29,43 +29,43 @@ find "$share/launcher" -type d -name __pycache__ -exec rm -rf -- {} +
 cp -r --no-preserve=ownership "$source_root/branding/icons" \
   "$source_root/branding/contributors" "$share/branding/"
 install -m644 "$source_root/branding/"*.png "$source_root/branding/"*.svg "$share/branding/"
-install -m644 "$source_root/branding/quadrahq.webp" "$share/branding/"
-install -m644 "$source_root/patch_startup_throttle.py" "$share/"
+install -m644 "$source_root/branding/quinta.webp" "$share/branding/"
+install -m644 "$source_root/scripts/patch-startup-throttle.py" "$share/"
 install -m644 "$source_root/README.md" "$share/"
 install -m755 "$source_root/install.sh" "$share/"
-install -m755 "$build_dir/libQuadraShims.dylib" \
-  "$build_dir/libquadra-wayland.so" "$shim/"
+install -m755 "$build_dir/libQuintaShims.dylib" \
+  "$build_dir/libquinta-wayland.so" "$shim/"
 # Studio's Vulkan fix: optional, built only where the Vulkan headers are installed.
-if [[ -f $build_dir/libquadra-studio-layer.so ]]; then
-  install -m755 "$build_dir/libquadra-studio-layer.so" "$shim/"
+if [[ -f $build_dir/libquinta-studio-layer.so ]]; then
+  install -m755 "$build_dir/libquinta-studio-layer.so" "$shim/"
 fi
 cp -r --no-preserve=ownership "$build_dir/frameworks" "$shim/"
 install -d "$shim/metal" "$share/prototype/metal-vulkan"
-install -m755 "$build_dir/metal/libquadra_metal_host.so" "$shim/metal/"
+install -m755 "$build_dir/metal/libquinta_metal_host.so" "$shim/metal/"
 cp -r --no-preserve=ownership "$build_dir/metal/Metal.framework" "$shim/metal/"
 install -m644 "$source_root/prototype/metal-vulkan/README.md" "$share/prototype/metal-vulkan/"
-cat > "$destdir/usr/bin/quadrahq" <<WRAPPER
+cat > "$destdir/usr/bin/quinta" <<WRAPPER
 #!/bin/sh
-export QUADRA_PREBUILT_SHIM=$libdir/quadrahq/shim
-exec python3 /usr/share/quadrahq/launcher/quadrahq-launcher "\$@"
+export QUINTA_PREBUILT_SHIM=$libdir/quinta/shim
+exec python3 /usr/share/quinta/launcher/quinta-launcher "\$@"
 WRAPPER
-chmod 755 "$destdir/usr/bin/quadrahq"
+chmod 755 "$destdir/usr/bin/quinta"
 for size in 16 22 24 32 48 64 128 256 512 1024; do
-  install -Dm644 "$source_root/branding/icons/quadrahq-$size.png" \
-    "$destdir/usr/share/icons/hicolor/${size}x${size}/apps/quadrahq.png"
+  install -Dm644 "$source_root/branding/icons/quinta-$size.png" \
+    "$destdir/usr/share/icons/hicolor/${size}x${size}/apps/quinta.png"
 done
-for file in org.quadrahq.Quadra.desktop org.quadrahq.Quadra.URI.desktop \
-  org.quadrahq.Quadra.Studio.desktop quadrahq-roblox-window.desktop; do
+for file in io.github.imqstr.Quinta.desktop io.github.imqstr.Quinta.URI.desktop \
+  io.github.imqstr.Quinta.Studio.desktop quinta-roblox-window.desktop; do
   install -Dm644 "$source_root/packaging/$file" \
     "$destdir/usr/share/applications/$file"
 done
-install -Dm644 "$source_root/packaging/org.quadrahq.Quadra.xml" \
-  "$destdir/usr/share/mime/packages/org.quadrahq.Quadra.xml"
+install -Dm644 "$source_root/packaging/io.github.imqstr.Quinta.xml" \
+  "$destdir/usr/share/mime/packages/io.github.imqstr.Quinta.xml"
 install -Dm644 "$source_root/LICENSE" \
-  "$destdir/usr/share/licenses/quadrahq/LICENSE"
+  "$destdir/usr/share/licenses/quinta/LICENSE"
 install -m644 "$source_root/LICENSES/MIT-MacOBlox.txt" \
-  "$destdir/usr/share/licenses/quadrahq/"
+  "$destdir/usr/share/licenses/quinta/"
 cp -r --no-preserve=ownership "$source_root/LICENSES/metal" \
-  "$destdir/usr/share/licenses/quadrahq/"
-install -m644 "$source_root/launcher/quadra/assets/fonts/"*-OFL.txt \
-  "$destdir/usr/share/licenses/quadrahq/"
+  "$destdir/usr/share/licenses/quinta/"
+install -m644 "$source_root/launcher/quinta/assets/fonts/"*-OFL.txt \
+  "$destdir/usr/share/licenses/quinta/"

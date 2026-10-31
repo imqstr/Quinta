@@ -10,8 +10,8 @@ excluded. Package updates use the distro's package manager.
 | --- | --- | --- |
 | Arch Linux | [AUR recipes](aur/README.md) | Manjaro, EndeavourOS, CachyOS |
 | Debian 13+, Ubuntu 24.04+ | [Debian overlay](debian/control) | Linux Mint 22 and compatible Debian/Ubuntu derivatives |
-| Fedora | [RPM spec](rpm/quadrahq.spec) | Nobara and compatible Fedora derivatives |
-| openSUSE | [RPM spec](rpm/quadrahq.spec) | Tumbleweed; Leap releases supplying the required UI versions |
+| Fedora | [RPM spec](rpm/quinta.spec) | Nobara and compatible Fedora derivatives |
+| openSUSE | [RPM spec](rpm/quinta.spec) | Tumbleweed; Leap releases supplying the required UI versions |
 | NixOS (x86_64) | [Flake and NixOS module](nix/README.md) | NixOS with flakes enabled |
 
 The release workflow builds Arch, Ubuntu 24.04 and Fedora packages in their
@@ -23,7 +23,7 @@ repositories or the AUR.
 The `noreply@aubree.wtf` maintainer address is a placeholder: set the real
 packaging contact before submitting to a distro.
 
-Quinta 0.37.p4 uses the `quadrahq` package name. The release workflow pins the
+Quinta 0.37.p4 uses the `quinta` package name. The release workflow pins the
 source archive checksum and stable AUR recipe after publication. The frozen
 Cider 0.30 AUR recipe remains in `aur/ciderhq/`. Use `--local` to package
 unreleased source changes.
@@ -47,8 +47,8 @@ to the Arch, Debian and RPM recipes.
 - Clang, LLD and pkg-config for the native build. Compile on the target distro
   or its build chroot so the helper uses that distro's library versions.
 - Rust 1.98+ (cargo/rustc) to build the Metal host. Release CI provides the
-  verified prebuilt host through `QUADRA_METAL_HOST_LIBRARY`; Debian uses the
-  `pkg.quadrahq.prebuilt-metal` build profile and RPM uses `--with prebuilt_metal`
+  verified prebuilt host through `QUINTA_METAL_HOST_LIBRARY`; Debian uses the
+  `pkg.quinta.prebuilt-metal` build profile and RPM uses `--with prebuilt_metal`
   for that CI path. Ordinary source builds compile it with Cargo.
 
 The recipes declare a PulseAudio-compatible playback helper, which works
@@ -60,14 +60,14 @@ their hardware Vulkan driver. The default renderer remains OpenGL.
 
 ## Prepare sources
 
-The release workflow attaches `quadrahq-0.37.p4-source.tar.gz` and pins its
+The release workflow attaches `quinta-0.37.p4-source.tar.gz` and pins its
 checksum in `release.json`. To package local source edits:
 
 ```bash
-./packaging/prepare-source.sh "$PWD/work/quadrahq-packages" --local
+./packaging/prepare-source.sh "$PWD/work/quinta-packages" --local
 ```
 
-This produces a source archive, Debian and RPM inputs, and a `quadrahq`
+This produces a source archive, Debian and RPM inputs, and a `quinta`
 PKGBUILD with that archive's checksum. It never installs to the host.
 
 
@@ -82,7 +82,7 @@ overlay and RPM inputs in a new output directory. It requires `curl`, `tar`
 and `sha256sum`. To use an already downloaded release archive:
 
 ```bash
-./packaging/prepare-source.sh "$PWD/work/native-packages" /path/to/quadrahq-0.37.p4-source.tar.gz
+./packaging/prepare-source.sh "$PWD/work/native-packages" /path/to/quinta-0.37.p4-source.tar.gz
 ```
 
 The output directory must not already exist. Arch builds use their own AUR
@@ -98,7 +98,7 @@ Then install the packaging tools and native development dependencies:
 ```bash
 sudo apt install build-essential debhelper dh-python python3 clang lld \
   pkg-config libsdl2-dev libwayland-dev
-cd work/native-packages/Quadra-0.37.p4
+cd work/native-packages/Quinta-0.37.p4
 dpkg-buildpackage -b -us -uc
 ```
 
@@ -107,7 +107,7 @@ one directory above the source directory. Install using `apt`, which resolves
 dependencies from the configured repositories:
 
 ```bash
-sudo apt install ../quadrahq_0.37.p4-1_amd64.deb
+sudo apt install ../quinta_0.37.p4-1_amd64.deb
 ```
 
 The recipe uses debhelper for Python bytecode and desktop/icon/MIME cache
@@ -138,7 +138,7 @@ From the checkout, build with the prepared RPM inputs:
 
 ```bash
 rpmbuild --define "_topdir $PWD/work/native-packages/rpm" \
-  -ba work/native-packages/rpm/SPECS/quadrahq.spec
+  -ba work/native-packages/rpm/SPECS/quinta.spec
 ```
 
 The spec selects openSUSE's typelib package names using `suse_version` and

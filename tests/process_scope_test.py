@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
 
-from quadra import core
+from quinta import core
 from session_fixture import bare_session
 
 

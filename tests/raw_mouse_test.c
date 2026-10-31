@@ -10,7 +10,7 @@
 #endif
 #define dlsym mock_dlsym
 #define write mock_write
-#include "../raw_mouse.c"
+#include "../native/raw_mouse.c"
 #undef dlsym
 #undef write
 
@@ -49,26 +49,26 @@ static void configure(int major, int minor) {
 }
 int main(void) {
     configure(2, 0);
-    assert(!quadra_raw_mouse_select((void *)1, 1) && !selected);
+    assert(!quinta_raw_mouse_select((void *)1, 1) && !selected);
     configure(2, 1);
-    assert(quadra_raw_mouse_select((void *)1, 1) && selected);
+    assert(quinta_raw_mouse_select((void *)1, 1) && selected);
     double values[] = {3.5, -2.25, 999}, accelerated[] = {50, 60};
     unsigned char bits = 7;
     raw.valuators.mask = &bits; raw.valuators.mask_len = 1;
     raw.raw_values = values; raw.valuators.values = accelerated;
     struct generic_cookie cookie = {.type = GENERIC_EVENT, .extension = 131, .evtype = XI_RAW_MOTION};
     double dx, dy;
-    assert(quadra_raw_mouse_event((void *)1, &cookie, &dx, &dy));
+    assert(quinta_raw_mouse_event((void *)1, &cookie, &dx, &dy));
     assert(dx == 3.5 && dy == -2.25 && fetched == 1 && freed == 1 && !cookie.data);
     bits = 2;
-    assert(quadra_raw_mouse_event((void *)1, &cookie, &dx, &dy));
+    assert(quinta_raw_mouse_event((void *)1, &cookie, &dx, &dy));
     assert(dx == 0 && dy == 3.5 && fetched == 2 && freed == 2);
     bits = 1; raw.raw_values = 0;
-    assert(quadra_raw_mouse_event((void *)1, &cookie, &dx, &dy));
+    assert(quinta_raw_mouse_event((void *)1, &cookie, &dx, &dy));
     assert(dx == 50 && dy == 0 && fetched == 3 && freed == 3);
     cookie.extension = 132;
-    assert(!quadra_raw_mouse_event((void *)1, &cookie, &dx, &dy));
+    assert(!quinta_raw_mouse_event((void *)1, &cookie, &dx, &dy));
     assert(fetched == 3 && freed == 3);
-    assert(!quadra_raw_mouse_select((void *)1, 0) && !selected);
+    assert(!quinta_raw_mouse_select((void *)1, 0) && !selected);
     puts("PASS: XI2.1 required, host ABI, packed axes, raw deltas, cookie ownership, deselection");
 }

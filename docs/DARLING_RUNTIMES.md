@@ -62,10 +62,10 @@ the runtime's own CPU policy; the build job count does not force idle workers
 to spin.
 
 The installer activates a selection by atomically saving
-`$XDG_CONFIG_HOME/quadrahq/runtime.json`, defaulting to
-`~/.config/quadrahq/runtime.json`, after the launcher shim and desktop setup
+`$XDG_CONFIG_HOME/quinta/runtime.json`, defaulting to
+`~/.config/quinta/runtime.json`, after the launcher shim and desktop setup
 succeed. It records an absolute client path, sysroot and prefix. The launcher,
-direct shim builds and `run_debug.sh` use these paths rather than independently
+direct shim builds and `scripts/run-debug.sh` use these paths rather than independently
 choosing a client on PATH and a root under `/usr`.
 
 Regular Darling's default prefix remains `~/.darling`. CiderDarling's default
@@ -83,7 +83,7 @@ the saved version, then other complete versions in `/opt/ciderdarling`.
 An incomplete version with missing metadata cannot appear as regular Darling.
 
 Only the existing workqueue trampoline workaround is bypassed automatically:
-the launcher supplies `QUADRA_NATIVE_WORKQUEUE=1` when the selected runtime's
+the launcher supplies `QUINTA_NATIVE_WORKQUEUE=1` when the selected runtime's
 metadata declares `workqueue_stack_reset_x86_64`. Other compatibility shims
 remain active. Changing the selected sysroot or runtime revision invalidates
 the launcher's shim build stamp. Restart the launcher after switching.
@@ -145,7 +145,7 @@ PYTHONPATH=launcher python3 -m unittest discover -s tests -p 'runtime_selection_
 GSETTINGS_BACKEND=memory GDK_BACKEND=x11 GSK_RENDERER=cairo xvfb-run -a python3 tests/runtime_settings_ui.py
 PYTHONPATH=launcher python3 -m unittest discover -s tests -p 'runtime_install_test.py'
 GSETTINGS_BACKEND=memory GDK_BACKEND=x11 QT_QPA_PLATFORM=xcb GSK_RENDERER=cairo dbus-run-session -- xvfb-run -a python3 tests/runtime_install_terminal.py
-bash -n install.sh build_debug_shim.sh run_debug.sh
+bash -n install.sh scripts/build-native.sh scripts/run-debug.sh
 bash website/build.sh
 cmp install.sh website/dist/install.sh
 ```

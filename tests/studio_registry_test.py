@@ -1,7 +1,7 @@
 """Wine registry files of Studio's prefix: parsing, sign-in decryption and the .reg files we write."""
 import unittest
 
-from quadra import studio_registry as registry
+from quinta import studio_registry as registry
 
 USER_REG = r'''WINE REGISTRY Version 2
 ;; All keys relative to \\User\\S-1-5-21-0-0-0-1000
@@ -100,8 +100,8 @@ class WrittenFileTests(unittest.TestCase):
         self.assertIn('"Window"="255 255 255"', light)
 
     def test_shell_folders_are_windows_paths_on_the_linux_root(self):
-        text = registry.folders_reg("/home/u/.local/share/quadrahq/studio/appdata", "/home/u/Documents", "/home/u/Pictures")
-        self.assertIn(r'"Local AppData"="Z:\\home\\u\\.local\\share\\quadrahq\\studio\\appdata"', text)
+        text = registry.folders_reg("/home/u/.local/share/quinta/studio/appdata", "/home/u/Documents", "/home/u/Pictures")
+        self.assertIn(r'"Local AppData"="Z:\\home\\u\\.local\\share\\quinta\\studio\\appdata"', text)
         self.assertIn(r'"My Pictures"="Z:\\home\\u\\Pictures"', text)
 
     def test_what_we_write_can_be_read_back_by_the_same_parser(self):

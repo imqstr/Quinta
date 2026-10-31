@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-REPOSITORY = 'QuadraHQ/Quadra'
+REPOSITORY = 'Quinta/Quinta'
 
 
 def run(*args, **kwargs):
@@ -26,7 +26,7 @@ def main():
             or not any(path.name.endswith('.pkg.tar.zst') for path in files)
             or not any(path.suffix == '.rpm' and not path.name.endswith('.src.rpm') for path in files)):
         raise ValueError('A distro package is missing; keeping the release unpublished')
-    source = dist / f'quadrahq-{version}-source.tar.gz'
+    source = dist / f'quinta-{version}-source.tar.gz'
     digest = hashlib.sha256(source.read_bytes()).hexdigest()
     sums = dist / 'SHA256SUMS'
     sums.write_text(''.join(f'{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n' for path in files))
@@ -56,12 +56,12 @@ def main():
         return
     record['sha256'] = digest
     (ROOT / 'packaging/release.json').write_text(json.dumps(record, indent=2) + '\n')
-    for asset, target in [('quadrahq.PKGBUILD', 'PKGBUILD'), ('quadrahq.SRCINFO', '.SRCINFO')]:
-        shutil.copy2(dist / asset, ROOT / 'packaging/aur/quadrahq' / target)
+    for asset, target in [('quinta.PKGBUILD', 'PKGBUILD'), ('quinta.SRCINFO', '.SRCINFO')]:
+        shutil.copy2(dist / asset, ROOT / 'packaging/aur/quinta' / target)
     run('git', 'config', 'user.name', 'Quinta release bot', cwd=ROOT)
     run('git', 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com', cwd=ROOT)
-    run('git', 'add', 'packaging/release.json', 'packaging/aur/quadrahq/PKGBUILD',
-        'packaging/aur/quadrahq/.SRCINFO', cwd=ROOT)
+    run('git', 'add', 'packaging/release.json', 'packaging/aur/quinta/PKGBUILD',
+        'packaging/aur/quinta/.SRCINFO', cwd=ROOT)
     changed = subprocess.run(['git', 'diff', '--cached', '--quiet'], cwd=ROOT).returncode
     if changed:
         run('git', 'commit', '-m', f'Pin Quinta {version} release source and AUR recipe', cwd=ROOT)

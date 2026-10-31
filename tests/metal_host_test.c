@@ -1,9 +1,9 @@
 /* Optional GPU regression of the real C ABI, render clear, MSAA resolve and
  * texture-to-buffer readback. No compositor, account or Roblox client needed.
  * clang -O2 -Wall -Wextra tests/metal_host_test.c -ldl -o /tmp/metal-host-test
- * /tmp/metal-host-test build/metal/libquadra_metal_host.so
+ * /tmp/metal-host-test build/metal/libquinta_metal_host.so
  */
-#include "../prototype/metal-vulkan/quadra_metal.h"
+#include "../prototype/metal-vulkan/quinta_metal.h"
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,24 +77,24 @@ int main(int argc, char **argv) {
     CHECK(entry && !entry(QM_API_VERSION + 1));
     api = entry(QM_API_VERSION);
     CHECK(api && api->version == QM_API_VERSION && api->size == sizeof(qm_api));
-    int (*check_air)(void) = (int (*)(void))dlsym(library, "quadra_metal_host_check_air");
+    int (*check_air)(void) = (int (*)(void))dlsym(library, "quinta_metal_host_check_air");
     CHECK(check_air && check_air());
     void *device = api->device_create(NULL);
     CHECK(device);
     qm_device_info info = {0};
     api->device_info(device, &info);
     printf("Device: %s\n", info.name);
-    const char *original_budget = getenv("QUADRA_VRAM_BYTES");
+    const char *original_budget = getenv("QUINTA_VRAM_BYTES");
     char *saved_budget = original_budget ? strdup(original_budget) : NULL;
-    setenv("QUADRA_VRAM_BYTES", "invalid", 1);
+    setenv("QUINTA_VRAM_BYTES", "invalid", 1);
     api->device_info(device, &info);
     CHECK(info.recommended_max_working_set_size >= (64u << 20));
     CHECK(info.recommended_max_working_set_size <= (512u << 20));
-    setenv("QUADRA_VRAM_BYTES", "134217728", 1);
+    setenv("QUINTA_VRAM_BYTES", "134217728", 1);
     api->device_info(device, &info);
     CHECK(info.recommended_max_working_set_size <= (128u << 20));
-    if (saved_budget) { setenv("QUADRA_VRAM_BYTES", saved_budget, 1); free(saved_budget); }
-    else unsetenv("QUADRA_VRAM_BYTES");
+    if (saved_budget) { setenv("QUINTA_VRAM_BYTES", saved_budget, 1); free(saved_budget); }
+    else unsetenv("QUINTA_VRAM_BYTES");
     puts("PASS: Metal C ABI bounds malformed and explicit graphics budgets on the selected Vulkan device");
     void *queue = api->queue_new(device);
     CHECK(queue);

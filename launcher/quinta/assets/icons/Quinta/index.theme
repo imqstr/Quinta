@@ -1,0 +1,12 @@
+[Icon Theme]
+Name=Quinta
+Comment=Google Material Symbols Rounded
+Inherits=Adwaita,hicolor
+Directories=scalable/actions
+
+[scalable/actions]
+Size=24
+Type=Scalable
+MinSize=16
+MaxSize=64
+Context=Actions

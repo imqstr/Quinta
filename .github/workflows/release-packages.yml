@@ -18,7 +18,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: quadra-packages-${{ github.ref }}
+  group: quinta-packages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -38,12 +38,12 @@ jobs:
           [[ $version =~ ^[0-9]+\.[0-9]+([A-Za-z0-9.]*)$ ]]
           if [[ $GITHUB_REF == refs/tags/* ]]; then [[ $GITHUB_REF == refs/tags/v$version ]]; fi
           mkdir dist
-          git archive --format=tar --prefix="Quinta-$version/" HEAD | gzip -n > "dist/quadrahq-$version-source.tar.gz"
+          git archive --format=tar --prefix="Quinta-$version/" HEAD | gzip -n > "dist/quinta-$version-source.tar.gz"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
-          name: quadra-source
+          name: quinta-source
           path: dist/
           if-no-files-found: error
 
@@ -78,14 +78,14 @@ jobs:
           sudo apt-get install -y clang binutils libvulkan1 mesa-vulkan-drivers libllvm18
           rustup toolchain install 1.98.1 --profile minimal
           export RUSTUP_TOOLCHAIN=1.98.1
-          export QUADRA_BUILD_DIR="$RUNNER_TEMP/metal-build"
+          export QUINTA_BUILD_DIR="$RUNNER_TEMP/metal-build"
           export CARGO_TARGET_DIR="$RUNNER_TEMP/metal-target"
           bash prototype/metal-vulkan/build.sh host
           cargo test --locked --release --manifest-path prototype/metal-vulkan/host/Cargo.toml --lib -- --include-ignored
           clang -O2 -Wall -Wextra tests/metal_host_test.c -ldl -o "$RUNNER_TEMP/metal-host-test"
-          "$RUNNER_TEMP/metal-host-test" "$QUADRA_BUILD_DIR/metal/libquadra_metal_host.so"
+          "$RUNNER_TEMP/metal-host-test" "$QUINTA_BUILD_DIR/metal/libquinta_metal_host.so"
           mkdir metal-host
-          cp "$QUADRA_BUILD_DIR/metal/libquadra_metal_host.so" metal-host/
+          cp "$QUINTA_BUILD_DIR/metal/libquinta_metal_host.so" metal-host/
       - uses: actions/upload-artifact@v4
         with:
           name: metal-host-internal
@@ -113,7 +113,7 @@ jobs:
           ref: ${{ needs.source.outputs.revision }}
       - uses: actions/download-artifact@v4
         with:
-          name: quadra-source
+          name: quinta-source
           path: out
       - uses: actions/download-artifact@v4
         with:
@@ -128,12 +128,12 @@ jobs:
         run: |
           docker run --rm -v "$GITHUB_WORKSPACE:/src:ro" -v "$GITHUB_WORKSPACE/out:/out" \
             -v "$GITHUB_WORKSPACE/metal-host:/metal-host:ro" \
-            -e QUADRA_METAL_HOST_LIBRARY=/metal-host/libquadra_metal_host.so \
+            -e QUINTA_METAL_HOST_LIBRARY=/metal-host/libquinta_metal_host.so \
             -v "$RUNNER_TEMP/runtime/sysroot:/runtime:ro" "$IMAGE" \
             bash /src/packaging/ci/build-package.sh "$FLAVOR"
       - uses: actions/upload-artifact@v4
         with:
-          name: quadra-${{ matrix.flavor }}
+          name: quinta-${{ matrix.flavor }}
           path: out/
           if-no-files-found: error
 
@@ -150,7 +150,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v4
         with:
-          pattern: quadra-*
+          pattern: quinta-*
           path: dist
           merge-multiple: true
       - name: Publish the tested packages

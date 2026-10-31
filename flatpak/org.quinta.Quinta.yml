@@ -1,0 +1,103 @@
+app-id: io.github.imqstr.Quinta
+runtime: org.freedesktop.Platform
+runtime-version: '26.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.llvm22
+command: quinta
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /lib/*/pkgconfig
+  - /lib/cmake
+  - /share/gir-1.0
+  - /share/gtk-doc
+  - /share/doc
+  - /share/man
+  - /lib/*.a
+finish-args:
+  - --share=network
+  - --share=ipc
+  # Default X11/Xwayland and optional native Wayland; the launcher is GTK.
+  - --socket=x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --device=dri
+  # Roblox asks the GPU driver for VRAM through sysfs (host_vram_bytes).
+  - --filesystem=/sys/class/drm:ro
+modules:
+  # Freedesktop supplies the graphics/audio stack. Bundle the launcher UI
+  # libraries instead of inheriting GNOME 50's 25.08 graphics extensions.
+  - launcher-ui.json
+  - name: darling
+    buildsystem: simple
+    build-commands:
+      - sh install-darling.sh debs.zip
+    sources:
+      - type: file
+        url: https://github.com/darlinghq/darling/releases/download/v0.1.20260608/debs_20260608.zip
+        sha256: 27469ef3932da2e91dd7fb34b70e3628a3e54b7af9fb5480051f44af35eca1fd
+        dest-filename: debs.zip
+      - type: file
+        path: install-darling.sh
+
+  - name: quinta
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/llvm22/bin
+      prepend-ld-library-path: /usr/lib/sdk/llvm22/lib
+    build-commands:
+      # The shim and the stub frameworks, against Darling's macOS root.
+      - QUINTA_BUILD_DIR=/app/lib/quinta/shim DARLING_SYSROOT=/app/libexec/darling ./scripts/build-native.sh
+      - rm -f /app/lib/quinta/shim/fast_libc.o
+      # Darling without root (see flatpak/darling-noroot.c).
+      - gcc -shared -fPIC -O2 -o /app/lib/quinta/darling-noroot.so flatpak/darling-noroot.c -ldl
+      - clang -target x86_64-apple-darwin -fuse-ld=lld -isysroot /app/libexec/darling -mmacosx-version-min=11.0
+        -dynamiclib -O2 -o /app/lib/quinta/launchd_pid1.dylib flatpak/launchd_pid1.c
+      - install -d /app/share/quinta
+      - cp -r launcher branding /app/share/quinta/
+      - rm -rf /app/share/quinta/branding/source
+      - install -m644 scripts/patch-startup-throttle.py /app/share/quinta/
+      - install -m644 README.md /app/share/quinta/
+      - install -Dm644 LICENSE /app/share/licenses/quinta/LICENSE
+      - install -m644 LICENSES/MIT-MacOBlox.txt /app/share/licenses/quinta/
+      - install -m644 launcher/quinta/assets/fonts/*-OFL.txt /app/share/licenses/quinta/
+      - rm -f /app/share/quinta/launcher/install.sh
+      - python3 -m compileall -q -d /app/share/quinta/launcher /app/share/quinta/launcher
+      - install -Dm755 flatpak/quinta.sh /app/bin/quinta
+      - for size in 16 22 24 32 48 64 128 256 512 1024; do
+          install -Dm644 "branding/icons/quinta-$size.png" "/app/share/icons/hicolor/${size}x${size}/apps/io.github.imqstr.Quinta.png";
+          install -Dm644 "branding/icons/quinta-$size.png" "/app/share/icons/hicolor/${size}x${size}/apps/quinta.png";
+          done
+      - install -d /app/share/applications
+      - sed 's/^Icon=.*/Icon=io.github.imqstr.Quinta/' packaging/io.github.imqstr.Quinta.desktop
+        > /app/share/applications/io.github.imqstr.Quinta.desktop
+      - sed 's/^Icon=.*/Icon=io.github.imqstr.Quinta/' packaging/io.github.imqstr.Quinta.URI.desktop
+        > /app/share/applications/io.github.imqstr.Quinta.URI.desktop
+      # The Roblox window's own entry, so docks show its icon.
+      - sed 's/^Icon=.*/Icon=io.github.imqstr.Quinta/' packaging/quinta-roblox-window.desktop
+        > /app/share/applications/io.github.imqstr.Quinta.RobloxWindow.desktop
+      - install -Dm644 flatpak/io.github.imqstr.Quinta.metainfo.xml -t /app/share/metainfo
+    sources:
+      - type: dir
+        path: ..
+        skip:
+          - .git
+          - .github
+          - website
+          - vercel.json
+          - .vercel
+          - .vercelignore
+          - RobloxPlayer.app
+          - build
+          - backups
+          - downloads
+          - logs
+          - work
+          - studio
+          - ffmpeg6
+          - ffmpeg_compat
+          - frameworks_backup
+          - .flatpak-builder
+          - flatpak/build-dir
+          - flatpak/repo

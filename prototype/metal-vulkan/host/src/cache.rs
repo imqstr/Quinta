@@ -187,7 +187,7 @@ mod tests {
 
     #[test]
     fn corruption_truncation_foreign_keys_and_oversized_entries_are_misses() {
-        let root = std::env::temp_dir().join(format!("quadra-cache-test-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("quinta-cache-test-{}", std::process::id()));
         fs::create_dir_all(&root).unwrap();
         let path = root.join("entry");
         let key = hash(b"source");

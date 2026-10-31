@@ -13,14 +13,14 @@ let
   regularHash = builtins.head (builtins.match ".*\nDARLING_DEBS_SHA256=([0-9a-f]+)\n.*" installer);
   cider = runtime == "ciderdarling";
   fhsPrefix =
-    if cider then "/usr/lib64/quadrahq-runtime/${builtins.substring 0 30 pins.revision}" else "/usr";
+    if cider then "/usr/lib64/quinta-runtime/${builtins.substring 0 32 pins.revision}" else "/usr";
 in
 assert lib.assertMsg (builtins.elem runtime [
   "ciderdarling"
   "regular"
 ]) "Unknown Darling runtime: ${runtime}";
 stdenvNoCC.mkDerivation {
-  pname = "quadrahq-${runtime}-runtime";
+  pname = "quinta-${runtime}-runtime";
   version = if cider then builtins.substring 0 12 pins.revision else lib.removePrefix "v" regularTag;
   src = fetchurl (
     if cider then

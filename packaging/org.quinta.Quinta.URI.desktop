@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Quinta Roblox Link Handler
+Comment=Open Roblox links in Quinta
+Exec=quinta %u
+Icon=quinta
+Terminal=false
+NoDisplay=true
+MimeType=x-scheme-handler/roblox;x-scheme-handler/roblox-player;

@@ -30,12 +30,12 @@ From a checkout:
 
 ```bash
 nix run .                              # CiderDarling
-nix run .#quadrahq-regular              # Regular Darling
-nix build .                            # ./result/bin/quadrahq
-nix profile add .#quadrahq              # Install with menu and URI handlers
+nix run .#quinta-regular              # Regular Darling
+nix build .                            # ./result/bin/quinta
+nix profile add .#quinta              # Install with menu and URI handlers
 ```
 
-You can replace `.` with `github:QuadraHQ/Quadra` once this support is
+You can replace `.` with `github:Quinta/Quinta` once this support is
 published in that repository. The flake lock pins Nixpkgs, and runtime
 downloads have fixed SHA-256 checksums. Builds do not fetch the mutable
 CiderDarling update feed.
@@ -48,17 +48,17 @@ Add Quinta to your system flake inputs, then import its module:
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    quadra.url = "github:QuadraHQ/Quadra";
+    quinta.url = "github:Quinta/Quinta";
   };
 
-  outputs = { nixpkgs, quadra, ... }: {
+  outputs = { nixpkgs, quinta, ... }: {
     nixosConfigurations.my-host = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         ./configuration.nix
-        quadra.nixosModules.default
+        quinta.nixosModules.default
         {
-          programs.quadrahq = {
+          programs.quinta = {
             enable = true;
             runtime = "ciderdarling"; # Or "regular"
             # withStudio = true;     # Also include Wine for Roblox Studio
@@ -75,14 +75,14 @@ and Roblox link handlers. To make Quinta your preferred link handler, add:
 
 ```nix
 xdg.mime.defaultApplications = {
-  "x-scheme-handler/roblox" = "org.quadrahq.Quadra.URI.desktop";
-  "x-scheme-handler/roblox-player" = "org.quadrahq.Quadra.URI.desktop";
+  "x-scheme-handler/roblox" = "io.github.imqstr.Quinta.URI.desktop";
+  "x-scheme-handler/roblox-player" = "io.github.imqstr.Quinta.URI.desktop";
 };
 ```
 
-For Home Manager, add `quadra.packages.x86_64-linux.quadrahq` to
+For Home Manager, add `quinta.packages.x86_64-linux.quinta` to
 `home.packages` and enable graphics in the host's NixOS configuration.
-The flake also exports `overlays.default`; the resulting `pkgs.quadrahq`
+The flake also exports `overlays.default`; the resulting `pkgs.quinta`
 accepts `.override { runtime = "regular"; withStudio = true; }`.
 
 ## Runtime selection and updates
@@ -96,7 +96,7 @@ path cannot replace the package's bundled runtime.
 CiderDarling's graphics, threading and diagnostics settings remain available.
 Runtime selection, downloads and rollback use your Nix configuration;
 the launcher's runtime installer and updater are disabled for this package.
-Update the `quadra` input with `nix flake update quadra`, then rebuild your
+Update the `quinta` input with `nix flake update quinta`, then rebuild your
 system. Use NixOS generations or Nix profile rollback to restore an earlier
 package and its matching runtime. Prefix data is retained across upgrades.
 

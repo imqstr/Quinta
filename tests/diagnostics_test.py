@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from unittest.mock import Mock, patch
 
-from quadra import diagnostics
+from quinta import diagnostics
 
 
 class DiagnosticSymbolsTests(unittest.TestCase):

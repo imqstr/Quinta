@@ -1,8 +1,8 @@
 import unittest
 
-from quadra import terminal
+from quinta import terminal
 
-ARGV = ["bash", "-c", "exit 0", "quadra-runtime-install"]
+ARGV = ["bash", "-c", "exit 0", "quinta-runtime-install"]
 
 
 def installed(*names):

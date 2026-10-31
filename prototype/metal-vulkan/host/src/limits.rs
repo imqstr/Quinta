@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn cgroup_parent_limits_are_not_ignored() {
-        let root = std::env::temp_dir().join(format!("quadra-cgroup-test-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("quinta-cgroup-test-{}", std::process::id()));
         std::fs::create_dir_all(root.join("child")).unwrap();
         for (name, value) in [
             ("memory.max", "1000"),

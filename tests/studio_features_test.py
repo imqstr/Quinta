@@ -14,7 +14,7 @@ import threading
 import unittest
 from unittest.mock import Mock, patch
 
-from quadra import core, studio, studio_deploy
+from quinta import core, studio, studio_deploy
 
 FAKE_WINE = '''#!/usr/bin/env python3
 import json, os, sys
@@ -125,11 +125,11 @@ class EnvironmentTests(StudioFixture):
     def test_the_vulkan_layer_is_enabled_only_when_it_was_built(self):
         self.assertNotIn('VK_INSTANCE_LAYERS', studio._wine_env(self.options(renderer='vulkan')))
         core.SHIM_DIR.mkdir()
-        (core.SHIM_DIR / 'libquadra-studio-layer.so').write_text('')
+        (core.SHIM_DIR / 'libquinta-studio-layer.so').write_text('')
         env = studio._wine_env(self.options(renderer='vulkan'))
-        self.assertEqual(env['VK_INSTANCE_LAYERS'], 'VK_LAYER_QUADRA_studio')
-        manifest = json.loads((Path(env['VK_LAYER_PATH']) / 'VkLayer_QUADRA_studio.json').read_text())
-        self.assertEqual(manifest['layer']['library_path'], str(core.SHIM_DIR / 'libquadra-studio-layer.so'))
+        self.assertEqual(env['VK_INSTANCE_LAYERS'], 'VK_LAYER_QUINTA_studio')
+        manifest = json.loads((Path(env['VK_LAYER_PATH']) / 'VkLayer_QUINTA_studio.json').read_text())
+        self.assertEqual(manifest['layer']['library_path'], str(core.SHIM_DIR / 'libquinta-studio-layer.so'))
         self.assertNotIn('VK_INSTANCE_LAYERS', studio._wine_env(self.options(renderer='dxvk')))
 
     def test_the_chosen_gpu_reaches_the_launch_and_a_missing_one_does_not_stop_it(self):
@@ -501,7 +501,7 @@ class SupervisorTests(StudioFixture):
         self.assertFalse(studio.BACKUPS.exists())
 
     def test_studios_log_lines_reach_discord_presence_as_they_are_written(self):
-        from quadra import studio_presence
+        from quinta import studio_presence
         lines = []
         presence = Mock(spec=studio_presence.StudioPresence)
         presence.feed.side_effect = lines.append

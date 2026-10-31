@@ -1,6 +1,6 @@
 /* Optional AppKit/Xvfb integration regression. Compile as in
  * darling_cursor_lock_test.m and inject the built shim in a disposable prefix.
- * Run once with QUADRA_RAW_MOUSE=0 and once with it enabled. */
+ * Run once with QUINTA_RAW_MOUSE=0 and once with it enabled. */
 extern int printf(const char *, ...);
 extern int fflush(void *);
 extern void *dlsym(void *, const char *);
@@ -296,7 +296,7 @@ int main(void) {
             [queue removeAllObjects];
         }
 
-    const char *focus_only=getenv("QUADRA_TEST_FOCUS_ONLY");
+    const char *focus_only=getenv("QUINTA_TEST_FOCUS_ONLY");
     if(focus_only && focus_only[0]=='1') {
         /* A drag interrupted by switching windows cannot be resurrected by
          * FocusIn or a late background request from the render thread. */
@@ -318,7 +318,7 @@ int main(void) {
         fflush(0);return 0;
     }
 
-    char *setting = getenv("QUADRA_RAW_MOUSE");
+    char *setting = getenv("QUINTA_RAW_MOUSE");
     raw_mode = !(setting && setting[0] == '0');
     union Event motion = {0};
     motion.motion = (struct Motion){.type=6, .display=connection, .window=xid, .x=160, .y=150,

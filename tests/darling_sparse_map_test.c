@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct quadra_sparse_map { unsigned long last_index; void **data; unsigned long scan_end; };
-typedef int (*insert_fn)(struct quadra_sparse_map *, int, void *);
-typedef void (*foreach_fn)(struct quadra_sparse_map *, void (*)(int, void *, void *), void *);
-int quadra_sparse_map_insert(struct quadra_sparse_map *, int, void *);
-int quadra_sparse_map_insert_asm(struct quadra_sparse_map *, int, void *);
-void quadra_sparse_map_foreach(struct quadra_sparse_map *, void (*)(int, void *, void *), void *);
-void quadra_sparse_map_foreach_asm(struct quadra_sparse_map *, void (*)(int, void *, void *), void *);
-struct visit { struct quadra_sparse_map *map; insert_fn insert; int indexes[32]; void *values[32]; int count, mutate; };
+struct quinta_sparse_map { unsigned long last_index; void **data; unsigned long scan_end; };
+typedef int (*insert_fn)(struct quinta_sparse_map *, int, void *);
+typedef void (*foreach_fn)(struct quinta_sparse_map *, void (*)(int, void *, void *), void *);
+int quinta_sparse_map_insert(struct quinta_sparse_map *, int, void *);
+int quinta_sparse_map_insert_asm(struct quinta_sparse_map *, int, void *);
+void quinta_sparse_map_foreach(struct quinta_sparse_map *, void (*)(int, void *, void *), void *);
+void quinta_sparse_map_foreach_asm(struct quinta_sparse_map *, void (*)(int, void *, void *), void *);
+struct visit { struct quinta_sparse_map *map; insert_fn insert; int indexes[32]; void *values[32]; int count, mutate; };
 static void visit(int index, void *value, void *opaque) {
     struct visit *v = opaque;
     assert(v->count < 32);
@@ -24,7 +24,7 @@ static void visit(int index, void *value, void *opaque) {
 }
 static void run(insert_fn insert, foreach_fn foreach) {
     void *slots[17] = {0};
-    struct quadra_sparse_map map = {16, slots, 0};
+    struct quinta_sparse_map map = {16, slots, 0};
     struct visit v = { .map=&map, .insert=insert };
     foreach(&map, visit, &v); assert(v.count == 0);
     assert(insert(&map, -1, (void *)1) == -1 && map.scan_end == 0);
@@ -62,7 +62,7 @@ static void run(insert_fn insert, foreach_fn foreach) {
     foreach(&map, visit, &v); assert(v.count == 1 && v.indexes[0] == 0);
 }
 int main(void) {
-    run(quadra_sparse_map_insert, quadra_sparse_map_foreach);
-    run(quadra_sparse_map_insert_asm, quadra_sparse_map_foreach_asm);
+    run(quinta_sparse_map_insert, quinta_sparse_map_foreach);
+    run(quinta_sparse_map_insert_asm, quinta_sparse_map_foreach_asm);
     puts("Darling sparse map C/assembly semantics passed");
 }

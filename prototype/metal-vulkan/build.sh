@@ -2,11 +2,11 @@
 # Metal on Vulkan: the guest Metal.framework (Darwin, needs clang + lld and
 # Darling's runtime sysroot) and the host library (Linux, needs Rust 1.98+).
 #   prototype/metal-vulkan/build.sh [framework|host|all]   (default: all)
-# Output: $QUADRA_BUILD_DIR/metal (default build/metal).
+# Output: $QUINTA_BUILD_DIR/metal (default build/metal).
 set -euo pipefail
 here=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 project_dir=$(dirname -- "$(dirname -- "$here")")
-build_dir=${QUADRA_BUILD_DIR:-$project_dir/build}/metal
+build_dir=${QUINTA_BUILD_DIR:-$project_dir/build}/metal
 what=${1:-all}
 mkdir -p "$build_dir"
 
@@ -16,7 +16,7 @@ build_framework() {
     sysroot=$(python3 - "$project_dir/launcher" <<'PY'
 import sys
 sys.path.insert(0, sys.argv[1])
-from quadra.runtime import resolve_runtime
+from quinta.runtime import resolve_runtime
 print(resolve_runtime()['sysroot'])
 PY
     )
@@ -55,15 +55,15 @@ build_host() {
     printf '%s\n' 'Metal host library skipped: install Rust (cargo) 1.98 or newer.' >&2
     return 1
   fi
-  local target=${CARGO_TARGET_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/quadrahq/metal-target}
+  local target=${CARGO_TARGET_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/quinta/metal-target}
   CARGO_TARGET_DIR=$target cargo build --locked --release --manifest-path "$here/host/Cargo.toml"
   local output
   output=$(mktemp "$build_dir/.host.XXXXXX")
   # Line tables stay in the cache's copy; the installed one is stripped.
-  objcopy --strip-debug "$target/release/libquadra_metal_host.so" "$output"
+  objcopy --strip-debug "$target/release/libquinta_metal_host.so" "$output"
   chmod 755 "$output"
-  mv -- "$output" "$build_dir/libquadra_metal_host.so"
-  printf 'Built: %s\n' "$build_dir/libquadra_metal_host.so"
+  mv -- "$output" "$build_dir/libquinta_metal_host.so"
+  printf 'Built: %s\n' "$build_dir/libquinta_metal_host.so"
 }
 
 case $what in

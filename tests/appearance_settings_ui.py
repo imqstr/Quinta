@@ -14,17 +14,17 @@ import threading
 import time
 from unittest.mock import patch
 
-temporary = tempfile.TemporaryDirectory(prefix="quadra-appearance-")
+temporary = tempfile.TemporaryDirectory(prefix="quinta-appearance-")
 base = Path(temporary.name)
 os.environ.update(XDG_CONFIG_HOME=str(base / "config"), XDG_DATA_HOME=str(base / "data"),
                   XDG_CACHE_HOME=str(base / "cache"), GSETTINGS_BACKEND="memory")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "launcher"))
 threading.Thread.start = lambda self: None
-from quadra import app, core, theme
+from quinta import app, core, theme
 from gi.repository import Adw, Gdk, Gio, GLib, Gtk
 
 Gtk.init()
-application = Adw.Application(application_id="org.quadrahq.Quadra.AppearanceTest",
+application = Adw.Application(application_id="io.github.imqstr.Quinta.AppearanceTest",
                               flags=Gio.ApplicationFlags.NON_UNIQUE)
 application.register(None)
 icons = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())

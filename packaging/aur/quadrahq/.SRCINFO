@@ -1,4 +1,4 @@
-pkgbase = quadrahq
+pkgbase = quinta
 	pkgdesc = Run the macOS Roblox client on Linux through Darling
 	pkgver = 0.37.p4
 	pkgrel = 1
@@ -43,14 +43,14 @@ pkgbase = quadrahq
 	optdepends = pipewire-audio: native PipeWire audio playback
 	provides = ciderhq
 	provides = macoblox
-	conflicts = quadrahq-git
+	conflicts = quinta-git
 	conflicts = ciderhq
 	conflicts = ciderhq-git
 	conflicts = macoblox
 	conflicts = macoblox-git
 	replaces = ciderhq
 	replaces = macoblox
-	source = quadrahq-0.37.p4.tar.gz::https://github.com/imqstr/Quinta/releases/download/v0.37.p4/quadrahq-0.37.p4-source.tar.gz
+	source = quinta-0.37.p4.tar.gz::https://github.com/imqstr/Quinta/releases/download/v0.37.p4/quadrahq-0.37.p4-source.tar.gz
 	sha256sums = b522dde65d89c204f2e9a97db2f7d3b586ad447164a13af9fac081b1fa0c064a
 
-pkgname = quadrahq
+pkgname = quinta

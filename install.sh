@@ -17,14 +17,14 @@ set -euo pipefail
 
 REPO=https://github.com/imqstr/Quinta.git
 DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
-DIR=$DATA_HOME/QuadraHQ
+DIR=$DATA_HOME/Quinta
 LEGACY_CIDER_DIR=$DATA_HOME/CiderHQ
 LEGACY_DIR=$DATA_HOME/MacOBlox
 CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
 PREFIX=${DPREFIX:-$HOME/.darling}
 # Darling's Debian packages, pinned to the release the Flatpak uses
-# (flatpak/org.quadrahq.Quadra.yml; change both together). The checksum makes
+# (flatpak/io.github.imqstr.Quinta.yml; change both together). The checksum makes
 # sure the download is that release, and a new Darling release cannot break
 # installs before the shim was tested with it.
 DARLING_TAG=v0.1.20260608
@@ -83,7 +83,7 @@ darling_runtime_name() {
 migrate_user_directories() {
   local base target source old
   for base in "$CONFIG_HOME" "$CACHE_HOME" "$DATA_HOME"; do
-    target=$base/quadrahq
+    target=$base/quinta
     if [[ -e $target || -L $target ]]; then
       # Keep existing Quinta data; an empty directory may be replaced.
       [[ -d $target ]] && rmdir -- "$target" 2>/dev/null || continue
@@ -100,7 +100,7 @@ migrate_user_directories() {
 
 load_darling_selection() {
   migrate_user_directories
-  local saved='' file=$CONFIG_HOME/quadrahq/runtime.json
+  local saved='' file=$CONFIG_HOME/quinta/runtime.json
   if [[ -f $file ]]; then
     command -v python3 >/dev/null || die "Python 3 is needed to read the saved Darling selection."
     saved=$(python3 - "$file" "$DARLING_RUNTIME" <<'PY'
@@ -166,7 +166,7 @@ save_darling_selection() {
   # With "remember" (a runtime-only install), only an update of the active
   # variant changes the selection; another variant is just remembered, and
   # nothing is written before a first selection exists.
-  python3 - "${1:-activate}" "$CONFIG_HOME/quadrahq/runtime.json" "$DARLING_RUNTIME" "$DARLING_EXECUTABLE" "$DARLING_SYSROOT" "$PREFIX" <<'PY'
+  python3 - "${1:-activate}" "$CONFIG_HOME/quinta/runtime.json" "$DARLING_RUNTIME" "$DARLING_EXECUTABLE" "$DARLING_SYSROOT" "$PREFIX" <<'PY'
 import json
 import os
 from pathlib import Path
@@ -332,7 +332,7 @@ setup_plan() {
   printf '    1. Prepare Darling and the system tools (%s).\n' "$dependencies"
   printf '    2. %s the Quinta launcher.\n' "$operation"
   printf '    3. Build its compatibility libraries.\n'
-  printf '    4. Add the app menu entry and quadrahq command.\n\n'
+  printf '    4. Add the app menu entry and quinta command.\n\n'
   printf '  Computer    %s (%s)\n' "$(distribution_name)" "$(uname -m)"
   printf '  Destination %s\n' "${DIR/#$HOME/\~}"
   printf '  Runtime     %s\n' "$(darling_runtime_name)"
@@ -362,8 +362,8 @@ backup_checkout_changes() {
     rm -rf -- "$list_dir"
     return
   fi
-  backup=$(umask 077; mkdir -p -- "$DATA_HOME/QuadraHQ-backups";
-    mktemp -d "$DATA_HOME/QuadraHQ-backups/update-$(date -u +%Y%m%d-%H%M%S)-XXXXXX")
+  backup=$(umask 077; mkdir -p -- "$DATA_HOME/Quinta-backups";
+    mktemp -d "$DATA_HOME/Quinta-backups/update-$(date -u +%Y%m%d-%H%M%S)-XXXXXX")
   git -C "$DIR" rev-parse HEAD > "$backup/revision"
   git -C "$DIR" diff --binary HEAD > "$backup/tracked.patch"
   cp -- "$list_dir/tracked" "$backup/tracked-paths"
@@ -400,7 +400,7 @@ setup_success() {
   printf '\n%s%s Setup complete%s\n' "$GOOD" "$ON" "$RESET"
   printf '  Quinta%s is ready in your app menu.\n' "${version:+ $version}"
   printf '\n  %sNext steps%s\n' "$BOLD" "$RESET"
-  printf '    1. Open Quinta from the app menu, or run quadrahq.\n'
+  printf '    1. Open Quinta from the app menu, or run quinta.\n'
   if [[ -d $DIR/RobloxPlayer.app ]]; then
     printf '    2. Launch Roblox from the launcher.\n'
     printf '    3. Sign in if needed, then choose a game.\n'
@@ -766,18 +766,18 @@ build_darling_source() {
     runtime_options=(-DENABLE_METAL=OFF -DCIDER_APPLY_PATCHES=ON -DCIDER_SHUTDOWN_ON_INSTALL=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo)
   fi
   install_darling_build_dependencies "$manager" || die "Could not install Darling build dependencies. Check enabled repositories and package names for your distro, then rerun."
-  mkdir -p -- "$CACHE_HOME/quadrahq/installer"
+  mkdir -p -- "$CACHE_HOME/quinta/installer"
   # Every build starts from a fresh tree, so earlier ones (kept by older
   # installers, or left by a failed build) only take disk space: several GB.
   local old_build
-  for old_build in "$CACHE_HOME/quadrahq/installer"/darling-source-*; do
+  for old_build in "$CACHE_HOME/quinta/installer"/darling-source-*; do
     [[ -d $old_build && ! -L $old_build ]] || continue
     say "Removing earlier build files: ${old_build/#$HOME/\~}"
     rm -rf -- "$old_build" || say "Could not remove all of $old_build; continuing."
   done
-  build=$(umask 077; mktemp -d "$CACHE_HOME/quadrahq/installer/darling-source-XXXXXX")
+  build=$(umask 077; mktemp -d "$CACHE_HOME/quinta/installer/darling-source-XXXXXX")
   # The log lives next to the tree, which is removed after a successful install.
-  log=$(umask 077; mktemp "$CACHE_HOME/quadrahq/installer/darling-build-$(date -u +%Y%m%d-%H%M%S)-XXXXXX.log")
+  log=$(umask 077; mktemp "$CACHE_HOME/quinta/installer/darling-build-$(date -u +%Y%m%d-%H%M%S)-XXXXXX.log")
   # The launcher's runtime installer shows the end of this log on failure.
   [[ -z ${CIDER_RUNTIME_LOG_RECORD:-} ]] || printf '%s\n' "$log" > "$CIDER_RUNTIME_LOG_RECORD" || true
   say "Building $(darling_runtime_name); sources: $build"
@@ -871,14 +871,14 @@ resolve_ciderdarling_release() {
   local -a values=()
   if [[ -z $file ]]; then
     [[ -z $CIDER_DARLING_PINNED ]] || return 0
-    mkdir -p -- "$CACHE_HOME/quadrahq/installer"
-    downloaded=$(umask 077; mktemp "$CACHE_HOME/quadrahq/installer/.release-XXXXXX")
+    mkdir -p -- "$CACHE_HOME/quinta/installer"
+    downloaded=$(umask 077; mktemp "$CACHE_HOME/quinta/installer/.release-XXXXXX")
     if command -v curl >/dev/null && curl -fsSL --connect-timeout 4 --max-time 12 \
       "$CIDER_DARLING_UPDATE_URL" -o "$downloaded"; then
       file=$downloaded
     else
       rm -f -- "$downloaded"
-      file=$CACHE_HOME/quadrahq/runtime-release.json
+      file=$CACHE_HOME/quinta/runtime-release.json
       [[ -f $file ]] || { say "Runtime update service unavailable; using Quinta's bundled runtime pin."; return 0; }
     fi
   fi
@@ -1047,7 +1047,7 @@ ciderdarling_client_is_setuid_root() {
 
 download_ciderdarling_archive() {
   local output=$1 name=$2 url=$3 digest=$4 folder part
-  folder=$CACHE_HOME/quadrahq/installer/downloads
+  folder=$CACHE_HOME/quinta/installer/downloads
   mkdir -p -- "$folder"
   chmod 700 -- "$folder"
   part=$folder/$name.tar.xz.part
@@ -1095,8 +1095,8 @@ try_ciderdarling_prebuilt() {
   fi
   name=ciderdarling-$CIDER_DARLING_REVISION-x86_64-$flavor
   url=$CIDER_DARLING_RELEASES/bin-${CIDER_DARLING_REVISION:0:12}
-  mkdir -p -- "$CACHE_HOME/quadrahq/installer"
-  work=$(umask 077; mktemp -d "$CACHE_HOME/quadrahq/installer/prebuilt-XXXXXX")
+  mkdir -p -- "$CACHE_HOME/quinta/installer"
+  work=$(umask 077; mktemp -d "$CACHE_HOME/quinta/installer/prebuilt-XXXXXX")
   say "Downloading prebuilt CiderDarling ${CIDER_DARLING_REVISION:0:12} ($flavor)"
   if ! curl -fsSL --retry 3 --connect-timeout 15 -o "$work/$name.json" "$url/$name.json"; then
     rm -rf -- "$work"
@@ -1294,11 +1294,11 @@ do_install() {
   fi
   step 3 "Build the compatibility libraries"
   say "This can take a few minutes."
-  mkdir -p -- "$CACHE_HOME/quadrahq/installer"
-  INSTALL_LOG=$(umask 077; mktemp "$CACHE_HOME/quadrahq/installer/build-$(date -u +%Y%m%d-%H%M%S)-XXXXXX.log")
+  mkdir -p -- "$CACHE_HOME/quinta/installer"
+  INSTALL_LOG=$(umask 077; mktemp "$CACHE_HOME/quinta/installer/build-$(date -u +%Y%m%d-%H%M%S)-XXXXXX.log")
 
   # IMPROVED: Show build output live with tee
-  if ! DARLING_SYSROOT="$DARLING_SYSROOT" "$DIR/build_debug_shim.sh" 2>&1 | tee "$INSTALL_LOG"; then
+  if ! DARLING_SYSROOT="$DARLING_SYSROOT" "$DIR/scripts/build-native.sh" 2>&1 | tee "$INSTALL_LOG"; then
     say "Build output saved to: $INSTALL_LOG"
     say "Last 40 lines of output:"
     tail -n 40 -- "$INSTALL_LOG" >&2
@@ -1313,11 +1313,11 @@ do_install() {
 
 # ---------------------------------------------------------------- uninstall
 
-# The launcher's Python package in a checkout: launcher/quadra, or
+# The launcher's Python package in a checkout: launcher/quinta, or
 # launcher/macoblox in a checkout from before the rename.
 launcher_package() {
   local name
-  for name in quadra macoblox; do
+  for name in quinta macoblox; do
     if [[ -f $1/launcher/$name/core.py ]]; then
       printf '%s' "$1/launcher/$name"
       return 0
@@ -1330,8 +1330,8 @@ launcher_package() {
 existing_checkout() {
   local checkout
   for checkout in "$DIR" "$LEGACY_CIDER_DIR" "$LEGACY_DIR"; do
-    if [[ -f $checkout/build_debug_shim.sh ]] && launcher_package "$checkout" >/dev/null &&
-       [[ -f $checkout/launcher/quadrahq-launcher || -f $checkout/launcher/ciderhq-launcher ||
+    if [[ -f $checkout/scripts/build-native.sh || -f $checkout/build_debug_shim.sh ]] && launcher_package "$checkout" >/dev/null &&
+       [[ -f $checkout/launcher/quinta-launcher || -f $checkout/launcher/ciderhq-launcher ||
           -f $checkout/launcher/macoblox-launcher ]]; then
       printf '%s' "$checkout"
       return 0
@@ -1354,10 +1354,10 @@ installed_version() {
 do_uninstall() {
   local purge=${1:-}
   if [[ ! -e $DIR ]]; then
-    DIR=$(existing_checkout) || DIR=$DATA_HOME/QuadraHQ
+    DIR=$(existing_checkout) || DIR=$DATA_HOME/Quinta
   fi
-  if [[ -e $DIR ]] && ! [[ -f $DIR/build_debug_shim.sh &&
-      ( -f $DIR/launcher/quadrahq-launcher || -f $DIR/launcher/ciderhq-launcher ||
+  if [[ -e $DIR ]] && ! [[ -f $DIR/scripts/build-native.sh &&
+      ( -f $DIR/launcher/quinta-launcher || -f $DIR/launcher/ciderhq-launcher ||
         -f $DIR/launcher/macoblox-launcher ) ]]; then
     die "$DIR does not look like Quinta, so it is left alone."
   fi
@@ -1374,19 +1374,19 @@ do_uninstall() {
     say "Removing the launcher, Roblox and Studio (${DIR/#$HOME/\~})"
     rm -rf -- "$DIR"
   fi
-  say "Removing the app menu entries, icons and the quadrahq command"
+  say "Removing the app menu entries, icons and the quinta command"
   local apps=$DATA_HOME/applications
-  rm -f -- "$apps/org.quadrahq.Quadra.desktop" "$apps/org.quadrahq.Quadra.URI.desktop" \
-    "$apps/org.quadrahq.Quadra.Studio.desktop" "$apps/quadrahq-roblox-window.desktop" \
-    "$DATA_HOME"/icons/hicolor/*/apps/quadrahq.png \
-    "$DATA_HOME/icons/hicolor/scalable/apps/quadrahq.svg" "$DATA_HOME/mime/packages/org.quadrahq.Quadra.xml"
+  rm -f -- "$apps/io.github.imqstr.Quinta.desktop" "$apps/io.github.imqstr.Quinta.URI.desktop" \
+    "$apps/io.github.imqstr.Quinta.Studio.desktop" "$apps/quinta-roblox-window.desktop" \
+    "$DATA_HOME"/icons/hicolor/*/apps/quinta.png \
+    "$DATA_HOME/icons/hicolor/scalable/apps/quinta.svg" "$DATA_HOME/mime/packages/io.github.imqstr.Quinta.xml"
   # Only Quinta's own CiderDarling entry; a user's entry of that name stays.
-  local cider_entry=$apps/org.quadrahq.Quadra.CiderDarling.desktop
+  local cider_entry=$apps/io.github.imqstr.Quinta.CiderDarling.desktop
   if [[ -f $cider_entry && ! -L $cider_entry ]] && grep -qsx 'X-Quinta-Managed=true' "$cider_entry"; then
     rm -f -- "$cider_entry"
   fi
-  local cider_link=$HOME/.local/bin/quadrahq
-  if [[ -L $cider_link && $(readlink "$cider_link") == */quadrahq-launcher ]]; then
+  local cider_link=$HOME/.local/bin/quinta
+  if [[ -L $cider_link && $(readlink "$cider_link") == */quinta-launcher ]]; then
     rm -f -- "$cider_link"
   fi
   rm -f -- "$apps/org.ciderhq.Cider.desktop" "$apps/org.ciderhq.Cider.URI.desktop" \
@@ -1413,8 +1413,8 @@ do_uninstall() {
   fi
   # Studio as the handler of roblox-studio: links and place files.
   if [[ -f $CONFIG_HOME/mimeapps.list ]]; then
-    sed -i -e 's/org\.quadrahq\.Quinta\.Studio\.desktop;\{0,1\}//g' \
-      -e 's/org\.quadrahq\.Quinta\.URI\.desktop;\{0,1\}//g' \
+    sed -i -e 's/org\.quinta\.Quinta\.Studio\.desktop;\{0,1\}//g' \
+      -e 's/org\.quinta\.Quinta\.URI\.desktop;\{0,1\}//g' \
       -e 's/org\.ciderhq\.Cider\.Studio\.desktop;\{0,1\}//g' \
       -e 's/org\.ciderhq\.Cider\.URI\.desktop;\{0,1\}//g' \
       -e 's/wtf\.aubree\.MacOBlox\.Studio\.desktop;\{0,1\}//g' \
@@ -1424,7 +1424,7 @@ do_uninstall() {
   update-mime-database "$DATA_HOME/mime" >/dev/null 2>&1 || true
   update-desktop-database "$apps" >/dev/null 2>&1 || true
   say "Removing settings and cache"
-  rm -rf -- "$CONFIG_HOME/quadrahq" "$CACHE_HOME/quadrahq" \
+  rm -rf -- "$CONFIG_HOME/quinta" "$CACHE_HOME/quinta" \
     "$CONFIG_HOME/ciderhq" "$CACHE_HOME/ciderhq" "$CONFIG_HOME/macoblox" "$CACHE_HOME/macoblox"
   if [[ -n $purge && -e $PREFIX ]]; then
     [[ $PREFIX == "$HOME"/?* ]] || die "Darling's prefix $PREFIX is not in your home folder, so it is left alone."
@@ -1460,7 +1460,7 @@ menu_close() {
 }
 
 banner() {
-  printf '\n  %sQUADRA%s\n  quadrahq.org\n' "$BOLD" "$RESET"
+  printf '\n  %sQUINTA%s\n  quinta.org\n' "$BOLD" "$RESET"
 }
 
 # choose TEXT ITEM...: a menu of "label|hint" items below TEXT (printf %b).
@@ -1594,7 +1594,7 @@ menu_uninstall() {
   local where=${DIR/#$HOME/\~} prefix=${PREFIX/#$HOME/\~}
   choose "  ${BOLD}Uninstall removes${RESET}
     ${BULLET} $where (the launcher, Roblox, Studio)
-    ${BULLET} the app menu entries, icons and the quadrahq command
+    ${BULLET} the app menu entries, icons and the quinta command
     ${BULLET} settings and cache
 
   ${DIM}Darling stays installed. Its prefix, $prefix, holds your Roblox sign-in.${RESET}" \

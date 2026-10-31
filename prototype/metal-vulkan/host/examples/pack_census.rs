@@ -23,14 +23,14 @@ fn main() {
             continue;
         }
         at = start + size;
-        let prepared = match quadra_metal_host::air::prepare(&pack[start..start + size]) {
+        let prepared = match quinta_metal_host::air::prepare(&pack[start..start + size]) {
             Ok(prepared) => prepared,
             Err(error) => {
                 *failures.entry(format!("upgrade: {error}")).or_default() += 1;
                 continue;
             }
         };
-        let bytes = quadra_metal_host::normalize_metallib(&prepared);
+        let bytes = quinta_metal_host::normalize_metallib(&prepared);
         let library = match device.new_library_with_data(&bytes) {
             Ok(library) => library,
             Err(error) => {

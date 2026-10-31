@@ -1,4 +1,4 @@
-pkgbase = quadrahq-git
+pkgbase = quinta-git
 	pkgdesc = Run the macOS Roblox client on Linux through Darling
 	pkgver = 0.37.4.r0
 	pkgrel = 1
@@ -42,10 +42,10 @@ pkgbase = quadrahq-git
 	optdepends = mesa: Mesa EGL and Zink for the Vulkan renderer
 	optdepends = vulkan-driver: hardware Vulkan driver for the Vulkan renderer
 	optdepends = pipewire-audio: native PipeWire audio playback
-	provides = quadrahq
+	provides = quinta
 	provides = ciderhq
 	provides = macoblox
-	conflicts = quadrahq
+	conflicts = quinta
 	conflicts = ciderhq
 	conflicts = ciderhq-git
 	conflicts = macoblox
@@ -55,4 +55,4 @@ pkgbase = quadrahq-git
 	source = Quinta::git+https://github.com/imqstr/Quinta.git
 	sha256sums = SKIP
 
-pkgname = quadrahq-git
+pkgname = quinta-git

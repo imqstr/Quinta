@@ -34,7 +34,7 @@ def upstream(url, timeout):
         urls.extend('https://' + host + parsed.path for host in ('setup-aws.rbxcdn.com', 'setup-ak.rbxcdn.com'))
     for index, candidate in enumerate(urls):
         try:
-            response = urllib.request.urlopen(urllib.request.Request(candidate, headers={'User-Agent': 'Quadra-download-mirror/1'}), timeout=timeout)
+            response = urllib.request.urlopen(urllib.request.Request(candidate, headers={'User-Agent': 'Quinta-download-mirror/1'}), timeout=timeout)
             break
         except urllib.error.HTTPError as error:
             if (index == 0 and error.code != 403) or error.code not in ALTERNATE_RETRY_STATUSES or index == len(urls) - 1:
@@ -179,7 +179,7 @@ class Server(http.server.ThreadingHTTPServer):
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
-    server_version = 'QuadraDownloads/1'
+    server_version = 'QuintaDownloads/1'
     sys_version = ''
 
     def setup(self):
@@ -195,7 +195,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             if self.path == '/healthz':
-                self._body(b'{"service":"quadra-roblox-mirror","status":"ok"}', 'application/json', 'no-store')
+                self._body(b'{"service":"quinta-roblox-mirror","status":"ok"}', 'application/json', 'no-store')
             elif VERSION_PATH.fullmatch(self.path):
                 self._body(self.server.cache.version(self.path), 'application/json', 'public, max-age=60')
             elif match := ARCHIVE_PATH.fullmatch(self.path):
@@ -234,7 +234,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', type=int, default=9473)
-    parser.add_argument('--cache-dir', type=Path, default=Path('/var/cache/quadra-roblox'))
+    parser.add_argument('--cache-dir', type=Path, default=Path('/var/cache/quinta-roblox'))
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format='%(levelname)s %(message)s')
     cache = Cache(args.cache_dir)

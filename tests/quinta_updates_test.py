@@ -2,7 +2,7 @@ import urllib.error
 import unittest
 from unittest.mock import patch
 
-from quadra import core
+from quinta import core
 
 
 class QuintaUpdateTests(unittest.TestCase):

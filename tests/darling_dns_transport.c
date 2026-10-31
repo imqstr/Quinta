@@ -2,7 +2,7 @@
  * Test-only local transport behind the exact production DNS interposer.
  * Synthetic documentation addresses only: no socket or DNS server is used.
  */
-#include "../dns_concurrency.h"
+#include "../native/dns_concurrency.h"
 extern void *dlsym(void *, const char *);
 extern int strcmp(const char *, const char *);
 static unsigned int active_queries, maximum_queries, query_count, destroy_count;
@@ -58,12 +58,12 @@ static void fixture_destroy(void *opaque) {
     if (state->magic == 0xd15ea5e) __atomic_add_fetch(&destroy_count, 1, __ATOMIC_RELAXED);
     state->magic = 0;
 }
-void *quadra_dns_fixture_symbol(void *handle, const char *name) {
+void *quinta_dns_fixture_symbol(void *handle, const char *name) {
     if (!strcmp(name, "res_9_ninit")) return (void *)fixture_initialize;
     if (!strcmp(name, "res_9_nquery")) return (void *)fixture_query;
     if (!strcmp(name, "res_9_ndestroy")) return (void *)fixture_destroy;
     return dlsym(handle, name);
 }
-unsigned int quadra_dns_fixture_maximum(void) { return __atomic_load_n(&maximum_queries, __ATOMIC_RELAXED); }
-unsigned int quadra_dns_fixture_queries(void) { return __atomic_load_n(&query_count, __ATOMIC_RELAXED); }
-unsigned int quadra_dns_fixture_destroys(void) { return __atomic_load_n(&destroy_count, __ATOMIC_RELAXED); }
+unsigned int quinta_dns_fixture_maximum(void) { return __atomic_load_n(&maximum_queries, __ATOMIC_RELAXED); }
+unsigned int quinta_dns_fixture_queries(void) { return __atomic_load_n(&query_count, __ATOMIC_RELAXED); }
+unsigned int quinta_dns_fixture_destroys(void) { return __atomic_load_n(&destroy_count, __ATOMIC_RELAXED); }

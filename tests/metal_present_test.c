@@ -1,7 +1,7 @@
 /* GPL-3.0-only. Authored native Wayland presentation/occlusion/resize qualification.
  * No client, game assets, shaders, account data or settings are used. */
 #define _GNU_SOURCE
-#include "../prototype/metal-vulkan/quadra_metal.h"
+#include "../prototype/metal-vulkan/quinta_metal.h"
 #include "xdg-shell-client-protocol.h"
 #include <wayland-client.h>
 #include <dlfcn.h>
@@ -68,7 +68,7 @@ static const struct xdg_toplevel_listener top_listener={.configure=top_configure
 
 static struct wl_buffer *solid_buffer(uint32_t color) {
     enum { WIDTH=384,HEIGHT=256,BYTES=WIDTH*HEIGHT*4 };
-    int descriptor=memfd_create("quadram2vk-authored-background",MFD_CLOEXEC);CHECK(descriptor>=0);
+    int descriptor=memfd_create("quintam2vk-authored-background",MFD_CLOEXEC);CHECK(descriptor>=0);
     CHECK(!ftruncate(descriptor,BYTES));
     uint32_t *memory=mmap(NULL,BYTES,PROT_READ|PROT_WRITE,MAP_SHARED,descriptor,0);CHECK(memory!=MAP_FAILED);
     for(unsigned i=0;i<WIDTH*HEIGHT;i++)memory[i]=color;
@@ -137,7 +137,7 @@ int main(int argc,char **argv) {
     struct xdg_toplevel *top=xdg_surface_get_toplevel(xdg);CHECK(top);
     xdg_toplevel_add_listener(top,&top_listener,NULL);
     xdg_toplevel_set_title(top,"Quinta M2VK presentation qualification");
-    xdg_toplevel_set_app_id(top,"org.quadrahq.Quadra.PresentationTest");
+    xdg_toplevel_set_app_id(top,"io.github.imqstr.Quinta.PresentationTest");
     wl_surface_commit(parent);CHECK(wl_display_roundtrip(display)>=0);
     background=solid_buffer(0xff203040);cover_buffer=solid_buffer(0xff809080);
     wl_surface_attach(parent,background,0,0);opaque(parent);wl_surface_damage(parent,0,0,384,256);wl_surface_commit(parent);
