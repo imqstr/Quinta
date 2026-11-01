@@ -1,38 +1,54 @@
-# macOS Studio startup experiment
+# 🛠️ Roblox Studio on Linux (experimental)
 
-Tested with the official Intel MacStudio 0.745.0.7451137 archive,
-`version-a7baca1cb08a4943`, obtained from Roblox's deployment API and CDN:
+Quinta runs the official **Intel macOS build of Roblox Studio** through
+CiderDarling, with a small compatibility library, `libStudioCompat.dylib`.
 
-- `https://clientsettingscdn.roblox.com/v2/client-version/MacStudio`
-- `https://setup.rbxcdn.com/mac/version-a7baca1cb08a4943-RobloxStudioApp.zip`
+## 📍 Status
 
-The archive and extracted app are local artifacts, excluded from git.
+| | |
+|---|---|
+| ✅ Starts and keeps running | Gets through Qt's startup and creates its windows |
+| 🔤 No text yet | Darling's CoreText is mostly stubs, so no fonts load |
+| 🧩 Some features fail | A few AppKit/Foundation methods are still missing |
 
-## Findings
+Tested with Studio `0.745.0.7451137` on CiderDarling
+`b0fcb0700dc1322cf8a840e69ccd469fecd0f0e7`.
 
-1. Bare Studio fails in dyld: missing `kCVPixelBufferCGBitmapContextCompatibilityKey`.
-2. Quinta's inherited Player shim supplies that constant and other existing APIs.
-3. Studio next requires `WKWebsiteDataTypeCookies`. The separate Studio shim
-   defines the public WebKit data-store identifier.
-4. Qt's `libqcocoa.dylib` requires `CGDisplayIsOnline`. The separate shim
-   implements this using Darling's existing `CGGetOnlineDisplayList`.
-5. Studio then creates two `NSWindow` objects and receives SIGSEGV before
-   an editor or login UI becomes usable. Reproduced with both the installed
-   Quinta shim and the freshly built Quinta shim, using the X11 backend.
-
-The runtime tested was Quinta's pinned CiderDarling revision
-`b0fcb0700dc1322cf8a840e69ccd469fecd0f0e7`. No conclusion about the exact
-crashing Qt/AppKit method has been established. Diagnostic register logs and
-core files remain local; they are not published with the source.
-
-## Reproduce
-
-After extracting the Intel Studio app and building the main Quinta shim:
+## ▶️ Try it
 
 ```sh
-quinta --macos-studio --bundle /path/to/RobloxStudio.app
+bash experimental/macos-studio/build.sh
+quinta --studio
 ```
 
-The launcher rejects a test while a Player process is running in its selected
-prefix. Studio's dependencies and graphics initialization require further
-compatibility work; these two API additions are not a working Studio port.
+Or press **Studio** in the app. Close the game first: both use the same
+Darling prefix.
+
+## 🔧 What the compatibility library fixes
+
+| Problem | Fix |
+|---|---|
+| Qt and Darling's AppKit both define `-platformWindow`, so AppKit got Qt's C++ object and crashed | Each caller gets its own version: libqcocoa gets Qt's, everyone else gets AppKit's |
+| Darling's CoreText returns `NULL` fonts that Qt retains and releases | NULL-safe `CFRetain`/`CFRelease` and fallback UI fonts, for libqcocoa only |
+| About 30 CoreGraphics, CoreText, AppKit and CoreFoundation functions Studio imports are missing | Added, each behaving like macOS when the resource is unavailable |
+| Darling's `KERN_PROCARGS` sysctl overruns its buffer | Reports the query as unsupported |
+
+The game's shim also creates Wayland windows at 1×1 when Qt asks for 0×0
+([`native/wayland_appkit.m`](../../native/wayland_appkit.m)).
+
+## 🧭 Next steps
+
+1. Missing `-[NSURLComponents setPath:]` and other methods as they come up
+2. A FreeType-backed CoreText, so Studio can draw text
+3. Sign-in, the start page, then the editor viewport
+
+## 🐞 Debugging
+
+Crash reports with symbol names:
+
+```sh
+QUINTA_GUEST_QUINTA_DIAGNOSTIC_SIGNALS=1 QUINTA_TRACE_CRASH_SYMBOLS=1 quinta --studio
+```
+
+Logs are written to `logs/` and shown in the app under **Logs**. The Studio app
+and its logs stay on your computer and are excluded from git.

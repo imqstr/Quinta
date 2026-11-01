@@ -35,7 +35,7 @@ with a Mac-style desktop app written in Rust and TypeScript.
 - 🦀 Rust (stable) and 🟢 Node.js 18+ to build the app
 - 🎮 A GPU with Vulkan or OpenGL drivers
 
-See the [upstream setup documentation](docs/UPSTREAM_README.md) for the full dependency list.
+See the [setup guide](docs/SETUP.md) for step-by-step instructions.
 
 ## 🚀 Getting started
 
