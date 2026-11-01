@@ -1,75 +1,99 @@
+<div align="center">
+
+<img src="branding/quinta-icon.png" width="128" alt="Quinta icon">
+
 # Quinta
 
-Quinta is [imqstr](https://github.com/imqstr)'s experimental launcher for running the
-macOS Roblox client on Linux through Darling/CiderDarling.
+**Run the macOS Roblox client on Linux.** 🐧🎮
 
-## Development checkout
+A fast, native-feeling launcher built on [Darling](https://www.darlinghq.org/) / CiderDarling,
+with a Mac-style desktop app written in Rust and TypeScript.
 
-On a machine with Quinta's dependencies and CiderDarling already installed:
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-0a84ff)](LICENSE)
+![Platform: Linux](https://img.shields.io/badge/platform-Linux-5e5ce6)
+![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%202-ff6a3d)
+
+</div>
+
+---
+
+## ✨ Features
+
+| | |
+|---|---|
+| 🚀 **One-click play** | Downloads, updates and launches the official macOS Roblox client. |
+| 🖥️ **Vulkan & GPU selection** | Pick the renderer and graphics card; NVIDIA PRIME and Wayland are handled for you. |
+| ⚡ **High refresh rates** | Detects your monitor's refresh rate; FPS caps up to 240+ stick. |
+| 🌐 **DNS over HTTPS** | Optional encrypted DNS for the game's connections. |
+| 🧩 **FastFlags editor** | Edit client flags from settings, searchable like everything else. |
+| 🛠️ **Roblox Studio (experimental)** | The macOS Studio build now starts; see [Studio](#-roblox-studio-experimental). |
+
+## 📦 Requirements
+
+- 🐧 Linux (x86_64) with Wayland or X11
+- 🍎 [CiderDarling](docs/DARLING_RUNTIMES.md) installed
+- 🦀 Rust (stable) and 🟢 Node.js 18+ to build the app
+- 🎮 A GPU with Vulkan or OpenGL drivers
+
+See the [upstream setup documentation](docs/UPSTREAM_README.md) for the full dependency list.
+
+## 🚀 Getting started
 
 ```sh
 git clone https://github.com/imqstr/Quinta.git
 cd Quinta
-bash launcher/install-quinta.sh
-quinta
+bash scripts/build-native.sh          # compatibility shim for the game
+
+cd desktop
+npm install && npm run build          # interface
+cd src-tauri
+cargo build --release --features tauri/custom-protocol
 ```
 
-Quinta uses its own app ID and `~/.config/quinta` / `~/.cache/quinta`
-folders. It does not automatically move Quinta's settings or take over Roblox
-protocol links. Choose a runtime in Quinta's settings, or copy a known working
-`runtime.json` into `~/.config/quinta`. A selected Darling prefix is still
-shared with any other launcher selecting that prefix; do not run both at once.
-The source checkout builds its own shim and downloads its own Roblox client.
-
-The inherited root installer and packaging recipes are still upstream-oriented;
-use `launcher/install-quinta.sh` for this development fork. Runtime ABI names,
-the Python `quadra` package, and existing icons remain from upstream.
-See [upstream setup documentation](docs/UPSTREAM_README.md) for dependencies.
-
-## Initial changes
-
-- Separate Quinta launcher, application ID, settings, cache, and shortcuts.
-- Update checks and checkout updates point to `imqstr/Quinta`.
-- Verified HeightmapDebugPS shader parser repair for Roblox 0.745.0.7451137.
-- Gradient shader capture for investigating invisible UIGradient elements.
-
-## Missing UI gradients
-
-This is under investigation; the fork does **not** claim a fix yet.
-Capture the installed client’s gradient shaders without launching Roblox:
+Run it from the repository root:
 
 ```sh
-quinta --dump-gradient-shaders /tmp/quinta-gradients
+QUINTA_ROOT=$PWD desktop/src-tauri/target/release/quinta
 ```
 
-The destination must be new. The capture includes source hashes and pack hash;
-it stays on your computer. To check the actual GLSL on your host driver:
+Then choose a runtime in **Settings → Advanced** and press **Play**. ▶️
 
-```sh
-clang -O2 tests/shader_driver_test.c shader_compat.c -lEGL -lGL -o /tmp/quinta-shader-test
-EGL_PLATFORM=x11 /tmp/quinta-shader-test /tmp/quinta-gradients/*.frag
-```
+> 💡 `--launch` starts the game right away and `--studio` starts Studio.
 
-Successful compilation alone does not prove gradient rendering: atlas uploads,
-sampler bindings, constants, blending and rendering through Darling still need
-verification. The HeightmapDebugPS repair is a separate confirmed parser issue.
+## ⚙️ Where things live
 
-## macOS Studio experiment
+| Path | What |
+|---|---|
+| `~/.config/quinta/` | ⚙️ Settings, runtime selection, FastFlags |
+| `~/.cache/quinta/` | 📥 Downloads and generated driver files |
+| `logs/` | 📜 Launch logs, also viewable in the app |
 
-An official Intel macOS Studio build was tested through CiderDarling.
-It reaches Qt window creation after filling two missing API symbols, then
-segfaults. It is not a working editor yet. Run the experiment with:
+Quinta uses its own app ID and folders. It doesn't take over `roblox://` links.
+A Darling prefix shared with another launcher must not run both at once. ⚠️
 
-```sh
-quinta --macos-studio --bundle /path/to/RobloxStudio.app
-```
+## 🛠️ Roblox Studio (experimental)
 
-This builds the small Studio shim and writes a local startup log in
-`experimental/macos-studio/launch.log`. Close Player before testing Studio
-in the same prefix. [Startup findings](experimental/macos-studio/README.md)
-describe the current blocker.
+The official Intel macOS Studio build now **starts and keeps running** under
+CiderDarling. It isn't usable as an editor yet:
 
-## License and credits
+- 🔤 Darling's CoreText is mostly stubs, so Studio has no working fonts yet.
+- 🧪 Some AppKit/Foundation methods are still missing and are being filled in.
 
-GPL-3.0; see [LICENSE](LICENSE). Quinta builds on the [upstream project](https://github.com/QuadraHQ/Quadra) and its contributors;
-upstream code, copyright notices and attribution are retained.
+The Studio compatibility layer is in
+[`experimental/macos-studio`](experimental/macos-studio/README.md). Build it with
+`bash experimental/macos-studio/build.sh`, then start Studio from Quinta or with
+`--studio`. Close the game before testing Studio in the same prefix.
+
+## 🐞 Reporting problems
+
+Open an [issue](https://github.com/imqstr/Quinta/issues) with the launch log from
+**Logs** in the app. Logs stay on your computer until you share them. 🔒
+
+## 📄 License & credits
+
+GPL-3.0; see [LICENSE](LICENSE). Quinta is a fork of
+[Quadra](https://github.com/QuadraHQ/Quadra) and builds on its contributors' work,
+plus Darling, CiderDarling and the native compatibility projects. Upstream
+copyright notices and attribution are kept.
+
+Quinta is not affiliated with Roblox Corporation.

@@ -144,6 +144,7 @@ static unsigned long quinta_cstr_length(const char* text) {
 }
 
 extern char* quinta_fix_shader_indices(char*, unsigned long*);
+extern char* quinta_fix_gradient_atlas(char*, unsigned long*);
 
 static void quinta_apply_ui_color_test(char* source,
                                          unsigned long source_length) {
@@ -218,6 +219,7 @@ static void quinta_glShaderSource(unsigned int shader, int count,
                 }
                 copy[position] = 0;
                 copy = quinta_fix_shader_indices(copy, &total);
+                copy = quinta_fix_gradient_atlas(copy, &total);
                 quinta_apply_ui_color_test(copy, total);
                 if (quinta_gl_test_ui_color() && quinta_shader_is_vertex(shader) &&
                     quinta_source_contains(copy, total,
@@ -1556,7 +1558,36 @@ static void crash_handler(int sig, void* info, void* uap) {
 
             // Keep signal-time diagnosis to kernel-provided registers. Walking
             // arbitrary stack memory can fault again; dladdr and pthread APIs
-            // can deadlock on locks held by the interrupted thread.
+            // can deadlock on locks held by the interrupted thread. Opt-in
+            // (QUINTA_TRACE_CRASH_SYMBOLS=1) for porting work, where a missing
+            // symbol name costs more than a rare hang of an already dead process.
+            static volatile int symbols = -1;
+            if (quinta_env_cached("QUINTA_TRACE_CRASH_SYMBOLS", &symbols)) {
+                struct { const char* fname; void* fbase; const char* sname; void* saddr; } info;
+                extern int dladdr(const void*, void*);
+                unsigned long long frames[12]; int count = 0;
+                frames[count++] = mc[18];
+                // A leaf such as objc_msgSend has no frame; its caller's return
+                // address is on top of the stack.
+                if (mc[9] > 0x10000 && (mc[9] & 7) == 0) frames[count++] = *(unsigned long long*)mc[9];
+                unsigned long long* frame = (unsigned long long*)mc[8];
+                while (count < 12 && frame && ((unsigned long long)frame & 7) == 0 &&
+                       (unsigned long long)frame > 0x10000 && frame[1] > 0x1000) {
+                    frames[count++] = frame[1];
+                    unsigned long long* next = (unsigned long long*)frame[0];
+                    if (next <= frame) break;
+                    frame = next;
+                }
+                for (int i = 0; i < count; i++) {
+                    write_str("  #"); print_num(i); write_str(" "); print_hex(frames[i]);
+                    if (dladdr((void*)frames[i], &info)) {
+                        write_str(" "); write_str(info.fname ? info.fname : "?");
+                        write_str(" "); write_str(info.sname ? info.sname : "?");
+                        write_str("+"); print_hex(frames[i] - (unsigned long long)info.saddr);
+                    }
+                    write_str("\n");
+                }
+            }
         } else {
             write_str("  register context unavailable or too short\n");
         }
@@ -2236,6 +2267,12 @@ static void window_set_titlebar_appears_transparent(id self, SEL cmd, signed cha
     (void)self; (void)cmd;
     quinta_titlebar_transparent = flag;
 }
+static void window_ignore_flag(id self, SEL cmd, signed char flag) { (void)self; (void)cmd; (void)flag; }
+static signed char window_flag_no(id self, SEL cmd) { (void)self; (void)cmd; return 0; }
+static void window_ignore_object(id self, SEL cmd, id value) { (void)self; (void)cmd; (void)value; }
+static id window_object_nil(id self, SEL cmd) { (void)self; (void)cmd; return 0; }
+static void window_ignore_none(id self, SEL cmd) { (void)self; (void)cmd; }
+static void window_ignore_integer(id self, SEL cmd, long value) { (void)self; (void)cmd; (void)value; }
 static signed char window_titlebar_appears_transparent(id self, SEL cmd) {
     (void)self; (void)cmd;
     return quinta_titlebar_transparent;
@@ -2414,6 +2451,79 @@ static long process_info_thermal_state_nominal(id self, SEL cmd) {
 static QuintaBool process_info_low_power_mode_disabled(id self, SEL cmd) {
     (void)self; (void)cmd;
     return 0;
+}
+
+// Darling's NSColor_catalog (system/catalog colours) releases ivars in dealloc
+// that its initializers never retained. Qt's macOS platform plugin asks for
+// such colours while Roblox Studio starts, and the first autorelease-pool
+// drain crashed on the over-released object. Clear the object ivars first so
+// the original dealloc releases nothing it does not own (a small leak).
+typedef struct objc_ivar* QuintaIvar;
+extern QuintaIvar* class_copyIvarList(Class, unsigned int*);
+extern const char* ivar_getTypeEncoding(QuintaIvar);
+extern void object_setIvar(id, QuintaIvar, id);
+static void (*orig_catalog_color_dealloc)(id, SEL);
+static void catalog_color_dealloc(id self, SEL cmd) {
+    unsigned int count = 0;
+    QuintaIvar* ivars = class_copyIvarList(objc_getClass("NSColor_catalog"), &count);
+    for (unsigned int i = 0; ivars && i < count; i++) {
+        const char* type = ivar_getTypeEncoding(ivars[i]);
+        if (type && type[0] == '@')
+            object_setIvar(self, ivars[i], 0);
+    }
+    free(ivars);
+    orig_catalog_color_dealloc(self, cmd);
+}
+
+// Darling's NSColor_CGColor lacks colour-space conversion; Qt converts every
+// palette colour with it and Studio died on NSInvalidArgumentException.
+// Rebuild an RGB colour from the CGColor's components.
+extern unsigned long CGColorGetNumberOfComponents(void*);
+extern const double* CGColorGetComponents(void*);
+static id cgcolor_using_color_space(id self, SEL cmd, id space) {
+    // A CGColor is never a pattern: Qt asks for NSPatternColorSpace to detect
+    // pattern colours and must get nil back.
+    if (space && cmd == sel_registerName("colorUsingColorSpaceName:")) {
+        const char* name = ((const char* (*)(id, SEL))objc_msgSend)(space, sel_registerName("UTF8String"));
+        if (name && ascii_strings_equal(name, "NSPatternColorSpace"))
+            return 0;
+    }
+    void* color = ((void* (*)(id, SEL))objc_msgSend)(self, sel_registerName("CGColor"));
+    double r = 0, g = 0, b = 0, a = 1;
+    unsigned long n = color ? CGColorGetNumberOfComponents(color) : 0;
+    const double* c = color ? CGColorGetComponents(color) : 0;
+    if (c && n >= 4) { r = c[0]; g = c[1]; b = c[2]; a = c[3]; }
+    else if (c && n == 2) { r = g = b = c[0]; a = c[1]; }
+    else if (c && n == 1) { r = g = b = c[0]; }
+    return ((id (*)(id, SEL, double, double, double, double))objc_msgSend)(
+        (id)objc_getClass("NSColor"), sel_registerName("colorWithCalibratedRed:green:blue:alpha:"), r, g, b, a);
+}
+
+// NSScreen's refresh-rate API (macOS 12) is missing in Darling. Roblox reads
+// maximumFramesPerSecond to decide which frame-rate caps are valid and reset
+// a saved "240 FPS" back to default on every start. Report the host monitor's
+// refresh rate, detected by the launcher (QUINTA_DISPLAY_HZ).
+static long quinta_display_hz(void) {
+    static volatile long cached = -1;
+    long value = __atomic_load_n(&cached, __ATOMIC_RELAXED);
+    if (value >= 0)
+        return value;
+    const char* text = getenv("QUINTA_DISPLAY_HZ");
+    value = 0;
+    for (int i = 0; text && text[i] >= '0' && text[i] <= '9' && i < 4; i++)
+        value = value * 10 + (text[i] - '0');
+    if (value < 30 || value > 1000)
+        value = 60;
+    __atomic_store_n(&cached, value, __ATOMIC_RELAXED);
+    return value;
+}
+static long screen_maximum_frames_per_second(id self, SEL cmd) {
+    (void)self; (void)cmd;
+    return quinta_display_hz();
+}
+static double screen_refresh_interval(id self, SEL cmd) {
+    (void)self; (void)cmd;
+    return 1.0 / (double)quinta_display_hz();
 }
 
 // Trace the handoff between Roblox's OpenGL renderer and Darling's X11
@@ -6586,6 +6696,41 @@ static void install_swizzles(void) {
             write_str("[Quinta] Added NSProcessInfo lowPowerMode=false\n");
     }
 
+    Class catalog_color = objc_getClass("NSColor_catalog");
+    if (catalog_color) {
+        Method dealloc = class_getInstanceMethod(catalog_color, sel_registerName("dealloc"));
+        if (dealloc && !orig_catalog_color_dealloc) {
+            orig_catalog_color_dealloc = (void (*)(id, SEL))method_setImplementation(dealloc, (IMP)catalog_color_dealloc);
+            write_str("[Quinta] NSColor_catalog dealloc releases only owned ivars\n");
+        }
+    }
+
+    Class cg_color = objc_getClass("NSColor_CGColor");
+    if (cg_color) {
+        SEL by_name = sel_registerName("colorUsingColorSpaceName:");
+        SEL by_space = sel_registerName("colorUsingColorSpace:");
+        int added = 0;
+        if (class_addMethod(cg_color, by_name, (IMP)cgcolor_using_color_space, "@@:@")) added++;
+        if (class_addMethod(cg_color, by_space, (IMP)cgcolor_using_color_space, "@@:@")) added++;
+        if (added) write_str("[Quinta] NSColor_CGColor converts colour spaces\n");
+    }
+    Class screen_class = objc_getClass("NSScreen");
+    if (screen_class) {
+        SEL max_fps = sel_registerName("maximumFramesPerSecond");
+        SEL min_interval = sel_registerName("minimumRefreshInterval");
+        SEL max_interval = sel_registerName("maximumRefreshInterval");
+        if (!class_getInstanceMethod(screen_class, max_fps) &&
+            class_addMethod(screen_class, max_fps, (IMP)screen_maximum_frames_per_second, "q@:")) {
+            write_str("[Quinta] Added NSScreen maximumFramesPerSecond=");
+            print_num(quinta_display_hz());
+            write_str("\n");
+        }
+        if (!class_getInstanceMethod(screen_class, min_interval))
+            class_addMethod(screen_class, min_interval, (IMP)screen_refresh_interval, "d@:");
+        if (!class_getInstanceMethod(screen_class, max_interval))
+            class_addMethod(screen_class, max_interval, (IMP)screen_refresh_interval, "d@:");
+    }
+
     Class gl_context_class = objc_getClass("NSOpenGLContext");
     if (gl_context_class) {
         if (quinta_wayland_enabled()) {
@@ -6842,6 +6987,14 @@ static void install_swizzles(void) {
             {"titlebarAppearsTransparent", (IMP)window_titlebar_appears_transparent, "c@:"},
             {"setTitleVisibility:", (IMP)window_set_title_visibility, "v@:q"},
             {"titleVisibility", (IMP)window_title_visibility, "q@:"},
+            // Window restoration (Qt/Studio): Darling never restores windows.
+            {"setRestorable:", (IMP)window_ignore_flag, "v@:c"},
+            {"isRestorable", (IMP)window_flag_no, "c@:"},
+            {"setRestorationClass:", (IMP)window_ignore_object, "v@:#"},
+            {"restorationClass", (IMP)window_object_nil, "#@:"},
+            {"invalidateRestorableState", (IMP)window_ignore_none, "v@:"},
+            {"setTabbingMode:", (IMP)window_ignore_integer, "v@:q"},
+            {"setAnimationBehavior:", (IMP)window_ignore_integer, "v@:q"},
         };
         int titlebar_added = 0;
         for (unsigned long i = 0; i < sizeof titlebar_methods / sizeof titlebar_methods[0]; i++) {

@@ -45,3 +45,23 @@ __pycache__/
 
 # Private VPS services and their local configuration
 /services/
+
+# Tauri development outputs
+/desktop/node_modules/
+/desktop/dist/
+/desktop/src-tauri/target/
+/desktop/src-tauri/gen/
+/output/
+
+# Local compatibility files retained for an already-running legacy launcher.
+# They are not part of the Rust application or distributed repository.
+/launcher/
+/tests/*.py
+/scripts/*.py
+/branding/*.py
+/experimental/**/*.py
+/prototype/**/*.py
+/packaging/**/*.py
+
+# Local browser-automation output
+/.playwright-cli/

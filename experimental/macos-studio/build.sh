@@ -9,5 +9,5 @@ PY
 )
 clang -target x86_64-apple-darwin -fuse-ld=lld -isysroot "$studio_sysroot" \
     -mmacosx-version-min=11.0 -dynamiclib -fno-objc-arc \
-    "$experiment_dir/studio_compat.m" -framework Foundation -framework CoreGraphics \
+    "$experiment_dir/studio_compat.m" -framework Foundation -framework CoreGraphics -framework CoreText -framework CoreFoundation \
     -o "$experiment_dir/libStudioCompat.dylib"

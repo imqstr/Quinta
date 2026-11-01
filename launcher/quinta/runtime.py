@@ -320,5 +320,5 @@ def guest_variables(runtime_metadata):
     # replacing the stack restart already fixed and tested in CiderDarling.
     fixes = runtime_metadata.get("source_fixes", [])
     if isinstance(fixes, list) and "workqueue_stack_reset_x86_64" in fixes:
-        return ["QUADRA_NATIVE_WORKQUEUE=1"]
+        return ["QUINTA_NATIVE_WORKQUEUE=1"]
     return []

@@ -1,0 +1,89 @@
+//! Endpoint for the shim's embedded-web bridge (native/web_bridge.m).
+//!
+//! Roblox's macOS client attaches to its web view host at startup; without
+//! QUINTA_WEB_SOCKET the shim leaves Darling's stub WebKit in place and the
+//! client never reaches its home screen (a black window). This side speaks the
+//! same JSON-lines protocol as launcher/quinta/web.py: requests ({"op": ...})
+//! in, events ({"event": ...}) out. Pages are not shown yet: requests that
+//! need a browser get an error reply so the game never waits on them.
+use serde_json::{json, Value};
+use std::{fs, io::{BufRead, BufReader, Write}, os::unix::{fs::PermissionsExt, net::{UnixListener, UnixStream}}, path::PathBuf, sync::{Arc, atomic::{AtomicBool, Ordering}}, thread, time::Duration};
+
+const MAX_LINE: usize = 1024 * 1024;
+
+pub struct WebBridge { pub guest_path: String, path: PathBuf, stop: Arc<AtomicBool> }
+
+impl Drop for WebBridge {
+    fn drop(&mut self) { self.stop.store(true, Ordering::Relaxed); let _ = fs::remove_file(&self.path); }
+}
+
+impl WebBridge {
+    pub fn start() -> Result<Self, String> {
+        let runtime = std::env::var_os("XDG_RUNTIME_DIR").map(PathBuf::from).unwrap_or_else(|| "/tmp".into());
+        let path = runtime.join(format!("quinta-web-{}.sock", std::process::id()));
+        let guest_path = format!("/Volumes/SystemRoot{}", path.display());
+        // Unix socket paths are limited to 104 bytes as the guest sees them.
+        if guest_path.len() >= 104 { return Err("Web bridge socket path is too long".into()); }
+        let _ = fs::remove_file(&path);
+        let listener = UnixListener::bind(&path).map_err(|e| format!("Could not start the web bridge: {e}"))?;
+        fs::set_permissions(&path, fs::Permissions::from_mode(0o600)).map_err(|e| e.to_string())?;
+        listener.set_nonblocking(true).map_err(|e| e.to_string())?;
+        let stop = Arc::new(AtomicBool::new(false));
+        let flag = stop.clone();
+        thread::spawn(move || {
+            while !flag.load(Ordering::Relaxed) {
+                match listener.accept() {
+                    Ok((stream, _)) => { let flag = flag.clone(); thread::spawn(move || serve(stream, flag)); }
+                    Err(_) => thread::sleep(Duration::from_millis(100)),
+                }
+            }
+        });
+        Ok(Self { guest_path, path, stop })
+    }
+}
+
+fn serve(stream: UnixStream, stop: Arc<AtomicBool>) {
+    let _ = stream.set_read_timeout(Some(Duration::from_millis(500)));
+    let Ok(mut writer) = stream.try_clone() else { return };
+    let mut reader = BufReader::new(stream);
+    let mut line = Vec::new();
+    while !stop.load(Ordering::Relaxed) {
+        match reader.read_until(b'\n', &mut line) {
+            Ok(0) => return,
+            Ok(_) if line.ends_with(b"\n") => {
+                if let Ok(message) = serde_json::from_slice::<Value>(&line) {
+                    if let Some(reply) = reply_for(&message) {
+                        let mut bytes = serde_json::to_vec(&reply).unwrap_or_default();
+                        bytes.push(b'\n');
+                        if writer.write_all(&bytes).is_err() { return; }
+                    }
+                }
+                line.clear();
+            }
+            Ok(_) => {}
+            Err(e) if matches!(e.kind(), std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut) => {}
+            Err(_) => return,
+        }
+        if line.len() > MAX_LINE { return; }
+    }
+}
+
+/// Only requests carry a "request" number and expect a reply.
+fn reply_for(message: &Value) -> Option<Value> {
+    let number = message.get("request").filter(|n| n.is_u64())?;
+    let view = message.get("view").cloned().unwrap_or(json!(0));
+    Some(match message.get("op").and_then(Value::as_str) {
+        Some("cookies-get") => json!({"view": view, "event": "reply", "request": number, "value": []}),
+        _ => json!({"view": view, "event": "reply", "request": number, "error": "Embedded pages are not available in this Quinta build"}),
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test] fn notifications_get_no_reply() { assert!(reply_for(&json!({"op":"attach","window":5})).is_none()); }
+    #[test] fn requests_never_wait() {
+        assert_eq!(reply_for(&json!({"op":"cookies-get","request":3})).unwrap()["value"], json!([]));
+        assert!(reply_for(&json!({"op":"eval","view":1,"request":4})).unwrap()["error"].is_string());
+    }
+}

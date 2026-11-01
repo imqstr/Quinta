@@ -2030,7 +2030,7 @@ for kv in "$@"; do export "$kv"; done
 # Darling. Bash only (3.2), which splits ${var/a/b} at a "/" even inside
 # quotes, so the patterns come from variables.
 case ${QUINTA_FRAMERATE_CAP:-} in
-  '' | *[!0-9]*) ;;
+  '' | 0 | *[!0-9]*) ;;
   *)
     cap_file="$HOME/Library/Roblox/GlobalBasicSettings_13.xml"
     if [ -f "$cap_file" ]; then

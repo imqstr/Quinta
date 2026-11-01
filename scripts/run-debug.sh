@@ -13,7 +13,7 @@ PY
 mapfile -t runtime <<< "$runtime_fields"
 darling_executable=${runtime[0]}
 export DARLING_SYSROOT=${runtime[1]} DPREFIX=${runtime[2]}
-if [[ ${runtime[3]:-} == 1 ]]; then export QUADRA_NATIVE_WORKQUEUE=1; fi
+if [[ ${runtime[3]:-} == 1 ]]; then export QUINTA_NATIVE_WORKQUEUE=1; fi
 # An upgraded kernel can leave the running kernel without loadable modules.
 if ! grep -qw overlay /proc/filesystems; then
   running_kernel=$(uname -r)

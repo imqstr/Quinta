@@ -295,7 +295,9 @@ static BOOL subwindow_frame(QuintaWaylandWindow *parent,NSRect value,int *x,int 
 - (id)initWithOwner:(NSWindow *)window {
     if(!(self=[super init]))return nil;
     initialize();owner=window;frame=[window frame];style=[window styleMask];
-    handle=api->create(frame.size.width,frame.size.height);
+    /* Qt creates windows before their geometry is known (0x0); a surface
+       needs a size, and the first setFrame: gives it the real one. */
+    handle=api->create(frame.size.width>=1?frame.size.width:1,frame.size.height>=1?frame.size.height:1);
     if(!handle)[NSException raise:@"NSWindowServerCommunicationException" format:@"Native Wayland window failed: %s",api->error()];
     /* NSWindow can request fullscreen before lazily creating its platform
      * window. Apply that initial state too; retaining only the Cocoa bit

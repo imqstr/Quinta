@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Quinta preview</title>
+<script>
+// Dev-only: feeds the UI a recorded snapshot so it renders without the Tauri backend.
+const snapshot = fetch('/preview-state.json').then(r => r.json());
+window.__QUINTA_TEST_BRIDGE__ = {
+  async request(command, args) {
+    const state = await snapshot;
+    if (command === 'get_snapshot') return state;
+    if (command === 'save_settings') { Object.assign(state.settings, args.patch); return state.settings; }
+    if (command === 'read_logs') return { path: 'preview.log', text: 'Preview mode: no launch logs.' };
+    return null;
+  },
+  async listen() { return () => {}; },
+};
+</script></head>
+<body><div id="app"></div><script type="module" src="/src/main.ts"></script></body></html>
