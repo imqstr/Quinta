@@ -7,17 +7,36 @@
 //! in, events ({"event": ...}) out. Pages are not shown yet: requests that
 //! need a browser get an error reply so the game never waits on them.
 use serde_json::{json, Value};
-use std::{fs, io::{BufRead, BufReader, Write}, os::unix::{fs::PermissionsExt, net::{UnixListener, UnixStream}}, path::PathBuf, sync::{Arc, atomic::{AtomicBool, Ordering}}, thread, time::Duration};
+use std::{fs, io::{BufRead, BufReader, Write}, os::unix::{fs::PermissionsExt, net::{UnixListener, UnixStream}}, path::{Path,PathBuf},process::{Child,Command,Stdio}, sync::{Arc, atomic::{AtomicBool, Ordering}}, thread, time::Duration};
 
 const MAX_LINE: usize = 1024 * 1024;
 
-pub struct WebBridge { pub guest_path: String, path: PathBuf, stop: Arc<AtomicBool> }
+pub struct WebBridge { pub guest_path: String, path: PathBuf, stop: Arc<AtomicBool>, host:Option<Child> }
 
 impl Drop for WebBridge {
-    fn drop(&mut self) { self.stop.store(true, Ordering::Relaxed); let _ = fs::remove_file(&self.path); }
+    fn drop(&mut self) { if let Some(host)=&mut self.host{let _=host.kill();let _=host.wait();} self.stop.store(true, Ordering::Relaxed); let _ = fs::remove_file(&self.path); }
 }
 
 impl WebBridge {
+    /// Reuse the full WebKitGTK bridge for Studio's sign-in and account pages.
+    pub fn start_studio(root:&Path)->Result<Self,String>{
+        let mut command=Command::new("python3");
+        let mut child=command
+            .args(["-m","quinta.studio_web_host"])
+            .env("PYTHONPATH",root.join("launcher"))
+            .env("WEBKIT_DISABLE_DMABUF_RENDERER","1")
+            .stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::inherit())
+            .spawn().map_err(|e|format!("Could not start Studio's WebKit host: {e}"))?;
+        let output=child.stdout.take().unwrap();
+        let (sender,receiver)=std::sync::mpsc::channel();
+        thread::spawn(move ||{let mut line=String::new();let result=BufReader::new(output).read_line(&mut line).map(|_|line);let _=sender.send(result);});
+        let line=receiver.recv_timeout(Duration::from_secs(15)).ok().and_then(Result::ok);
+        let Some(guest_path)=line.map(|s|s.trim().to_string()).filter(|s|s.starts_with("/Volumes/SystemRoot/")) else{
+            let _=child.kill();let _=child.wait();return Err("Studio's WebKit host did not start. Install Python GObject, GTK4, libadwaita and WebKitGTK 6.".into());
+        };
+        let path=PathBuf::from(guest_path.strip_prefix("/Volumes/SystemRoot").unwrap());
+        Ok(Self{guest_path,path,stop:Arc::new(AtomicBool::new(false)),host:Some(child)})
+    }
     pub fn start() -> Result<Self, String> {
         let runtime = std::env::var_os("XDG_RUNTIME_DIR").map(PathBuf::from).unwrap_or_else(|| "/tmp".into());
         let path = runtime.join(format!("quinta-web-{}.sock", std::process::id()));
@@ -38,7 +57,7 @@ impl WebBridge {
                 }
             }
         });
-        Ok(Self { guest_path, path, stop })
+        Ok(Self { guest_path, path, stop, host:None })
     }
 }
 

@@ -12,6 +12,7 @@ It is the protocol of spidercraft's Roblox Mac Linux Port
 import json
 import os
 import socket
+import sys
 import urllib.parse
 from collections import deque
 
@@ -577,6 +578,8 @@ class WebBridge:
     # ---------------------------------------------------------------- requests
     def _handle(self, message):
         op = message.get("op")
+        if os.environ.get("QUINTA_TRACE_WEB_OPS"):
+            print(f"[Studio web] {op}", file=sys.stderr, flush=True)
         page_id = message.get("view", 0)
         if op == "return-to-game":
             self._return_to_game()
@@ -640,6 +643,8 @@ class WebBridge:
 
     def _set_user_agent(self, page, agent):
         valid = isinstance(agent, str) and agent and all(32 <= ord(c) <= 126 for c in agent)
+        if os.environ.get("QUINTA_TRACE_WEB_OPS"):
+            print(f"[Studio web] user-agent {agent!r}", file=sys.stderr, flush=True)
         page.view.get_settings().set_user_agent(_compatible_user_agent(agent) if valid else None)
 
     def _load(self, page, message):

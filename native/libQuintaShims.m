@@ -1343,6 +1343,12 @@ void my_objc_exception_throw(id exception) {
         write_str("[Quinta Hook] Exception class: ");
         write_str(object_getClassName(exception));
         write_str("\n");
+        id reason = ((id (*)(id, SEL))objc_msgSend)(exception, sel_registerName("reason"));
+        if (reason) {
+            write_str("[Quinta Hook] Exception reason: ");
+            write_str(((const char* (*)(id, SEL))objc_msgSend)(reason, sel_registerName("UTF8String")));
+            write_str("\n");
+        }
     }
     write_str("[Quinta Hook] Backtrace:\n");
     print_backtrace();

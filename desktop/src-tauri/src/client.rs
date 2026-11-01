@@ -17,9 +17,13 @@ pub fn launch(state:AppState,app:AppHandle,kind:String,uri:Option<String>)->Resu
 fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Result<(),String>{
  if state.session.lock().unwrap().is_some(){return Err("A client is already running".into());}
  let runtime=runtime::read(&state.paths.runtime_file())?;let settings=state.settings.lock().unwrap().clone();
- let inventory=state.gpus.lock().unwrap().clone();let graphics=runtime::graphics(&settings,&inventory,&state.paths.root)?;
- let shim=state.paths.root.join("build");if !shim.join("libQuintaShims.dylib").is_file(){return Err("Native compatibility shims are missing. Run scripts/build-native.sh first.".into());}
  let studio=kind=="studio";
+ // Studio's raster Qt backing store uses AppKit's X11 bitmap presentation.
+ // Keep the game's selected backend in the saved settings.
+ let mut graphics_settings=settings.clone();
+ if studio{graphics_settings["display_backend"]=json!("x11");}
+ let inventory=state.gpus.lock().unwrap().clone();let graphics=runtime::graphics(&graphics_settings,&inventory,&state.paths.root)?;
+ let shim=state.paths.root.join("build");if !shim.join("libQuintaShims.dylib").is_file(){return Err("Native compatibility shims are missing. Run scripts/build-native.sh first.".into());}
  let bundle=if studio{state.paths.root.join("experimental/macos-studio/RobloxStudio.app")}else{state.paths.bundle()};
  let executable=bundle.join(if studio{"Contents/MacOS/RobloxStudio"}else{"Contents/MacOS/RobloxPlayer"});
  if !executable.is_file(){return Err(if studio{"The macOS Studio experiment is not installed"}else{"Install Roblox before launching"}.into());}
@@ -32,13 +36,13 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  let _=writeln!(log,"Quinta {} · Rust backend\nRuntime: {}\nRenderer: {}\nClient: {}",env!("CARGO_PKG_VERSION"),runtime.executable.display(),settings["renderer"],kind);
  if !studio{
   if settings["auto_patch_throttle"].as_bool().unwrap_or(true){let _=writeln!(log,"Compatibility: {}",patches::throttle(&executable)?);}
-  let pack=bundle.join("Contents/Resources/shaders/shaders_glsl3.pack");if pack.is_file() && std::env::var_os("QUINTA_SKIP_SHADER_REPAIR").is_none(){let _=writeln!(log,"Shaders: {}",patches::shaders(&pack)?);}
   crate::modifications::apply(&state.paths.data,&bundle,&settings)?;
  }
+ let pack=bundle.join("Contents/Resources/shaders/shaders_glsl3.pack");if pack.is_file() && std::env::var_os("QUINTA_SKIP_SHADER_REPAIR").is_none(){let _=writeln!(log,"Shaders: {}",patches::shaders(&pack)?);}
  let dns=DnsService::start(settings["dns"].as_str().unwrap_or("quad9"),settings["dns_custom"].as_str().unwrap_or(""))?;
  let audio=Audio::start(&state.paths.cache).unwrap_or(None);
  // Roblox waits on its web view host at startup; without it the window stays black.
- let web=crate::web::WebBridge::start().map_err(|e|{let _=writeln!(log,"Web bridge unavailable: {e}");e}).ok();
+ let web=(if studio{crate::web::WebBridge::start_studio(&state.paths.root)}else{crate::web::WebBridge::start()}).map_err(|e|{let _=writeln!(log,"Web bridge unavailable: {e}");e}).ok();
  let mut variables=graphics;
  variables.extend([
   ("QUINTA_SESSION_DIRECTORY".into(),"Library/Quinta".into()),
@@ -67,7 +71,11 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  if variables.iter().any(|(k,v)|k=="QUINTA_WAYLAND"&&v=="1"){command.env_remove("DISPLAY");}
  for key in std::env::vars_os().filter_map(|(k,_)|k.to_str().filter(|s|s.starts_with("DSERVER_LOG_")).map(str::to_string)){command.env_remove(key);}
  // Qt logs through os_log, which crashes in Darling: keep Studio on stderr.
- if studio{variables.push(("QT_FORCE_STDERR_LOGGING".into(),"1".into()));}
+ if studio{
+  variables.push(("QT_FORCE_STDERR_LOGGING".into(),"1".into()));
+  // Host-backed Xlib consumes host paths, including XAUTHORITY.
+  for key in ["DISPLAY","XAUTHORITY"]{if let Ok(value)=std::env::var(key){variables.push((key.into(),value));}}
+ }
  if studio{
   let compat=state.paths.root.join("experimental/macos-studio/libStudioCompat.dylib");
   if !compat.is_file(){return Err("The Studio experiment shim must be built before testing this client".into());}

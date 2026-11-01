@@ -1,5 +1,5 @@
 // Minimal API additions for the macOS Studio startup experiment.
-// This does not make Studio usable: Qt startup still segfaults.
+// Studio-specific additions for APIs absent from the supported Darling runtime.
 @class NSString;
 NSString * const WKWebsiteDataTypeCookies = @"WKWebsiteDataTypeCookies";
 
@@ -140,7 +140,87 @@ static id studio_url_path_allowed(id self, SEL cmd) {
     return ((id (*)(id, SEL, id))objc_msgSend)(self, sel_registerName("characterSetWithCharactersInString:"),
         (id)@"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~!$&'()*+,;=:@/");
 }
+#include "url_components.m"
+#include "cookies.m"
+#include "screens.m"
+typedef struct {double x,y,width,height;} StudioImageRect;
+static id studio_web_init(id self,SEL cmd,StudioImageRect frame,id configuration,signed char menu,id browser) {
+    (void)cmd;(void)menu;(void)browser;
+    return ((id(*)(id,SEL,StudioImageRect,id))objc_msgSend)(self,sel_registerName("initWithFrame:configuration:"),frame,configuration);
+}
+static void* studio_image_cgimage(id,SEL,void*,id,id);
+static void studio_image_draw(id self,SEL cmd,StudioImageRect destination,StudioImageRect source,unsigned long operation,double fraction,signed char flipped,id hints) {
+    (void)cmd;(void)hints;
+    extern void CGContextSaveGState(void*);extern void CGContextRestoreGState(void*);
+    extern void CGContextTranslateCTM(void*,double,double);extern void CGContextScaleCTM(void*,double,double);
+    extern void CGContextClipToRect(void*,StudioImageRect);extern void CGContextDrawImage(void*,StudioImageRect,const void*);
+    extern void CGContextSetAlpha(void*,double);
+    id graphics=((id(*)(id,SEL))objc_msgSend)((id)objc_getClass("NSGraphicsContext"),sel_registerName("currentContext"));
+    void* context=((void*(*)(id,SEL))objc_msgSend)(graphics,sel_registerName("graphicsPort"));
+    int flip=flipped && ((signed char(*)(id,SEL))objc_msgSend)(graphics,sel_registerName("isFlipped"));
+    CGContextSaveGState(context);
+    if(flip){CGContextTranslateCTM(context,0,2*destination.y+destination.height);CGContextScaleCTM(context,1,-1);}
+    void* image=studio_image_cgimage(self,cmd,0,graphics,0);
+    if(image && destination.width>0 && destination.height>0) {
+        typedef struct {double width,height;} ImageSize;
+        ImageSize size=((ImageSize(*)(id,SEL))objc_msgSend)(self,sel_registerName("size"));
+        if(source.width<=0 || source.height<=0)source=(StudioImageRect){0,0,size.width,size.height};
+        if(source.width>0 && source.height>0) {
+            ((void(*)(id,SEL,unsigned long))objc_msgSend)(graphics,sel_registerName("setCompositingOperation:"),operation);
+            CGContextSetAlpha(context,fraction);CGContextClipToRect(context,destination);
+            CGContextTranslateCTM(context,destination.x,destination.y);
+            CGContextScaleCTM(context,destination.width/source.width,destination.height/source.height);
+            CGContextDrawImage(context,(StudioImageRect){-source.x,-source.y,size.width,size.height},image);
+        }
+    }else ((void(*)(id,SEL,StudioImageRect,StudioImageRect,unsigned long,double))objc_msgSend)(self,sel_registerName("drawInRect:fromRect:operation:fraction:"),destination,source,operation,fraction);
+    CGContextRestoreGState(context);
+}
+static void* studio_image_cgimage(id self,SEL cmd,void* rect,id context,id hints) {
+    (void)cmd;(void)rect;(void)context;(void)hints;
+    id reps=((id(*)(id,SEL))objc_msgSend)(self,sel_registerName("representations"));
+    unsigned long count=((unsigned long(*)(id,SEL))objc_msgSend)(reps,sel_registerName("count"));
+    for(unsigned long i=0;i<count;i++) {
+        id rep=((id(*)(id,SEL,unsigned long))objc_msgSend)(reps,sel_registerName("objectAtIndex:"),i);
+        SEL image=sel_registerName("CGImage");
+        if(((signed char(*)(id,SEL,SEL))objc_msgSend)(rep,sel_registerName("respondsToSelector:"),image)) {
+            void* cg=((void*(*)(id,SEL))objc_msgSend)(rep,image);if(cg)return cg;
+        }
+    }
+    return 0;
+}
+static char studio_layer_mask_key;
+static id studio_layer_mask(id self,SEL cmd) {(void)cmd;return objc_getAssociatedObject(self,&studio_layer_mask_key);}
+static void studio_set_layer_mask(id self,SEL cmd,id mask) {(void)cmd;objc_setAssociatedObject(self,&studio_layer_mask_key,mask,1);}
+static signed char studio_validate_menu(id self,SEL cmd,id item) {
+    (void)cmd;SEL action=((SEL(*)(id,SEL))objc_msgSend)(item,sel_registerName("action"));
+    return action && ((signed char(*)(id,SEL,SEL))objc_msgSend)(self,sel_registerName("respondsToSelector:"),action);
+}
+static double studio_backing_scale(id self,SEL cmd) {(void)self;(void)cmd;return 1.0;}
+static id studio_event_copy(id self,SEL cmd,void* zone) {(void)cmd;(void)zone;return ((id(*)(id,SEL))objc_msgSend)(self,sel_registerName("retain"));}
+static short studio_event_subtype(id self,SEL cmd) {(void)self;(void)cmd;return 0;}
+static id studio_no_input_context(id self,SEL cmd) {(void)self;(void)cmd;return 0;}
+static signed char studio_no(id self, SEL cmd) { (void)self; (void)cmd; return 0; }
 static void studio_add_missing_methods(void) {
+    Class input=objc_getMetaClass("NSTextInputContext");
+    if(input)class_addMethod(input,sel_registerName("currentInputContext"),(IMP)studio_no_input_context,"@@:");
+    Class layer = objc_getClass("CALayer");
+    if(layer){class_addMethod(layer,sel_registerName("mask"),(IMP)studio_layer_mask,"@@:");class_addMethod(layer,sel_registerName("setMask:"),(IMP)studio_set_layer_mask,"v@:@");}
+    Class web = objc_getClass("QuintaWebView");
+    if(web)class_addMethod(web,sel_registerName("initWithFrame:configuration:enableDefaultContextMenu:browser:"),(IMP)studio_web_init,"@@:{CGRect={CGPoint=dd}{CGSize=dd}}@c@");
+    Class image = objc_getClass("NSImage");
+    if(image) {
+        class_addMethod(image,sel_registerName("CGImageForProposedRect:context:hints:"),(IMP)studio_image_cgimage,"^v@:^v@@");
+        studio_components_method(image,sel_registerName("drawInRect:fromRect:operation:fraction:respectFlipped:hints:"),(IMP)studio_image_draw,"v@:{CGRect={CGPoint=dd}{CGSize=dd}}{CGRect={CGPoint=dd}{CGSize=dd}}Qdc@");
+    }
+    Class window = objc_getClass("NSWindow");
+    if(window)class_addMethod(window,sel_registerName("backingScaleFactor"),(IMP)studio_backing_scale,"d@:");
+    const char* events[]={"NSEvent_mouse","NSEvent_key"};
+    for(unsigned i=0;i<2;i++){Class event=objc_getClass(events[i]);if(event){class_addMethod(event,sel_registerName("subtype"),(IMP)studio_event_subtype,"s@:");class_addMethod(event,sel_registerName("copyWithZone:"),(IMP)studio_event_copy,"@@:^v");}}
+    Class app = objc_getClass("NSApplication");
+    if (app) {class_addMethod(app,sel_registerName("isFullKeyboardAccessEnabled"),(IMP)studio_no,"c@:");class_addMethod(app,sel_registerName("validateMenuItem:"),(IMP)studio_validate_menu,"c@:@");}
+    studio_install_url_components();
+    studio_install_cookies();
+    studio_install_screens();
     Class characters = objc_getMetaClass("NSCharacterSet");
     if (characters) class_addMethod(characters, sel_registerName("URLPathAllowedCharacterSet"), (IMP)studio_url_path_allowed, "@@:");
     Class workspace = objc_getClass("NSWorkspace");
@@ -152,6 +232,14 @@ static void studio_split_platform_window(void) {
     if (done || !qcocoa_header) return;
     studio_add_missing_methods();
     static const char* names[] = {"QNSWindow", "QNSPanel", "QNSView"};
+    Class view = objc_getClass("QNSView");
+    if(view) {
+        const char* layerMethods[]={"layerEnabledByMacOS","layerExplicitlyRequested"};
+        for(unsigned i=0;i<2;i++) {
+            Method method=class_getInstanceMethod(view,sel_registerName(layerMethods[i]));
+            if(method)method_setImplementation(method,(IMP)studio_no);
+        }
+    }
     SEL selector = sel_registerName("platformWindow");
     unsigned used = 0;
     for (unsigned i = 0; i < 3; i++) {
@@ -170,11 +258,14 @@ static void studio_split_platform_window(void) {
     }
     done = 1;
 }
+static void studio_bind_fonts(const struct mach_header*, intptr_t);
 static void studio_image_added(const struct mach_header* header, intptr_t slide) {
-    (void)slide;
     Dl_info info;
     if (!dladdr(header, &info) || !info.dli_fname) return;
     unsigned long length = strlen(info.dli_fname);
+    static const char own[]="/libStudioCompat.dylib";
+    if(length>=sizeof own-1 && !strcmp(info.dli_fname+length-(sizeof own-1),own))return;
+    studio_bind_fonts(header,slide);
     static const char suffix[] = "/libqcocoa.dylib";
     if (length < sizeof suffix - 1 || strcmp(info.dli_fname + length - (sizeof suffix - 1), suffix)) return;
     qcocoa_header = header;
@@ -192,6 +283,7 @@ static void studio_image_added(const struct mach_header* header, intptr_t slide)
     write(2, note, sizeof note - 1);
 }
 __attribute__((constructor)) static void studio_compat_init(void) {
+    studio_add_missing_methods();
     _dyld_register_func_for_add_image(studio_image_added);
 }
 
@@ -239,7 +331,7 @@ const void* CGSessionCopyCurrentDictionary(void) {
 STUDIO_UNAVAILABLE(CGColorGetTypeID)
 STUDIO_UNAVAILABLE(CGColorSpaceCopyPropertyList)
 STUDIO_UNAVAILABLE(CGDisplayCreateImageForRect)
-STUDIO_UNAVAILABLE(CGDisplayCreateUUIDFromDisplayID)
+
 STUDIO_UNAVAILABLE(CGDisplayIsAsleep)
 STUDIO_UNAVAILABLE(CGEventSetFlags)
 STUDIO_UNAVAILABLE(CGEventSourceKeyState)
@@ -248,9 +340,9 @@ STUDIO_UNAVAILABLE(CGFontCopyPostScriptName)
 STUDIO_UNAVAILABLE(CGSClearWindowTags)
 STUDIO_UNAVAILABLE(CGSSetWindowTags)
 STUDIO_UNAVAILABLE(CTFontDescriptorCreateCopyWithAttributes)
-STUDIO_UNAVAILABLE(CTFontDescriptorCreateMatchingFontDescriptor)
-STUDIO_UNAVAILABLE(CTFontDescriptorCreateMatchingFontDescriptors)
-STUDIO_UNAVAILABLE(CTFontDescriptorCreateWithNameAndSize)
+
+
+
 STUDIO_UNAVAILABLE(CTFontManagerCreateFontDescriptorFromData)
 STUDIO_UNAVAILABLE(CTFontManagerCreateFontDescriptorsFromURL)
 STUDIO_UNAVAILABLE(CTTypesetterCreateLine)
@@ -293,3 +385,8 @@ void CGContextBeginTransparencyLayerWithRect(void* context, StudioRect rect, con
     (void)rect;
     CGContextBeginTransparencyLayer(context, auxiliaryInfo);
 }
+
+#include "fonts.m"
+
+#include "graphics.m"
+#include "bindings.m"

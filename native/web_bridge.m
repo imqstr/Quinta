@@ -673,6 +673,12 @@ static void failRequests(id view, NSString *reason) {
 @interface WKUserScript : NSObject @end
 
 @implementation WKWebViewConfiguration (QuintaWeb)
+- (void)setProcessPool:(id)value {
+    if(value)stateFor(self)[@"processPool"]=value;
+    else [stateFor(self) removeObjectForKey:@"processPool"];
+}
+- (id)processPool { return stateFor(self)[@"processPool"]; }
+
 - (id)preferences {
     id p = stateFor(self)[@"preferences"];
     if (!p) stateFor(self)[@"preferences"] = p = [[[WKPreferences alloc] init] autorelease];
@@ -740,6 +746,7 @@ static void failRequests(id view, NSString *reason) {
 }
 @end
 @implementation WKUserContentController (QuintaWeb)
+- (void)removeAllUserScripts { [stateFor(self) removeObjectForKey:@"scripts"]; }
 - (void)addScriptMessageHandler:(id)handler name:(NSString *)name {
     NSMutableDictionary *handlers = stateFor(self)[@"handlers"];
     if (!handlers) stateFor(self)[@"handlers"] = handlers = [NSMutableDictionary dictionary];
