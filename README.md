@@ -42,20 +42,12 @@ See the [upstream setup documentation](docs/UPSTREAM_README.md) for the full dep
 ```sh
 git clone https://github.com/imqstr/Quinta.git
 cd Quinta
-bash scripts/build-native.sh          # compatibility shim for the game
-
-cd desktop
-npm install && npm run build          # interface
-cd src-tauri
-cargo build --release --features tauri/custom-protocol
+bash install.sh                 # first time only: sets up CiderDarling
+bash scripts/install-app.sh     # builds and installs the app
 ```
 
-Run it from the repository root:
-
-```sh
-QUINTA_ROOT=$PWD desktop/src-tauri/target/release/quinta
-```
-
+Open **Quinta** from your app menu, or run `quinta`. Run `scripts/install-app.sh`
+again after a `git pull` to update; it only rebuilds what changed.
 Then choose a runtime in **Settings → Advanced** and press **Play**. ▶️
 
 > 💡 `--launch` starts the game right away and `--studio` starts Studio.
@@ -91,8 +83,8 @@ Open an [issue](https://github.com/imqstr/Quinta/issues) with the launch log fro
 
 ## 📄 License & credits
 
-GPL-3.0; see [LICENSE](LICENSE). Quinta is a fork of
-[Quadra](https://github.com/QuadraHQ/Quadra) and builds on its contributors' work,
+GPL-3.0; see [LICENSE](LICENSE). Quinta builds on
+[Quadra](https://github.com/QuadraHQ/Quadra) and its contributors' work,
 plus Darling, CiderDarling and the native compatibility projects. Upstream
 copyright notices and attribution are kept.
 

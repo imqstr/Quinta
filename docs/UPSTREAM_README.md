@@ -5,7 +5,7 @@
 </p>
 
 <h1 align="center">
- Quinta, maintained by imqstr.
+ Quinta
 </h1>
 
  <p align="center">
@@ -40,7 +40,7 @@ Any derivatives must be also under the GPL v3 license, and cannot remove any cop
   Migration from Cider / Mac O' Blox to Quinta
 </h1>
 
-Quinta is maintained by **imqstr** and builds on an existing Linux launcher. The terminal
+Quinta builds on an existing Linux launcher. The terminal
 command and native package name are **`quinta`**, the desktop ID is
 `io.github.imqstr.Quinta`, and the website is
 [quinta.org](https://quadrahq.org). The logo stays the same.
