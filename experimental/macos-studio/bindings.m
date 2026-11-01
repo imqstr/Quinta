@@ -33,6 +33,7 @@ static void* studio_font_binding(const char* name) {
     BIND(CGColorSpaceCreateWithName,studio_color_space);
     BIND(CGImageCreateCopyWithColorSpace,studio_image_copy_color);
     BIND(CGBitmapContextCreate,studio_bitmap_create);
+    BIND(CGDataProviderCreateWithData,studio_provider_create);
     BIND(CTFontCreatePathForGlyph,studio_glyph_path);
 #undef BIND
     return 0;

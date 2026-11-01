@@ -47,3 +47,43 @@ static void* studio_bitmap_create(void* bytes,unsigned long width,unsigned long 
     return CGBitmapContextCreate(bytes,width,height,bpc,row,color,info);
 }
 STUDIO_FONT_INTERPOSE(CGBitmapContextCreate,studio_bitmap_create)
+// Darling's CGDataProviderCreateWithData drops the release callback
+// (O2DataProvider initWithBytes:length:), so the caller's bytes are never
+// freed. Qt hands its backing store to CoreGraphics this way on every flush,
+// and Studio leaked a full window bitmap per frame (~200 MB/s). Wrap the bytes
+// in a CFData whose deallocator runs the caller's callback instead.
+typedef void (*StudioProviderRelease)(void*,const void*,unsigned long);
+struct StudioProviderBytes { StudioProviderRelease release; void* info; unsigned long size; };
+typedef struct {
+    long version; void* info; const void* (*retain)(const void*); void (*release)(const void*);
+    const void* (*copyDescription)(const void*); void* (*allocate)(long,unsigned long,void*);
+    void* (*reallocate)(void*,long,unsigned long,void*); void (*deallocate)(void*,void*);
+    long (*preferredSize)(long,unsigned long,void*);
+} StudioAllocatorContext;
+extern const void* CFAllocatorCreate(const void*,StudioAllocatorContext*);
+extern const void* CFDataCreateWithBytesNoCopy(const void*,const void*,long,const void*);
+extern void* CGDataProviderCreateWithCFData(const void*);
+extern void* CGDataProviderCreateWithData(void*,const void*,unsigned long,StudioProviderRelease);
+extern void* malloc(unsigned long);
+extern void free(void*);
+static void studio_provider_bytes_done(void* bytes,void* context) {
+    struct StudioProviderBytes* owner=context;
+    owner->release(owner->info,bytes,owner->size);
+}
+static void studio_provider_context_done(const void* context) { free((void*)context); }
+static void* studio_provider_create(void* info,const void* bytes,unsigned long size,StudioProviderRelease release) {
+    if(!release || !bytes)return CGDataProviderCreateWithData(info,bytes,size,release);
+    struct StudioProviderBytes* owner=malloc(sizeof *owner);
+    if(!owner)return CGDataProviderCreateWithData(info,bytes,size,release);
+    *owner=(struct StudioProviderBytes){release,info,size};
+    StudioAllocatorContext context={0,owner,0,studio_provider_context_done,0,0,0,studio_provider_bytes_done,0};
+    const void* allocator=CFAllocatorCreate(0,&context);
+    if(!allocator){free(owner);return CGDataProviderCreateWithData(info,bytes,size,release);}
+    // From here the allocator owns `owner` and frees it with the allocator.
+    const void* data=CFDataCreateWithBytesNoCopy(0,bytes,(long)size,allocator);
+    CFRelease(allocator);
+    if(!data)return CGDataProviderCreateWithData(info,bytes,size,release);
+    void* provider=CGDataProviderCreateWithCFData(data);
+    CFRelease(data);
+    return provider;
+}

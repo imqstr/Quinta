@@ -701,6 +701,20 @@ static void failRequests(id view, NSString *reason) {
 @implementation WKWebsiteDataStore (QuintaWeb)
 + (id)defaultDataStore { static id store; if (!store) store = [self new]; return store; }
 - (id)httpCookieStore { static id store; if (!store) store = [WKHTTPCookieStore new]; return store; }
+// Studio's sign-in waits on these completions. The host browser keeps no
+// separate data records, so report none and finish removals at once.
+- (void)fetchDataRecordsOfTypes:(id)types completionHandler:(void (^)(NSArray *))completion {
+    (void)types;
+    if (completion) dispatch_async(&_dispatch_main_q, ^{ completion([NSArray array]); });
+}
+- (void)removeDataOfTypes:(id)types forDataRecords:(id)records completionHandler:(void (^)(void))completion {
+    (void)types; (void)records;
+    if (completion) dispatch_async(&_dispatch_main_q, ^{ completion(); });
+}
+- (void)removeDataOfTypes:(id)types modifiedSince:(id)date completionHandler:(void (^)(void))completion {
+    (void)types; (void)date;
+    if (completion) dispatch_async(&_dispatch_main_q, ^{ completion(); });
+}
 @end
 @implementation WKHTTPCookieStore (QuintaWeb)
 - (void)setCookie:(NSHTTPCookie *)cookie completionHandler:(void (^)(void))completion {
