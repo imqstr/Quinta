@@ -95,6 +95,7 @@ class _Page:
         self.handlers = set()
         self.scripts = set()
         self.script_bytes = 0
+        self.embed = None  # (window, xid, parent) while drawn inside the game's window
 
 
 class WebBridge:
@@ -142,6 +143,17 @@ class WebBridge:
         self.session = None
         self.current = None
         self.window = None
+        # QUINTA_WEB_EMBED=1: draw pages inside the game's own windows (Studio).
+        self.embedder = None
+        self.frame_pump = 0
+        if os.environ.get("QUINTA_WEB_EMBED") == "1":
+            from . import x11_embed
+
+            if x11_embed.available():
+                try:
+                    self.embedder = x11_embed.X11Embedder()
+                except OSError as error:
+                    print(f"[Quinta Web] Pages open in a window: {error}", file=sys.stderr, flush=True)
 
     # ---------------------------------------------------------------- socket
     def stop(self):
@@ -490,7 +502,14 @@ class WebBridge:
                 manager.unregister_script_message_handler(name, None)
             manager.remove_all_scripts()
             view.stop_loading()
-            self.stack.remove(view)
+            if page.embed:
+                window = page.embed[0]
+                self.embedder.forget(page.embed[1])
+                window.set_child(None)
+                window.destroy()
+                page.embed = None
+            else:
+                self.stack.remove(view)
         page.handlers.clear()
         page.scripts.clear()
         page.script_bytes = 0
@@ -609,6 +628,12 @@ class WebBridge:
                 self._build_window()
             self._cookie_set(message.get("request"), message.get("cookie"))
             return
+        if op == "place":
+            if self.embedder:
+                page = self._page(page_id)
+                if page:
+                    self._place(page, message)
+            return
         if op not in ("load", "user-agent", "eval", "back", "forward", "reload", "stop", "handler", "script"):
             self._reply_error(message.get("request"), "Unknown embedded browser operation")
             return
@@ -656,7 +681,8 @@ class WebBridge:
         page.panel_title = message.get("panelTitle") if isinstance(message.get("panelTitle"), str) else ""
         self._set_user_agent(page, message.get("agent"))
         self.current = page
-        self.stack.set_visible_child(page.view)
+        if not page.embed:
+            self.stack.set_visible_child(page.view)
         self._controls()
         request = self.WebKit.URIRequest.new(url)
         headers = message.get("headers")
@@ -666,8 +692,71 @@ class WebBridge:
                 if isinstance(name, str) and isinstance(value, str) and _header_ok(name, value):
                     fields.replace(name, value)
         page.view.load_request(request)
-        if self._active_page(page):
+        if not self._active_page(page):
+            return
+        if self.embedder:
+            # The game reports where the page goes; open a window only if it never does.
+            GLib.timeout_add(1500, self._show_unplaced, page)
+            return
+        self.window.present()
+        page.view.grab_focus()
+
+    def _pump_frames(self):
+        embedded = [page.embed[1] for page in self.pages.values() if page.embed]
+        for xid in embedded:
+            self.embedder.frame_drawn(xid)
+        if not embedded:
+            self.frame_pump = 0
+            return GLib.SOURCE_REMOVE
+        return GLib.SOURCE_CONTINUE
+
+    def _show_unplaced(self, page):
+        if self.pages.get(page.id) is page and not page.embed and self.current is page:
             self.window.present()
+            page.view.grab_focus()
+        return GLib.SOURCE_REMOVE
+
+    def _place(self, page, message):
+        """Draw the page inside the game's window at the web view's rectangle."""
+        def number(key):
+            value = message.get(key)
+            return value if isinstance(value, int) and not isinstance(value, bool) and 0 <= value < 1 << 32 else None
+
+        parent, x, y, width, height = (number(k) for k in ("window", "x", "y", "width", "height"))
+        visible = message.get("visible") is True and None not in (parent, x, y, width, height) and parent
+        if not page.embed:
+            if not visible:
+                return
+            view = page.view
+            if view.get_parent() is self.stack:
+                self.stack.remove(view)
+                if self.current is page:
+                    self.window.set_visible(False)
+            window = Gtk.Window(decorated=False, default_width=width, default_height=height)
+            window.set_child(view)
+            window.realize()
+            xid = self.embedder.window_id(window)
+            if not xid:
+                window.set_child(None)
+                window.destroy()
+                self.stack.add_named(view, str(page.id))
+                return
+            # X11 hands keys to the focused window only: take focus on click.
+            click = Gtk.GestureClick(propagation_phase=Gtk.PropagationPhase.CAPTURE)
+            click.connect("pressed", lambda *_args: self.embedder.focus(xid))
+            window.add_controller(click)
+            page.embed = (window, xid, 0)
+            if not self.frame_pump:
+                self.frame_pump = GLib.timeout_add(8, self._pump_frames)
+        window, xid, current_parent = page.embed
+        if not visible:
+            window.set_visible(False)
+            return
+        self.embedder.place(xid, parent, x, y, width, height, parent != current_parent)
+        page.embed = (window, xid, parent)
+        if not window.get_visible():
+            window.present()
+            self.embedder.place(xid, parent, x, y, width, height, False)
             page.view.grab_focus()
 
     def _eval(self, page, number, script):

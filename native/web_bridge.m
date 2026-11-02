@@ -31,6 +31,7 @@ typedef struct { NSUInteger location, length; } NSRange;
 extern Class objc_getClass(const char *);
 extern Class object_getClass(id);
 extern SEL sel_registerName(const char *);
+extern id objc_msgSend(id, SEL, ...);
 extern Method class_getInstanceMethod(Class, SEL);
 extern Method class_getClassMethod(Class, SEL);
 extern IMP method_setImplementation(Method, IMP);
@@ -124,6 +125,7 @@ static long bridgeSocketSend(int fd, const void* bytes, unsigned long length) {
 @interface NSDictionary : NSObject
 + (id)dictionary;
 + (id)dictionaryWithObjects:(const id *)objects forKeys:(const id *)keys count:(NSUInteger)count;
+- (NSArray *)allValues;
 - (id)objectForKey:(id)key; - (id)objectForKeyedSubscript:(id)key; - (NSArray *)allKeys;
 - (NSUInteger)count;
 @end
@@ -179,9 +181,10 @@ extern NSString *NSRunLoopCommonModes;
 @interface NSView : NSObject
 - (id)initWithFrame:(NSRect)frame; - (void)viewDidMoveToWindow; - (id)window; - (void)removeFromSuperview;
 - (id)superview; - (NSRect)bounds; - (void)setFrame:(NSRect)frame; - (void)setAutoresizingMask:(NSUInteger)mask;
+- (NSRect)convertRect:(NSRect)rect toView:(id)view; - (BOOL)isFlipped; - (BOOL)isHiddenOrHasHiddenAncestor;
 @end
 @interface NSWindow : NSObject
-- (NSRect)frame; - (BOOL)isVisible; - (id)platformWindow;
+- (NSRect)frame; - (BOOL)isVisible; - (id)platformWindow; - (id)contentView;
 @end
 @interface NSPanel : NSWindow
 @end
@@ -422,6 +425,13 @@ static void closeHostedView(id self, SEL selector) {
                 break;
             }
         }
+    }
+    // Hosts that can embed pages place them over each view (Studio's sign-in).
+    NSArray *placed = [views allValues];
+    for (NSUInteger i = 0; i < [placed count]; i++) {
+        id view = [[placed objectAtIndex:i] value];
+        if (view)
+            ((void (*)(id, SEL))objc_msgSend)(view, sel_registerName("quintaReportPlacement"));
     }
     NSUInteger writeBudget = WEB_TURN_BYTES, writeMessages = WEB_TURN_MESSAGES;
     while (!bridgeReadClosed && [outgoing count] && writeBudget && writeMessages) {
@@ -918,6 +928,32 @@ static id webViewAllocWithZone(id cls, SEL selector, void *zone) {
 - (id)goForward { sendMessage(@{@"op": @"forward", @"view": @(_id)}); return _navigation; }
 - (id)reload { sendMessage(@{@"op": @"reload", @"view": @(_id)}); return _navigation; }
 - (void)stopLoading { sendMessage(@{@"op": @"stop", @"view": @(_id)}); }
+// The view's native window and its rectangle in that window's pixels (top-left
+// origin), sent when they change so the host can draw the page in place.
+- (void)quintaReportPlacement {
+    NSWindow *window = [self window];
+    id platform = window ? [window platformWindow] : nil;
+    unsigned long handle = [platform respondsToSelector:sel_registerName("windowHandle")]
+        ? ((unsigned long (*)(id, SEL))objc_msgSend)(platform, sel_registerName("windowHandle")) : 0;
+    id content = window ? [window contentView] : nil;
+    BOOL visible = handle && content && [window isVisible] &&
+        !([self respondsToSelector:@selector(isHiddenOrHasHiddenAncestor)] && [self isHiddenOrHasHiddenAncestor]);
+    NSRect rect = {{0, 0}, {0, 0}};
+    if (visible) {
+        rect = [self convertRect:[self bounds] toView:content];
+        if (![content isFlipped])
+            rect.origin.y = [content bounds].size.height - rect.origin.y - rect.size.height;
+        visible = rect.size.width >= 1 && rect.size.height >= 1;
+    }
+    long x = (long)(rect.origin.x + 0.5), y = (long)(rect.origin.y + 0.5);
+    long width = (long)(rect.size.width + 0.5), height = (long)(rect.size.height + 0.5);
+    NSString *key = visible ? [NSString stringWithFormat:@"%lu %ld %ld %ld %ld", handle, x, y, width, height] : @"hidden";
+    if ([stateFor(self)[@"placement"] isEqual:key])
+        return;
+    stateFor(self)[@"placement"] = key;
+    sendMessage(@{@"op": @"place", @"view": @(_id), @"visible": @(visible), @"window": @(handle),
+                  @"x": @(x), @"y": @(y), @"width": @(width), @"height": @(height)});
+}
 - (void)viewDidMoveToWindow {
     [super viewDidMoveToWindow];
     BOOL attached = [self window] != nil;

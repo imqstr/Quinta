@@ -25,6 +25,8 @@ impl WebBridge {
             .args(["-m","quinta.studio_web_host"])
             .env("PYTHONPATH",root.join("launcher"))
             .env("WEBKIT_DISABLE_DMABUF_RENDERER","1")
+            // Studio runs on X11; the host joins it there to draw sign-in pages inside Studio's dialog.
+            .env("GDK_BACKEND","x11").env("QUINTA_WEB_EMBED","1")
             .stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::inherit())
             .spawn().map_err(|e|format!("Could not start Studio's WebKit host: {e}"))?;
         let output=child.stdout.take().unwrap();
