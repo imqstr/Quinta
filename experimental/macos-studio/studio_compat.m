@@ -200,9 +200,38 @@ static id studio_event_copy(id self,SEL cmd,void* zone) {(void)cmd;(void)zone;re
 static short studio_event_subtype(id self,SEL cmd) {(void)self;(void)cmd;return 0;}
 static id studio_no_input_context(id self,SEL cmd) {(void)self;(void)cmd;return 0;}
 static signed char studio_no(id self, SEL cmd) { (void)self; (void)cmd; return 0; }
+// Darling's NSMenuItem has no custom views; Studio sets some after sign-in
+// and stopped with an unrecognized selector. Keep the view for -view; the
+// menu still shows the item's title.
+static char studio_menu_item_view_key;
+static id studio_menu_item_view(id self,SEL cmd) {(void)cmd;return objc_getAssociatedObject(self,&studio_menu_item_view_key);}
+static void studio_set_menu_item_view(id self,SEL cmd,id view) {(void)cmd;objc_setAssociatedObject(self,&studio_menu_item_view_key,view,1);}
+// +[NSEvent pressedMouseButtons] is missing in Darling; Studio polls it while
+// dragging. Answer from X11's pointer state: bit 0 left, 1 right, 2 middle.
+static unsigned long studio_pressed_mouse_buttons(id self,SEL cmd) {
+    (void)self;(void)cmd;
+    static void* display; static int unavailable;
+    static int (*query)(void*,unsigned long,unsigned long*,unsigned long*,int*,int*,int*,int*,unsigned*);
+    static unsigned long (*root_window)(void*);
+    if(!display && !unavailable) {
+        void* (*open_display)(const char*)=(void*(*)(const char*))dlsym(RTLD_DEFAULT,"XOpenDisplay");
+        query=(int(*)(void*,unsigned long,unsigned long*,unsigned long*,int*,int*,int*,int*,unsigned*))dlsym(RTLD_DEFAULT,"XQueryPointer");
+        root_window=(unsigned long(*)(void*))dlsym(RTLD_DEFAULT,"XDefaultRootWindow");
+        display=open_display && query && root_window ? open_display(0) : 0;
+        unavailable=!display;
+    }
+    if(!display)return 0;
+    unsigned long root,child;int rx,ry,wx,wy;unsigned mask=0;
+    if(!query(display,root_window(display),&root,&child,&rx,&ry,&wx,&wy,&mask))return 0;
+    return (mask&(1u<<8)?1:0)|(mask&(1u<<10)?2:0)|(mask&(1u<<9)?4:0);
+}
 static void studio_add_missing_methods(void) {
     Class input=objc_getMetaClass("NSTextInputContext");
     if(input)class_addMethod(input,sel_registerName("currentInputContext"),(IMP)studio_no_input_context,"@@:");
+    Class event = objc_getMetaClass("NSEvent");
+    if(event)class_addMethod(event,sel_registerName("pressedMouseButtons"),(IMP)studio_pressed_mouse_buttons,"Q@:");
+    Class item = objc_getClass("NSMenuItem");
+    if(item){class_addMethod(item,sel_registerName("view"),(IMP)studio_menu_item_view,"@@:");class_addMethod(item,sel_registerName("setView:"),(IMP)studio_set_menu_item_view,"v@:@");}
     Class layer = objc_getClass("CALayer");
     if(layer){class_addMethod(layer,sel_registerName("mask"),(IMP)studio_layer_mask,"@@:");class_addMethod(layer,sel_registerName("setMask:"),(IMP)studio_set_layer_mask,"v@:@");}
     Class web = objc_getClass("QuintaWebView");

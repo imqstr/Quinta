@@ -24,20 +24,23 @@ pub struct Session{pub child:Child,pub kind:String,pub log:PathBuf,pub started:I
 impl Drop for Session{fn drop(&mut self){if self.child.try_wait().ok().flatten().is_none(){let _=self.child.kill();let _=self.child.wait();}}}
 #[derive(Clone)]
 pub struct AppState{
- pub paths:Paths,pub settings:Arc<Mutex<Value>>,pub session:Arc<Mutex<Option<Session>>>,
+ pub paths:Paths,pub settings:Arc<Mutex<Value>>,pub session:Arc<Mutex<Vec<Session>>>,
  pub gpus:Arc<Mutex<Vec<Gpu>>>,pub busy:Arc<AtomicBool>,pub last_log:Arc<Mutex<Option<PathBuf>>>,pub pending_uri:Arc<Mutex<Option<String>>>,
 }
 impl AppState{
  pub fn new()->Result<Self,String>{let paths=Paths::discover()?;let stored=settings::load(&paths.settings_file());let last_log=latest_log(&paths.logs());
-    Ok(Self{paths,settings:Arc::new(Mutex::new(stored)),session:Arc::new(Mutex::new(None)),gpus:Arc::new(Mutex::new(Vec::new())),busy:Arc::new(AtomicBool::new(false)),last_log:Arc::new(Mutex::new(last_log)),pending_uri:Arc::new(Mutex::new(None))})
+    Ok(Self{paths,settings:Arc::new(Mutex::new(stored)),session:Arc::new(Mutex::new(Vec::new())),gpus:Arc::new(Mutex::new(Vec::new())),busy:Arc::new(AtomicBool::new(false)),last_log:Arc::new(Mutex::new(last_log)),pending_uri:Arc::new(Mutex::new(None))})
  }
  pub fn snapshot(&self)->Value{
     let settings=self.settings.lock().unwrap().clone();let runtime=runtime::read(&self.paths.runtime_file());
     let version=client_version(&self.paths.bundle());let shims=self.paths.root.join("build/libQuintaShims.dylib").is_file();
-    let session=self.session.lock().unwrap();let running=session.as_ref().map(|s|json!({"kind":s.kind,"pid":s.child.id(),"seconds":s.started.elapsed().as_secs(),"log":s.log}));
+    // One session per kind: the game and Studio can run side by side.
+    let sessions=self.session.lock().unwrap();
+    let describe=|kind:&str|sessions.iter().find(|s|s.kind==kind).map(|s|json!({"kind":s.kind,"pid":s.child.id(),"seconds":s.started.elapsed().as_secs(),"log":s.log}));
+    let (running,studio)=(describe("player"),describe("studio"));
     let problem=if runtime.is_err(){runtime.as_ref().err().cloned()}else if version.is_none(){Some("Install the Roblox client to get started".into())}else if !shims{Some("Build the native compatibility shims first".into())}else{None};
     json!({"version":env!("CARGO_PKG_VERSION"),"clientVersion":version,"settings":settings,"runtime":runtime.as_ref().ok(),"runtimeError":runtime.as_ref().err(),
-      "gpus":self.gpus.lock().unwrap().clone(),"session":running,"busy":self.busy.load(std::sync::atomic::Ordering::Relaxed),"canLaunch":problem.is_none(),"readiness":problem,
+      "gpus":self.gpus.lock().unwrap().clone(),"session":running,"studioSession":studio,"busy":self.busy.load(std::sync::atomic::Ordering::Relaxed),"canLaunch":problem.is_none(),"readiness":problem,
       "source":self.paths.root,"data":self.paths.data,"logs":self.paths.logs(),"shimsReady":shims,"backend":"Rust","studioInstalled":self.paths.root.join("experimental/macos-studio/RobloxStudio.app/Contents/MacOS/RobloxStudio").is_file(),
       "mods":crate::modifications::list(&self.paths.data,&settings),"fastFlags":read_json(&self.paths.bundle().join("Contents/MacOS/ClientSettings/ClientAppSettings.json"))})
  }

@@ -15,7 +15,7 @@ pub fn launch(state:AppState,app:AppHandle,kind:String,uri:Option<String>)->Resu
  result
 }
 fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Result<(),String>{
- if state.session.lock().unwrap().is_some(){return Err("A client is already running".into());}
+ if state.session.lock().unwrap().iter().any(|s|s.kind==kind){return Err(if kind=="studio"{"Studio is already running"}else{"Roblox is already running"}.into());}
  let runtime=runtime::read(&state.paths.runtime_file())?;let settings=state.settings.lock().unwrap().clone();
  let studio=kind=="studio";
  // Studio's raster Qt backing store uses AppKit's X11 bitmap presentation.
@@ -81,7 +81,12 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  if !wayland{for key in ["DISPLAY","XAUTHORITY"]{if let Ok(value)=std::env::var(key){variables.push((key.into(),value));}}}
  for key in std::env::vars_os().filter_map(|(k,_)|k.to_str().filter(|s|s.starts_with("DSERVER_LOG_")).map(str::to_string)){command.env_remove(key);}
  // Qt logs through os_log, which crashes in Darling: keep Studio on stderr.
- if studio{variables.push(("QT_FORCE_STDERR_LOGGING".into(),"1".into()));}
+ if studio{
+  variables.push(("QT_FORCE_STDERR_LOGGING".into(),"1".into()));
+  // Studio's GL output does not reach its X11 child windows yet; unmapped,
+  // they no longer cover the interface with black panels.
+  variables.push(("QUINTA_GL_SUBWINDOWS".into(),"hide".into()));
+ }
  if studio{
   let compat=state.paths.root.join("experimental/macos-studio/libStudioCompat.dylib");
   if !compat.is_file(){return Err("The Studio experiment shim must be built before testing this client".into());}
@@ -101,15 +106,17 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  progress(app,"Starting client",0.8);
  let child=command.spawn().map_err(|e|format!("Could not start the selected runtime: {e}"))?;
  *state.last_log.lock().unwrap()=Some(log_path.clone());
- *state.session.lock().unwrap()=Some(Session{child,kind:kind.into(),log:log_path,started:Instant::now(),_dns:dns,_audio:audio,_web:web});
+ let pid=child.id();
+ state.session.lock().unwrap().push(Session{child,kind:kind.into(),log:log_path,started:Instant::now(),_dns:dns,_audio:audio,_web:web});
  if settings["hide_launcher_on_launch"].as_bool().unwrap_or(false){if let Some(window)=app.get_webview_window("main"){let _=window.hide();}}
  progress(app,"Client started",1.0);
  let state=state.clone();let app=app.clone();
  thread::spawn(move||loop{
   thread::sleep(Duration::from_millis(750));
-  let ended={let mut lock=state.session.lock().unwrap();match lock.as_mut(){None=>return,Some(session)=>match session.child.try_wait(){Ok(Some(status))=>Some((status.success(),session.started.elapsed().as_secs(),session.kind.clone())),Err(_)=>Some((false,0,session.kind.clone())),_=>None}}};
-  if let Some((success,seconds,kind))=ended{
-   state.session.lock().unwrap().take();if kind=="player"{state.add_playtime(seconds);}
+  let ended={let mut lock=state.session.lock().unwrap();let Some(index)=lock.iter().position(|s|s.child.id()==pid) else{return};let session=&mut lock[index];
+   match session.child.try_wait(){Ok(Some(status))=>Some((index,status.success(),session.started.elapsed().as_secs(),session.kind.clone())),Err(_)=>Some((index,false,0,session.kind.clone())),_=>None}};
+  if let Some((index,success,seconds,kind))=ended{
+   state.session.lock().unwrap().remove(index);if kind=="player"{state.add_playtime(seconds);}
    let _=app.emit("session-changed",json!({"running":false,"success":success,"kind":kind,"earlyExit":seconds<5}));
    if state.settings.lock().unwrap()["show_launcher_after_exit"].as_bool().unwrap_or(true){if let Some(window)=app.get_webview_window("main"){let _=window.show();}}
    return;
@@ -124,10 +131,10 @@ export DYLD_FORCE_FLAT_NAMESPACE=1 DYLD_INSERT_LIBRARIES="$compat:$shim/libQuint
 exec ./RobloxStudio
 "#;
 
-pub fn stop(state:&AppState)->Result<(),String>{let mut lock=state.session.lock().unwrap();if let Some(mut session)=lock.take(){let _=unsafe{libc::kill(-(session.child.id() as i32),libc::SIGTERM)};let _=session.child.kill();let _=session.child.wait();if session.kind=="player"{state.add_playtime(session.started.elapsed().as_secs());}}Ok(())}
+pub fn stop(state:&AppState,kind:&str)->Result<(),String>{let mut lock=state.session.lock().unwrap();if let Some(index)=lock.iter().position(|s|s.kind==kind){let mut session=lock.remove(index);let _=unsafe{libc::kill(-(session.child.id() as i32),libc::SIGTERM)};let _=session.child.kill();let _=session.child.wait();if session.kind=="player"{state.add_playtime(session.started.elapsed().as_secs());}}Ok(())}
 
 pub fn update(state:AppState,app:AppHandle)->Result<Value,String>{
- if state.session.lock().unwrap().is_some(){return Err("Close the client before updating it".into());}
+ if !state.session.lock().unwrap().is_empty(){return Err("Close the client before updating it".into());}
  if state.busy.swap(true,Ordering::SeqCst){return Err("Another operation is already running".into());}
  let result=update_inner(&state,&app);state.busy.store(false,Ordering::SeqCst);result
 }

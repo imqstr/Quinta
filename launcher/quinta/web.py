@@ -62,6 +62,13 @@ def _client_url(url):
         (lower.startswith("roblox-player:") and len(lower) > 14)
 
 
+def _app_url(url):
+    """Studio's sign-in ends on roblox-studio-auth:/?code=...; only the
+    page's navigation delegate (Studio) may see it, and it is never loaded."""
+    lower = url.lower() if isinstance(url, str) else ""
+    return lower.startswith(("roblox-studio-auth:", "roblox-studio:")) and len(url) <= 16384
+
+
 def _compatible_user_agent(agent):
     """Roblox's user agent, as WebKitGTK accepts it. Apple's WebKit takes
     Roblox's concatenated products; WebKitGTK's parser rejects the second
@@ -549,7 +556,7 @@ class WebBridge:
             self._event(page, "launch-url", url=url)
             decision.ignore()
             return True
-        if not _web_url(url) and url != "about:blank":
+        if not _web_url(url) and url != "about:blank" and not (page.delegate and _app_url(url)):
             decision.ignore()
             return True
         if kind == WebKit.PolicyDecisionType.NEW_WINDOW_ACTION:
@@ -580,6 +587,9 @@ class WebBridge:
         if entry:
             decision, page, source = entry
             GLib.source_remove(source)
+            # The delegate has seen an app URL; WebKit cannot load one.
+            if allow and _app_url(decision.get_navigation_action().get_request().get_uri()):
+                allow = False
             decision.use() if allow and self._active_page(page) else decision.ignore()
 
     def _message(self, _manager, value, page, name):

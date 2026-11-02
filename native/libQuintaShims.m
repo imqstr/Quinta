@@ -2578,9 +2578,17 @@ static id hooked_gl_context_init(id self, SEL cmd, id format, id shared) {
     return result;
 }
 
+static void quinta_track_gl_context(id context, int tracked);
 static void hooked_gl_context_set_view(id self, SEL cmd, id view) {
     orig_gl_context_set_view(self, cmd, view);
     trace_gl_context("setView", self, -1);
+    quinta_track_gl_context(self, 1);
+}
+extern IMP class_replaceMethod(Class, SEL, IMP, const char*);
+static void (*orig_gl_context_dealloc)(id, SEL) = 0;
+static void hooked_gl_context_dealloc(id self, SEL cmd) {
+    quinta_track_gl_context(self, 0);
+    orig_gl_context_dealloc(self, cmd);
 }
 
 static void hooked_gl_context_make_current(id self, SEL cmd) {
@@ -2722,8 +2730,10 @@ static void trace_gl_frame_state(long count) {
     write_str("\n");
 }
 
+static void quinta_note_gl_present(id context);
 static void hooked_gl_context_flush(id self, SEL cmd) {
     long count = __sync_add_and_fetch(&quinta_gl_flush_count, 1);
+    quinta_note_gl_present(self);
     static volatile int test_clear = -1;
     if (quinta_env_cached("QUINTA_GL_TEST_CLEAR", &test_clear)) {
         void (*disable)(unsigned int) =
@@ -5747,6 +5757,124 @@ static void hooked_process_pending_events(id self, SEL cmd) {
     }
 }
 
+// Darling's X11 backend gives each NSOpenGLContext view a child X window
+// (X11SubWindow) but never follows the view afterwards: the window stayed at
+// its initial 100x100 in the bottom-left corner, and stayed mapped after Qt
+// hid the view. Studio showed these as black panels. Keep every GL child
+// window on its view's rectangle, and unmapped while the view is hidden,
+// detached or empty, or while its context has never presented a frame:
+// Qt also attaches contexts it never draws with, and their windows covered
+// the raster-drawn interface in black. Runs on the main thread, every
+// 50 ms, and talks to X only when something changed.
+// Opt-in per client: QUINTA_GL_SUBWINDOWS=follow places them, =hide keeps
+// them unmapped (Studio, whose GL presentation does not reach the screen
+// yet); unset leaves Darling's behaviour alone (the game).
+#define QUINTA_GL_VIEWS 64
+static struct { id context; unsigned long window; int x, y, width, height, shown, presented; } quinta_gl_views[QUINTA_GL_VIEWS];
+extern int strcmp(const char*, const char*);
+static int quinta_gl_subwindow_mode(void) { // 0 off, 1 follow, 2 hide
+    static int mode = -1;
+    if (mode < 0) {
+        const char* value = getenv("QUINTA_GL_SUBWINDOWS");
+        mode = !value ? 0 : !strcmp(value, "follow") ? 1 : !strcmp(value, "hide") ? 2 : 0;
+    }
+    return mode;
+}
+static void quinta_note_gl_present(id context) {
+    for (int i = 0; i < QUINTA_GL_VIEWS; i++)
+        if (quinta_gl_views[i].context == context) { quinta_gl_views[i].presented = 1; return; }
+}
+extern const void *CFRunLoopGetMain(void);
+extern const void *kCFRunLoopCommonModes;
+extern double CFAbsoluteTimeGetCurrent(void);
+extern void *CFRunLoopTimerCreate(const void*, double, double, unsigned long, long, void (*)(void*, void*), void*);
+extern void CFRunLoopAddTimer(const void*, void*, const void*);
+
+static void quinta_sync_gl_subwindows(void* timer, void* info) {
+    (void)timer; (void)info;
+    static int (*move_resize)(void*, unsigned long, int, int, unsigned int, unsigned int);
+    static int (*map)(void*, unsigned long);
+    static int (*unmap)(void*, unsigned long);
+    static int (*flush)(void*);
+    if (!move_resize) {
+        move_resize = (int (*)(void*, unsigned long, int, int, unsigned int, unsigned int))dlsym(RTLD_DEFAULT, "XMoveResizeWindow");
+        map = (int (*)(void*, unsigned long))dlsym(RTLD_DEFAULT, "XMapWindow");
+        unmap = (int (*)(void*, unsigned long))dlsym(RTLD_DEFAULT, "XUnmapWindow");
+        flush = (int (*)(void*))dlsym(RTLD_DEFAULT, "XFlush");
+        if (!move_resize || !map || !unmap || !flush) { move_resize = 0; return; }
+    }
+    for (int i = 0; i < QUINTA_GL_VIEWS; i++) {
+        id context = quinta_gl_views[i].context;
+        if (!context) continue;
+        void** slots = (void**)context;
+        id view = (id)slots[2], sub = (id)slots[4];
+        if (!sub) continue;
+        Class sub_class = object_getClass(sub);
+        Ivar window_ivar = class_getInstanceVariable(sub_class, "_window");
+        Ivar display_ivar = class_getInstanceVariable(sub_class, "_display");
+        if (!window_ivar || !display_ivar) continue;
+        unsigned long xid = *(unsigned long*)((char*)sub + ivar_getOffset(window_ivar));
+        void* display = *(void**)((char*)sub + ivar_getOffset(display_ivar));
+        if (!xid || !display) continue;
+        id window = view ? ((id (*)(id, SEL))objc_msgSend)(view, sel_registerName("window")) : 0;
+        id content = window ? ((id (*)(id, SEL))objc_msgSend)(window, sel_registerName("contentView")) : 0;
+        int visible = quinta_gl_subwindow_mode() == 1 && quinta_gl_views[i].presented && content &&
+            ((signed char (*)(id, SEL))objc_msgSend)(window, sel_registerName("isVisible")) &&
+            !((signed char (*)(id, SEL))objc_msgSend)(view, sel_registerName("isHiddenOrHasHiddenAncestor"));
+        QuintaRect rect = {{0, 0}, {0, 0}};
+        if (visible) {
+            QuintaRect bounds, content_bounds;
+            ((void (*)(QuintaRect*, id, SEL))objc_msgSend_stret)(&bounds, view, sel_registerName("bounds"));
+            ((void (*)(QuintaRect*, id, SEL, QuintaRect, id))objc_msgSend_stret)(
+                &rect, view, sel_registerName("convertRect:toView:"), bounds, content);
+            if (!((signed char (*)(id, SEL))objc_msgSend)(content, sel_registerName("isFlipped"))) {
+                ((void (*)(QuintaRect*, id, SEL))objc_msgSend_stret)(&content_bounds, content, sel_registerName("bounds"));
+                rect.origin.y = content_bounds.size.height - rect.origin.y - rect.size.height;
+            }
+            visible = rect.size.width >= 1 && rect.size.height >= 1;
+        }
+        int x = (int)(rect.origin.x + 0.5), y = (int)(rect.origin.y + 0.5);
+        int width = (int)(rect.size.width + 0.5), height = (int)(rect.size.height + 0.5);
+        if (quinta_gl_views[i].window == xid && quinta_gl_views[i].shown == visible &&
+            (!visible || (quinta_gl_views[i].x == x && quinta_gl_views[i].y == y &&
+                          quinta_gl_views[i].width == width && quinta_gl_views[i].height == height)))
+            continue;
+        if (visible) {
+            move_resize(display, xid, x, y, (unsigned int)width, (unsigned int)height);
+            if (quinta_gl_views[i].window != xid || !quinta_gl_views[i].shown) map(display, xid);
+        } else {
+            unmap(display, xid);
+        }
+        flush(display);
+        quinta_gl_views[i].window = xid; quinta_gl_views[i].shown = visible;
+        quinta_gl_views[i].x = x; quinta_gl_views[i].y = y;
+        quinta_gl_views[i].width = width; quinta_gl_views[i].height = height;
+    }
+}
+
+static void quinta_track_gl_context(id context, int tracked) {
+    // Wayland GL views are positioned by wayland_appkit.m.
+    if (!context || quinta_wayland_enabled() || !quinta_gl_subwindow_mode()) return;
+    static void* timer;
+    int free_slot = -1;
+    for (int i = 0; i < QUINTA_GL_VIEWS; i++) {
+        if (quinta_gl_views[i].context == context) {
+            if (!tracked) quinta_gl_views[i].context = 0;
+            else quinta_gl_views[i].window = 0; // new view: place it again
+            return;
+        }
+        if (!quinta_gl_views[i].context && free_slot < 0) free_slot = i;
+    }
+    if (!tracked || free_slot < 0) return;
+    quinta_gl_views[free_slot].context = context;
+    quinta_gl_views[free_slot].window = 0;
+    quinta_gl_views[free_slot].presented = 0;
+    if (!timer) {
+        timer = CFRunLoopTimerCreate(0, CFAbsoluteTimeGetCurrent() + 0.05, 0.05, 0, 0, quinta_sync_gl_subwindows, 0);
+        if (timer) CFRunLoopAddTimer(CFRunLoopGetMain(), timer, kCFRunLoopCommonModes);
+    }
+}
+
 // OpenGL subwindows get the screen's visual (gl_profile.c explains why).
 #include "x11_drawable_cache.h"
 
@@ -6765,6 +6893,11 @@ static void install_swizzles(void) {
             orig_gl_context_set_view =
                 (void (*)(id, SEL, id))method_getImplementation(method);
             method_setImplementation(method, (IMP)hooked_gl_context_set_view);
+        }
+        method = class_getInstanceMethod(gl_context_class, sel_registerName("dealloc"));
+        if (method) {
+            orig_gl_context_dealloc = (void (*)(id, SEL))method_getImplementation(method);
+            class_replaceMethod(gl_context_class, sel_registerName("dealloc"), (IMP)hooked_gl_context_dealloc, "v@:");
         }
         method = class_getInstanceMethod(
             gl_context_class, sel_registerName("makeCurrentContext"));
