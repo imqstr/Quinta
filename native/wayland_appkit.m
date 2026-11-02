@@ -558,13 +558,28 @@ int quinta_wayland_dispatch_event(id event) {
     api->cursor(CGBitmapContextGetData(context),size.width,size.height,CGBitmapContextGetBytesPerRow(context),cursor->hot.x,cursor->hot.y,0);CGContextRelease(context);
 }
 - (void)grabMouse:(BOOL)value {
+    /* The window last asked to lock: an unlock must reach it even before the
+     * host has acknowledged the capture, or after the pointer left every
+     * window. Without it the release went nowhere and the cursor stayed
+     * locked (third-person camera drags in BedWars). */
+    static unsigned lock_target;
     unsigned handle=pointer_snapshot().window;
+    if(getenv("QUINTA_TRACE_WAYLAND")) {
+        char line[120];int n=snprintf(line,sizeof line,"[Quinta Wayland] grabMouse %d pointer=%u captured=%u target=%u\n",
+            value,handle,__atomic_load_n(&captured,__ATOMIC_ACQUIRE),lock_target);
+        if(n>0)write(2,line,n);
+    }
     /* Host acknowledgement determines actual capture; preserve intent on blur. */
     if(!value) {
-        unsigned old=__atomic_exchange_n(&captured,0,__ATOMIC_ACQ_REL);
+        unsigned old=__atomic_exchange_n(&captured,0,__ATOMIC_ACQ_REL),target=lock_target;
+        lock_target=0;
         if(old)api->action(old,MW_LOCK,0,0,0);
         if(handle && handle!=old)api->action(handle,MW_LOCK,0,0,0);
-    } else if(handle)api->action(handle,MW_LOCK,1,0,0);
+        if(target && target!=old && target!=handle)api->action(target,MW_LOCK,0,0,0);
+    } else if(handle) {
+        lock_target=handle;
+        api->action(handle,MW_LOCK,1,0,0);
+    }
 }
 - (void)warpMouse:(NSPoint)position {
     __typeof__(pointer_state) value=pointer_snapshot();
