@@ -71,14 +71,17 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  let mut command=Command::new(&runtime.executable);command.env("DPREFIX",&runtime.prefix).stdin(Stdio::null()).stdout(log.try_clone().map_err(|e|e.to_string())?).stderr(log);
  // Host graphics libraries read these before the guest re-exports them.
  for (key,value) in variables.iter().filter(|(k,_)|is_host_graphics(k)){command.env(key,value);}
- if variables.iter().any(|(k,v)|k=="QUINTA_WAYLAND"&&v=="1"){command.env_remove("DISPLAY");}
+ // Darling's daemons inherit the environment of whichever launch starts the
+ // container. With DISPLAY, iokitd scans XRandR outputs and crashes on
+ // Xwayland (no EDID); every IOKit display query then waits forever and
+ // Studio hung at startup. The X11 display goes only to the client.
+ let wayland=variables.iter().any(|(k,v)|k=="QUINTA_WAYLAND"&&v=="1");
+ command.env_remove("DISPLAY").env_remove("XAUTHORITY");
+ // Host-backed Xlib consumes host paths, including XAUTHORITY.
+ if !wayland{for key in ["DISPLAY","XAUTHORITY"]{if let Ok(value)=std::env::var(key){variables.push((key.into(),value));}}}
  for key in std::env::vars_os().filter_map(|(k,_)|k.to_str().filter(|s|s.starts_with("DSERVER_LOG_")).map(str::to_string)){command.env_remove(key);}
  // Qt logs through os_log, which crashes in Darling: keep Studio on stderr.
- if studio{
-  variables.push(("QT_FORCE_STDERR_LOGGING".into(),"1".into()));
-  // Host-backed Xlib consumes host paths, including XAUTHORITY.
-  for key in ["DISPLAY","XAUTHORITY"]{if let Ok(value)=std::env::var(key){variables.push((key.into(),value));}}
- }
+ if studio{variables.push(("QT_FORCE_STDERR_LOGGING".into(),"1".into()));}
  if studio{
   let compat=state.paths.root.join("experimental/macos-studio/libStudioCompat.dylib");
   if !compat.is_file(){return Err("The Studio experiment shim must be built before testing this client".into());}
