@@ -225,11 +225,17 @@ static unsigned long studio_pressed_mouse_buttons(id self,SEL cmd) {
     if(!query(display,root_window(display),&root,&child,&rx,&ry,&wx,&wy,&mask))return 0;
     return (mask&(1u<<8)?1:0)|(mask&(1u<<10)?2:0)|(mask&(1u<<9)?4:0);
 }
+// -[NSView clipsToBounds] (macOS 14): Darling's views always clip.
+static char studio_clips_key;
+static signed char studio_clips_to_bounds(id self,SEL cmd) {(void)cmd;id value=objc_getAssociatedObject(self,&studio_clips_key);return value?((signed char(*)(id,SEL))objc_msgSend)(value,sel_registerName("boolValue")):1;}
+static void studio_set_clips_to_bounds(id self,SEL cmd,signed char clips) {(void)cmd;objc_setAssociatedObject(self,&studio_clips_key,((id(*)(id,SEL,signed char))objc_msgSend)((id)objc_getClass("NSNumber"),sel_registerName("numberWithBool:"),clips),1);}
 static void studio_add_missing_methods(void) {
     Class input=objc_getMetaClass("NSTextInputContext");
     if(input)class_addMethod(input,sel_registerName("currentInputContext"),(IMP)studio_no_input_context,"@@:");
     Class event = objc_getMetaClass("NSEvent");
     if(event)class_addMethod(event,sel_registerName("pressedMouseButtons"),(IMP)studio_pressed_mouse_buttons,"Q@:");
+    Class view = objc_getClass("NSView");
+    if(view){class_addMethod(view,sel_registerName("clipsToBounds"),(IMP)studio_clips_to_bounds,"c@:");class_addMethod(view,sel_registerName("setClipsToBounds:"),(IMP)studio_set_clips_to_bounds,"v@:c");}
     Class item = objc_getClass("NSMenuItem");
     if(item){class_addMethod(item,sel_registerName("view"),(IMP)studio_menu_item_view,"@@:");class_addMethod(item,sel_registerName("setView:"),(IMP)studio_set_menu_item_view,"v@:@");}
     Class layer = objc_getClass("CALayer");

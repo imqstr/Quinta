@@ -781,6 +781,12 @@ static void failRequests(id view, NSString *reason) {
         if (completion) completion();
     });
 }
+// Studio clears its cookies on sign-out and waits for each completion.
+// The host browser keeps its own session; complete at once.
+- (void)deleteCookie:(NSHTTPCookie *)cookie completionHandler:(void (^)(void))completion {
+    (void)cookie;
+    if (completion) dispatch_async(&_dispatch_main_q, ^{ completion(); });
+}
 - (void)getAllCookies:(void (^)(NSArray *))completion {
     request([@{@"op": @"cookies-get"} mutableCopy], ^(id value, NSError *error) {
         (void)error;

@@ -130,7 +130,8 @@ const STUDIO_SCRIPT:&str=r#"cd "$1" || exit 1
 compat=$2; shim=$3; shift 3
 for kv in "$@"; do export "$kv"; done
 export DYLD_FORCE_FLAT_NAMESPACE=1 DYLD_INSERT_LIBRARIES="$compat:$shim/libQuintaShims.dylib" DYLD_LIBRARY_PATH="$shim"
-exec ./RobloxStudio
+# QUINTA_STUDIO_ARGS: Studio's own options, e.g. -task EditFile -localPlaceFile <path>.
+exec ./RobloxStudio ${QUINTA_STUDIO_ARGS:-}
 "#;
 
 pub fn stop(state:&AppState,kind:&str)->Result<(),String>{let mut lock=state.session.lock().unwrap();if let Some(index)=lock.iter().position(|s|s.kind==kind){let mut session=lock.remove(index);let _=unsafe{libc::kill(-(session.child.id() as i32),libc::SIGTERM)};let _=session.child.kill();let _=session.child.wait();if session.kind=="player"{state.add_playtime(session.started.elapsed().as_secs());}}Ok(())}
