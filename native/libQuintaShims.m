@@ -2753,6 +2753,13 @@ static void hooked_gl_context_flush(id self, SEL cmd) {
             (unsigned int (*)(unsigned int))
                 dlsym(RTLD_NEXT, "glCheckFramebufferStatus");
         void (*finish)(void) = (void (*)(void))dlsym(RTLD_NEXT, "glFinish");
+        void (*get_integer)(unsigned int, int*) = (void (*)(unsigned int, int*))dlsym(RTLD_NEXT, "glGetIntegerv");
+        void (*bind_framebuffer)(unsigned int, unsigned int) =
+            (void (*)(unsigned int, unsigned int))dlsym(RTLD_NEXT, "glBindFramebuffer");
+        int bound = 0;
+        if (get_integer) get_integer(0x8CA6U, &bound); // GL_DRAW_FRAMEBUFFER_BINDING
+        // Clear the window's own framebuffer: the app may leave an FBO bound.
+        if (bind_framebuffer && bound) bind_framebuffer(0x8CA9U, 0); // GL_DRAW_FRAMEBUFFER
         if (disable && color_mask && clear_color && clear) {
             unsigned int before_error = get_error ? get_error() : 0;
             disable(0x0C11U); // GL_SCISSOR_TEST
@@ -2766,6 +2773,8 @@ static void hooked_gl_context_flush(id self, SEL cmd) {
                 print_hex(before_error);
                 write_str(" after-error=");
                 print_hex(get_error ? get_error() : 0);
+                write_str(" app-framebuffer=");
+                print_num(bound);
                 write_str(" framebuffer-status=");
                 print_hex(check_framebuffer
                               ? check_framebuffer(0x8CA9U) // GL_DRAW_FRAMEBUFFER
@@ -2773,6 +2782,7 @@ static void hooked_gl_context_flush(id self, SEL cmd) {
                 write_str("\n");
             }
         }
+        if (bind_framebuffer && bound) bind_framebuffer(0x8CA9U, (unsigned int)bound);
     }
     if (quinta_gl_trace_enabled() && (count <= 5 || count == 60 || count == 600)) {
         trace_gl_frame_state(count);
@@ -5766,9 +5776,8 @@ static void hooked_process_pending_events(id self, SEL cmd) {
 // Qt also attaches contexts it never draws with, and their windows covered
 // the raster-drawn interface in black. Runs on the main thread, every
 // 50 ms, and talks to X only when something changed.
-// Opt-in per client: QUINTA_GL_SUBWINDOWS=follow places them, =hide keeps
-// them unmapped (Studio, whose GL presentation does not reach the screen
-// yet); unset leaves Darling's behaviour alone (the game).
+// Opt-in diagnostics: QUINTA_GL_SUBWINDOWS=follow places them, =hide keeps
+// them unmapped; unset leaves Darling's own placement alone (the default).
 #define QUINTA_GL_VIEWS 64
 static struct { id context; unsigned long window; int x, y, width, height, shown, presented; } quinta_gl_views[QUINTA_GL_VIEWS];
 extern int strcmp(const char*, const char*);

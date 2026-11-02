@@ -129,6 +129,10 @@ void quinta_record_egl_swap(unsigned int succeeded) {
     swap_error = succeeded ? EGL_SUCCESS : quinta_capture_egl_error();
 }
 
+int quinta_last_egl_swap_error(void) {
+    return swap_failed ? swap_error : EGL_SUCCESS;
+}
+
 unsigned long quinta_egl_swap_serial(void) {
     return swap_serial;
 }

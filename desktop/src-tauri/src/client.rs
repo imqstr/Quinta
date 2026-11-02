@@ -21,7 +21,14 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  // Studio's raster Qt backing store uses AppKit's X11 bitmap presentation.
  // Keep the game's selected backend in the saved settings.
  let mut graphics_settings=settings.clone();
- if studio{graphics_settings["display_backend"]=json!("x11");}
+ // Diagnostics: QUINTA_DISPLAY_BACKEND=x11|wayland overrides the saved choice for this launch.
+ if let Ok(backend)=std::env::var("QUINTA_DISPLAY_BACKEND"){if matches!(backend.as_str(),"x11"|"wayland"){graphics_settings["display_backend"]=json!(backend);}}
+ if studio{
+  graphics_settings["display_backend"]=json!("x11");
+  // Studio's GL child windows on X11: the driver's own OpenGL presents to
+  // them; zink's Vulkan swapchain did not reach the screen (black window).
+  graphics_settings["renderer"]=json!(std::env::var("QUINTA_STUDIO_RENDERER").unwrap_or_else(|_|"opengl".into()));
+ }
  let inventory=state.gpus.lock().unwrap().clone();let graphics=runtime::graphics(&graphics_settings,&inventory,&state.paths.root)?;
  let shim=state.paths.root.join("build");if !shim.join("libQuintaShims.dylib").is_file(){return Err("Native compatibility shims are missing. Run scripts/build-native.sh first.".into());}
  let bundle=if studio{state.paths.root.join("experimental/macos-studio/RobloxStudio.app")}else{state.paths.bundle()};
@@ -81,12 +88,7 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  if !wayland{for key in ["DISPLAY","XAUTHORITY"]{if let Ok(value)=std::env::var(key){variables.push((key.into(),value));}}}
  for key in std::env::vars_os().filter_map(|(k,_)|k.to_str().filter(|s|s.starts_with("DSERVER_LOG_")).map(str::to_string)){command.env_remove(key);}
  // Qt logs through os_log, which crashes in Darling: keep Studio on stderr.
- if studio{
-  variables.push(("QT_FORCE_STDERR_LOGGING".into(),"1".into()));
-  // Studio's GL output does not reach its X11 child windows yet; unmapped,
-  // they no longer cover the interface with black panels.
-  variables.push(("QUINTA_GL_SUBWINDOWS".into(),"hide".into()));
- }
+ if studio{variables.push(("QT_FORCE_STDERR_LOGGING".into(),"1".into()));}
  if studio{
   let compat=state.paths.root.join("experimental/macos-studio/libStudioCompat.dylib");
   if !compat.is_file(){return Err("The Studio experiment shim must be built before testing this client".into());}
