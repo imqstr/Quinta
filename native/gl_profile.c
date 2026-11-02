@@ -293,11 +293,71 @@ DYLD_INTERPOSE(quinta_eglChooseConfig, eglChooseConfig)
 
 static void forget_configured_surface(void *surface);
 
+/* Window surfaces by X window. Darling recreates a view's child window and
+ * surface when the app attaches the view again, destroys the old surface,
+ * and leaves the old window mapped (Studio's black box). Windows whose
+ * surface was destroyed are orphans; libQuintaShims.m unmaps them while they
+ * are still children of a live app window. */
+#define QUINTA_GL_SURFACES 512
+static struct { void *surface; unsigned long window; } gl_surfaces[QUINTA_GL_SURFACES];
+static unsigned long gl_orphans[QUINTA_GL_SURFACES];
+static int gl_orphan_count;
+static volatile int gl_surface_lock;
+static void note_window_surface(void *surface, unsigned long window) {
+    while (__sync_lock_test_and_set(&gl_surface_lock, 1)) {}
+    for (int i = 0; i < gl_orphan_count; i++) /* a window reused by a new surface is live again */
+        if (gl_orphans[i] == window) gl_orphans[i] = gl_orphans[--gl_orphan_count];
+    for (int i = 0; i < QUINTA_GL_SURFACES; i++)
+        if (!gl_surfaces[i].surface) { gl_surfaces[i].surface = surface; gl_surfaces[i].window = window; break; }
+    __sync_lock_release(&gl_surface_lock);
+}
+static void forget_window_surface(void *surface) {
+    while (__sync_lock_test_and_set(&gl_surface_lock, 1)) {}
+    for (int i = 0; i < QUINTA_GL_SURFACES; i++)
+        if (gl_surfaces[i].surface == surface) {
+            unsigned long window = gl_surfaces[i].window;
+            gl_surfaces[i].surface = 0;
+            int live = 0; /* another surface may still use the window */
+            for (int j = 0; j < QUINTA_GL_SURFACES; j++) if (gl_surfaces[j].surface && gl_surfaces[j].window == window) live = 1;
+            if (!live && gl_orphan_count < QUINTA_GL_SURFACES) gl_orphans[gl_orphan_count++] = window;
+            break;
+        }
+    __sync_lock_release(&gl_surface_lock);
+}
+int quinta_gl_window_orphaned(unsigned long window) {
+    int orphaned = 0;
+    while (__sync_lock_test_and_set(&gl_surface_lock, 1)) {}
+    for (int i = 0; i < gl_orphan_count && !orphaned; i++) orphaned = gl_orphans[i] == window;
+    __sync_lock_release(&gl_surface_lock);
+    return orphaned;
+}
+int quinta_gl_window_known(unsigned long window) {
+    int known = 0;
+    while (__sync_lock_test_and_set(&gl_surface_lock, 1)) {}
+    for (int i = 0; i < QUINTA_GL_SURFACES && !known; i++) known = gl_surfaces[i].surface && gl_surfaces[i].window == window;
+    for (int i = 0; i < gl_orphan_count && !known; i++) known = gl_orphans[i] == window;
+    __sync_lock_release(&gl_surface_lock);
+    return known;
+}
+extern unsigned int eglDestroySurface(void *, void *);
+static unsigned int quinta_eglDestroySurface(void *display, void *surface) {
+    forget_window_surface(surface);
+    const char *trace = getenv("QUINTA_TRACE_CGL");
+    if (trace && trace[0] == '1') {
+        char line[96];
+        snprintf(line, sizeof line, "[Quinta GL] eglDestroySurface %p (orphans %d)\n", surface, gl_orphan_count);
+        log_line(line);
+    }
+    return eglDestroySurface(display, surface);
+}
+DYLD_INTERPOSE(quinta_eglDestroySurface, eglDestroySurface)
+
 static void *quinta_eglCreateWindowSurface(void *display, void *config, unsigned long window,
                                              const int *attributes) {
     void *surface = eglCreateWindowSurface(display, config, window, attributes);
     if (surface) {
         forget_configured_surface(surface); /* a new surface at an old address */
+        note_window_surface(surface, window);
         extern int quinta_wayland_enabled(void);
         static volatile long wayland_surfaces;
         if (quinta_wayland_enabled() && __sync_add_and_fetch(&wayland_surfaces, 1) <= 6) {

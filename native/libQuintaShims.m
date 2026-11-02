@@ -2582,6 +2582,19 @@ static void quinta_track_gl_context(id context, int tracked);
 static void hooked_gl_context_set_view(id self, SEL cmd, id view) {
     orig_gl_context_set_view(self, cmd, view);
     trace_gl_context("setView", self, -1);
+    if (view) {
+        id window = ((id (*)(id, SEL))objc_msgSend)(view, sel_registerName("window"));
+        id superview = ((id (*)(id, SEL))objc_msgSend)(view, sel_registerName("superview"));
+        write_str("[Quinta GL]   view class=");
+        write_str(object_getClassName(view));
+        write_str(" superview=");
+        write_str(superview ? object_getClassName(superview) : "-");
+        write_str(" window=");
+        write_str(window ? object_getClassName(window) : "-");
+        write_str(" hidden=");
+        print_num(((signed char (*)(id, SEL))objc_msgSend)(view, sel_registerName("isHiddenOrHasHiddenAncestor")));
+        write_str("\n");
+    }
     quinta_track_gl_context(self, 1);
 }
 extern IMP class_replaceMethod(Class, SEL, IMP, const char*);
@@ -5776,19 +5789,25 @@ static void hooked_process_pending_events(id self, SEL cmd) {
 // Qt also attaches contexts it never draws with, and their windows covered
 // the raster-drawn interface in black. Runs on the main thread, every
 // 50 ms, and talks to X only when something changed.
-// Opt-in diagnostics: QUINTA_GL_SUBWINDOWS=follow places them, =hide keeps
-// them unmapped; unset leaves Darling's own placement alone (the default).
+// By default only visibility is synced: Darling places shown views itself,
+// but left windows mapped for views the app had hidden (Studio's black box).
+// Diagnostics: QUINTA_GL_SUBWINDOWS=follow also places them, =hide keeps
+// them all unmapped, =off leaves Darling alone.
 #define QUINTA_GL_VIEWS 64
 static struct { id context; unsigned long window; int x, y, width, height, shown, presented; } quinta_gl_views[QUINTA_GL_VIEWS];
 extern int strcmp(const char*, const char*);
-static int quinta_gl_subwindow_mode(void) { // 0 off, 1 follow, 2 hide
+static int quinta_gl_subwindow_mode(void) { // 0 off, 1 follow, 2 hide, 3 visibility
     static int mode = -1;
     if (mode < 0) {
         const char* value = getenv("QUINTA_GL_SUBWINDOWS");
-        mode = !value ? 0 : !strcmp(value, "follow") ? 1 : !strcmp(value, "hide") ? 2 : 0;
+        mode = !value ? 3 : !strcmp(value, "follow") ? 1 : !strcmp(value, "hide") ? 2 : 0;
     }
     return mode;
 }
+extern int quinta_gl_window_orphaned(unsigned long window);
+extern int quinta_gl_window_known(unsigned long window);
+static unsigned long quinta_gl_parked[QUINTA_GL_VIEWS * 4]; // windows unmapped for still being unsized
+static int quinta_gl_parked_count;
 static void quinta_note_gl_present(id context) {
     for (int i = 0; i < QUINTA_GL_VIEWS; i++)
         if (quinta_gl_views[i].context == context) { quinta_gl_views[i].presented = 1; return; }
@@ -5801,6 +5820,8 @@ extern void CFRunLoopAddTimer(const void*, void*, const void*);
 
 static void quinta_sync_gl_subwindows(void* timer, void* info) {
     (void)timer; (void)info;
+    static int announced;
+    if (!announced && getenv("QUINTA_TRACE_CGL")) { announced = 1; write_str("[Quinta GL] subwindow sync running\n"); }
     static int (*move_resize)(void*, unsigned long, int, int, unsigned int, unsigned int);
     static int (*map)(void*, unsigned long);
     static int (*unmap)(void*, unsigned long);
@@ -5827,7 +5848,8 @@ static void quinta_sync_gl_subwindows(void* timer, void* info) {
         if (!xid || !display) continue;
         id window = view ? ((id (*)(id, SEL))objc_msgSend)(view, sel_registerName("window")) : 0;
         id content = window ? ((id (*)(id, SEL))objc_msgSend)(window, sel_registerName("contentView")) : 0;
-        int visible = quinta_gl_subwindow_mode() == 1 && quinta_gl_views[i].presented && content &&
+        int mode = quinta_gl_subwindow_mode();
+        int visible = (mode == 3 || (mode == 1 && quinta_gl_views[i].presented)) && content &&
             ((signed char (*)(id, SEL))objc_msgSend)(window, sel_registerName("isVisible")) &&
             !((signed char (*)(id, SEL))objc_msgSend)(view, sel_registerName("isHiddenOrHasHiddenAncestor"));
         QuintaRect rect = {{0, 0}, {0, 0}};
@@ -5849,7 +5871,7 @@ static void quinta_sync_gl_subwindows(void* timer, void* info) {
                           quinta_gl_views[i].width == width && quinta_gl_views[i].height == height)))
             continue;
         if (visible) {
-            move_resize(display, xid, x, y, (unsigned int)width, (unsigned int)height);
+            if (mode == 1) move_resize(display, xid, x, y, (unsigned int)width, (unsigned int)height);
             if (quinta_gl_views[i].window != xid || !quinta_gl_views[i].shown) map(display, xid);
         } else {
             unmap(display, xid);
@@ -5858,6 +5880,65 @@ static void quinta_sync_gl_subwindows(void* timer, void* info) {
         quinta_gl_views[i].window = xid; quinta_gl_views[i].shown = visible;
         quinta_gl_views[i].x = x; quinta_gl_views[i].y = y;
         quinta_gl_views[i].width = width; quinta_gl_views[i].height = height;
+    }
+    // Orphans: GL child windows of a live app window whose EGL surface was
+    // destroyed (gl_profile.c). Only current children of a live parent are touched, so a
+    // destroyed window never reaches X (an X error would end the app).
+    static int (*query_tree)(void*, unsigned long, unsigned long*, unsigned long*, unsigned long**, unsigned int*);
+    static int (*x_free)(void*);
+    static int (*get_attributes)(void*, unsigned long, void*);
+    if (!query_tree) {
+        query_tree = (int (*)(void*, unsigned long, unsigned long*, unsigned long*, unsigned long**, unsigned int*))dlsym(RTLD_DEFAULT, "XQueryTree");
+        x_free = (int (*)(void*))dlsym(RTLD_DEFAULT, "XFree");
+        get_attributes = (int (*)(void*, unsigned long, void*))dlsym(RTLD_DEFAULT, "XGetWindowAttributes");
+        if (!query_tree || !x_free || !get_attributes) { query_tree = 0; return; }
+    }
+    unsigned long parents[QUINTA_GL_VIEWS]; void* displays[QUINTA_GL_VIEWS]; int parent_count = 0;
+    for (int i = 0; i < QUINTA_GL_VIEWS; i++) {
+        id context = quinta_gl_views[i].context;
+        if (!context) continue;
+        id view = (id)((void**)context)[2];
+        id window = view ? ((id (*)(id, SEL))objc_msgSend)(view, sel_registerName("window")) : 0;
+        id platform = window ? ((id (*)(id, SEL))objc_msgSend)(window, sel_registerName("platformWindow")) : 0;
+        if (!platform || !((signed char (*)(id, SEL, SEL))objc_msgSend)(platform, sel_registerName("respondsToSelector:"), sel_registerName("windowHandle")))
+            continue;
+        unsigned long handle = ((unsigned long (*)(id, SEL))objc_msgSend)(platform, sel_registerName("windowHandle"));
+        void* display = quinta_native_window_display(window);
+        int seen = 0;
+        for (int j = 0; j < parent_count; j++) if (parents[j] == handle) seen = 1;
+        if (handle && display && !seen) { parents[parent_count] = handle; displays[parent_count++] = display; }
+    }
+    static int traced_parents = -1;
+    if (getenv("QUINTA_TRACE_CGL") && traced_parents != parent_count) {
+        traced_parents = parent_count;
+        write_str("[Quinta GL] orphan scan parents="); print_num(parent_count); write_str("\n");
+    }
+    for (int j = 0; j < parent_count; j++) {
+        unsigned long root, parent, *children = 0; unsigned int count = 0;
+        if (!query_tree(displays[j], parents[j], &root, &parent, &children, &count)) continue;
+        for (unsigned int c = 0; c < count; c++) {
+            unsigned long child = children[c];
+            if (!quinta_gl_window_known(child)) continue;
+            unsigned char attributes[136]; // XWindowAttributes: x, y, width, height ints; map_state at 92
+            if (!get_attributes(displays[j], child, attributes)) continue;
+            int mapped = *(int*)(attributes + 92) != 0;
+            // Darling creates each GL window at 100x100 and sizes it once the
+            // view is laid out; one still unsized belongs to no visible view.
+            int unsized = *(int*)(attributes + 8) == 100 && *(int*)(attributes + 12) == 100;
+            int parked = -1;
+            for (int q = 0; q < quinta_gl_parked_count; q++) if (quinta_gl_parked[q] == child) parked = q;
+            if ((quinta_gl_window_orphaned(child) || unsized) && mapped) {
+                unmap(displays[j], child);
+                flush(displays[j]);
+                if (unsized && parked < 0 && quinta_gl_parked_count < QUINTA_GL_VIEWS * 4)
+                    quinta_gl_parked[quinta_gl_parked_count++] = child;
+            } else if (!unsized && parked >= 0 && !quinta_gl_window_orphaned(child)) {
+                quinta_gl_parked[parked] = quinta_gl_parked[--quinta_gl_parked_count]; // sized now: show it again
+                map(displays[j], child);
+                flush(displays[j]);
+            }
+        }
+        if (children) x_free(children);
     }
 }
 
@@ -5881,6 +5962,7 @@ static void quinta_track_gl_context(id context, int tracked) {
     if (!timer) {
         timer = CFRunLoopTimerCreate(0, CFAbsoluteTimeGetCurrent() + 0.05, 0.05, 0, 0, quinta_sync_gl_subwindows, 0);
         if (timer) CFRunLoopAddTimer(CFRunLoopGetMain(), timer, kCFRunLoopCommonModes);
+        if (getenv("QUINTA_TRACE_CGL")) { write_str("[Quinta GL] subwindow sync timer "); print_hex((unsigned long long)timer); write_str("\n"); }
     }
 }
 
