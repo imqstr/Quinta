@@ -193,8 +193,23 @@ extern NSString *NSRunLoopCommonModes;
 @end
 extern NSApplication *NSApp;
 @interface NSImage : NSObject
-- (id)initWithSize:(NSSize)size; - (void)setFlipped:(BOOL)flipped; - (void)lockFocus; - (void)unlockFocus;
+- (id)initWithSize:(NSSize)size; - (void)setFlipped:(BOOL)flipped; - (void)addRepresentation:(id)representation;
 @end
+@interface NSBitmapImageRep : NSObject
+- (id)initWithCGImage:(void *)image;
+@end
+@interface NSGraphicsContext : NSObject
++ (id)graphicsContextWithCGContext:(void *)context flipped:(BOOL)flipped;
++ (void)saveGraphicsState; + (void)restoreGraphicsState; + (void)setCurrentContext:(id)context;
+@end
+extern void *CGColorSpaceCreateDeviceRGB(void);
+extern void CGColorSpaceRelease(void *);
+extern void *CGBitmapContextCreate(void *, unsigned long, unsigned long, unsigned long, unsigned long, void *, unsigned);
+extern void *CGBitmapContextCreateImage(void *);
+extern void CGContextRelease(void *);
+extern void CGImageRelease(void *);
+extern void CGContextTranslateCTM(void *, double, double);
+extern void CGContextScaleCTM(void *, double, double);
 @interface NSButton : NSView
 - (void)setTitle:(NSString *)title; - (void)setImage:(NSImage *)image; - (void)setTarget:(id)target;
 - (void)setAction:(SEL)action; - (void)setBordered:(BOOL)bordered;
@@ -560,14 +575,41 @@ int quinta_web_open_url(id url) {
 }
 @end
 @implementation NSImage (QuintaWebChrome)
+// Draw into an offscreen bitmap. Darling's lockFocus caches the image in a
+// hidden NSWindow, and the Wayland backend showed each one as a real window
+// (four empty 36x36 windows whenever a web page opened).
 + (id)imageWithSize:(NSSize)size flipped:(BOOL)flipped drawingHandler:(BOOL (^)(NSRect))draw {
     NSImage *image = [[[self alloc] initWithSize:size] autorelease];
-    [image setFlipped:flipped];
-    [image lockFocus];
+    unsigned long width = size.width > 0 ? (unsigned long)(size.width + 0.999) : 0;
+    unsigned long height = size.height > 0 ? (unsigned long)(size.height + 0.999) : 0;
+    if (!width || !height || !draw)
+        return image;
+    void *space = CGColorSpaceCreateDeviceRGB();
+    // Premultiplied ARGB, little-endian: the format Onyx2D reads and writes.
+    void *bitmap = CGBitmapContextCreate(0, width, height, 8, width * 4, space, 2 | 8192);
+    CGColorSpaceRelease(space);
+    if (!bitmap)
+        return image;
+    if (flipped) {
+        CGContextTranslateCTM(bitmap, 0, height);
+        CGContextScaleCTM(bitmap, 1, -1);
+    }
+    [NSGraphicsContext saveGraphicsState];
+    [NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithCGContext:bitmap flipped:flipped]];
     @try {
         draw((NSRect){{0, 0}, size});
     } @finally {
-        [image unlockFocus];
+        [NSGraphicsContext restoreGraphicsState];
+    }
+    void *picture = CGBitmapContextCreateImage(bitmap);
+    CGContextRelease(bitmap);
+    if (picture) {
+        NSBitmapImageRep *representation = [[NSBitmapImageRep alloc] initWithCGImage:picture];
+        CGImageRelease(picture);
+        if (representation) {
+            [image addRepresentation:representation];
+            [representation release];
+        }
     }
     return image;
 }

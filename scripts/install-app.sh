@@ -18,7 +18,7 @@ step() { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 fail() { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
 if [[ ${1:-} == --remove ]]; then
-  rm -f "$bin_dir/quinta" "$apps_dir/$app_id.desktop" "$icons_dir/$app_id.png"
+  rm -f "$bin_dir/quinta" "$apps_dir/$app_id.desktop" "$apps_dir/quinta-roblox-window.desktop" "$icons_dir/$app_id.png"
   step "Removed Quinta's command and menu entry (settings in ~/.config/quinta are kept)"
   exit 0
 fi
@@ -58,6 +58,17 @@ Exec=$bin_dir/quinta
 Icon=$app_id
 Categories=Game;
 StartupWMClass=quinta
+EOF
+# The game's windows use this Wayland app ID; the hidden entry gives them Quinta's icon.
+cat > "$apps_dir/quinta-roblox-window.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Roblox
+Comment=Roblox running in Quinta
+Exec=$bin_dir/quinta
+Icon=$app_id
+NoDisplay=true
+StartupWMClass=quinta-roblox-window
 EOF
 command -v update-desktop-database >/dev/null && update-desktop-database "$apps_dir" 2>/dev/null || true
 

@@ -1,4 +1,4 @@
-"""WebKit host process for the native Studio launcher."""
+"""WebKit host process for the game's and Studio's embedded pages."""
 import os
 import signal
 import sys
@@ -13,6 +13,8 @@ from .web import WebBridge
 
 
 def main():
+    # Wayland app ID: the window shows Quinta's icon (io.github.imqstr.Quinta.desktop).
+    GLib.set_prgname("io.github.imqstr.Quinta")
     Gtk.init()
     Adw.init()
     bridge = WebBridge(None)
@@ -28,7 +30,9 @@ def main():
     GLib.timeout_add_seconds(1, check_owner)
     signal.signal(signal.SIGTERM, lambda *_: GLib.idle_add(loop.quit))
     signal.signal(signal.SIGINT, lambda *_: GLib.idle_add(loop.quit))
-    print(bridge.guest_path, flush=True)
+    # The launcher reads one line: the guest socket path and WebKit's user agent,
+    # which the game extends with its app name as macOS WebKit does.
+    print(f"{bridge.guest_path}\t{bridge.user_agent}", flush=True)
     try:
         loop.run()
     finally:

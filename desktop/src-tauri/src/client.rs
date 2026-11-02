@@ -42,7 +42,7 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  let dns=DnsService::start(settings["dns"].as_str().unwrap_or("quad9"),settings["dns_custom"].as_str().unwrap_or(""))?;
  let audio=Audio::start(&state.paths.cache).unwrap_or(None);
  // Roblox waits on its web view host at startup; without it the window stays black.
- let web=(if studio{crate::web::WebBridge::start_studio(&state.paths.root)}else{crate::web::WebBridge::start()}).map_err(|e|{let _=writeln!(log,"Web bridge unavailable: {e}");e}).ok();
+ let web=crate::web::WebBridge::start_host(&state.paths.root,studio).or_else(|e|{let _=writeln!(log,"Embedded pages unavailable: {e}");crate::web::WebBridge::start()}).map_err(|e|{let _=writeln!(log,"Web bridge unavailable: {e}");e}).ok();
  let mut variables=graphics;
  variables.extend([
   ("QUINTA_SESSION_DIRECTORY".into(),"Library/Quinta".into()),
@@ -62,7 +62,10 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  if let Some(cap)=settings["framerate_cap"].as_u64().filter(|c|*c>0){variables.push(("QUINTA_FRAMERATE_CAP".into(),cap.to_string()));}
  if runtime.runtime=="ciderdarling"{variables.push(("QUINTA_NATIVE_WORKQUEUE".into(),"1".into()));}
  if let Some(dns)=&dns{variables.push(("QUINTA_DNS".into(),dns.address.clone()));}
- if let Some(web)=&web{variables.push(("QUINTA_WEB_SOCKET".into(),web.guest_path.clone()));}
+ if let Some(web)=&web{
+  variables.push(("QUINTA_WEB_SOCKET".into(),web.guest_path.clone()));
+  if let Some(agent)=&web.user_agent{variables.push(("QUINTA_WEB_USER_AGENT".into(),agent.clone()));}
+ }
  if let Some(audio)=&audio{variables.extend([("QUINTA_AUDIO".into(),"1".into()),("QUINTA_AUDIO_FIFO".into(),guest(&audio.fifo))]);}else{variables.push(("QUINTA_AUDIO".into(),"0".into()));}
  for (setting,key) in [("trace_gl","QUINTA_TRACE_GL"),("trace_udp","QUINTA_TRACE_UDP"),("diagnostic_signals","QUINTA_DIAGNOSTIC_SIGNALS")]{if settings[setting].as_bool().unwrap_or(false){variables.push((key.into(),"1".into()));}}
  let mut command=Command::new(&runtime.executable);command.env("DPREFIX",&runtime.prefix).stdin(Stdio::null()).stdout(log.try_clone().map_err(|e|e.to_string())?).stderr(log);

@@ -11,33 +11,38 @@ use std::{fs, io::{BufRead, BufReader, Write}, os::unix::{fs::PermissionsExt, ne
 
 const MAX_LINE: usize = 1024 * 1024;
 
-pub struct WebBridge { pub guest_path: String, path: PathBuf, stop: Arc<AtomicBool>, host:Option<Child> }
+pub struct WebBridge { pub guest_path: String, pub user_agent: Option<String>, path: PathBuf, stop: Arc<AtomicBool>, host:Option<Child> }
 
 impl Drop for WebBridge {
     fn drop(&mut self) { if let Some(host)=&mut self.host{let _=host.kill();let _=host.wait();} self.stop.store(true, Ordering::Relaxed); let _ = fs::remove_file(&self.path); }
 }
 
 impl WebBridge {
-    /// Reuse the full WebKitGTK bridge for Studio's sign-in and account pages.
-    pub fn start_studio(root:&Path)->Result<Self,String>{
+    /// The full WebKitGTK host (launcher/quinta/web.py) for the client's
+    /// sign-in, profile and purchase pages. `embed`: the client runs on X11
+    /// and the host draws pages inside the client's own windows (Studio);
+    /// otherwise pages open in the host's browser window.
+    pub fn start_host(root:&Path,embed:bool)->Result<Self,String>{
         let mut command=Command::new("python3");
-        let mut child=command
-            .args(["-m","quinta.studio_web_host"])
+        command.args(["-m","quinta.studio_web_host"])
             .env("PYTHONPATH",root.join("launcher"))
-            .env("WEBKIT_DISABLE_DMABUF_RENDERER","1")
-            // Studio runs on X11; the host joins it there to draw sign-in pages inside Studio's dialog.
-            .env("GDK_BACKEND","x11").env("QUINTA_WEB_EMBED","1")
+            .env("WEBKIT_DISABLE_DMABUF_RENDERER","1");
+        if embed{command.env("GDK_BACKEND","x11").env("QUINTA_WEB_EMBED","1");}
+        let mut child=command
             .stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::inherit())
-            .spawn().map_err(|e|format!("Could not start Studio's WebKit host: {e}"))?;
+            .spawn().map_err(|e|format!("Could not start the WebKit host: {e}"))?;
         let output=child.stdout.take().unwrap();
         let (sender,receiver)=std::sync::mpsc::channel();
         thread::spawn(move ||{let mut line=String::new();let result=BufReader::new(output).read_line(&mut line).map(|_|line);let _=sender.send(result);});
         let line=receiver.recv_timeout(Duration::from_secs(15)).ok().and_then(Result::ok);
-        let Some(guest_path)=line.map(|s|s.trim().to_string()).filter(|s|s.starts_with("/Volumes/SystemRoot/")) else{
-            let _=child.kill();let _=child.wait();return Err("Studio's WebKit host did not start. Install Python GObject, GTK4, libadwaita and WebKitGTK 6.".into());
+        let line=line.unwrap_or_default();
+        let (guest_path,user_agent)=line.trim_end().split_once('\t').unwrap_or((line.trim_end(),""));
+        let user_agent=Some(user_agent.to_string()).filter(|a|!a.is_empty()&&a.bytes().all(|b|(32..127).contains(&b)));
+        let Some(guest_path)=Some(guest_path.to_string()).filter(|s|s.starts_with("/Volumes/SystemRoot/")) else{
+            let _=child.kill();let _=child.wait();return Err("The WebKit host did not start. Install Python GObject, GTK4, libadwaita and WebKitGTK 6.".into());
         };
         let path=PathBuf::from(guest_path.strip_prefix("/Volumes/SystemRoot").unwrap());
-        Ok(Self{guest_path,path,stop:Arc::new(AtomicBool::new(false)),host:Some(child)})
+        Ok(Self{guest_path,user_agent,path,stop:Arc::new(AtomicBool::new(false)),host:Some(child)})
     }
     pub fn start() -> Result<Self, String> {
         let runtime = std::env::var_os("XDG_RUNTIME_DIR").map(PathBuf::from).unwrap_or_else(|| "/tmp".into());
@@ -59,7 +64,7 @@ impl WebBridge {
                 }
             }
         });
-        Ok(Self { guest_path, path, stop, host:None })
+        Ok(Self { guest_path, user_agent:None, path, stop, host:None })
     }
 }
 
