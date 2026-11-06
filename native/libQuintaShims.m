@@ -5919,8 +5919,17 @@ static void quinta_sync_gl_subwindows(void* timer, void* info) {
         if (!query_tree(displays[j], parents[j], &root, &parent, &children, &count)) continue;
         for (unsigned int c = 0; c < count; c++) {
             unsigned long child = children[c];
-            if (!quinta_gl_window_known(child)) continue;
-            unsigned char attributes[136]; // XWindowAttributes: x, y, width, height ints; map_state at 92
+            unsigned char attributes[136]; // XWindowAttributes: x, y, width, height, border, depth ints; map_state at 92
+            if (!quinta_gl_window_known(child)) {
+                // A 32-bit child with no GL surface is never drawn into and
+                // shows uninitialised memory (Studio's striped device bar).
+                if (get_attributes(displays[j], child, attributes) && *(int*)(attributes + 20) == 32 &&
+                    *(int*)(attributes + 92) != 0) {
+                    unmap(displays[j], child);
+                    flush(displays[j]);
+                }
+                continue;
+            }
             if (!get_attributes(displays[j], child, attributes)) continue;
             int mapped = *(int*)(attributes + 92) != 0;
             // Darling creates each GL window at 100x100 and sizes it once the
