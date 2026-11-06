@@ -247,6 +247,13 @@ static id studio_add_global_monitor(id self,SEL cmd,unsigned long long mask,id h
     (void)self;(void)cmd;(void)mask;(void)handler;
     return ((id(*)(id,SEL))objc_msgSend)((id)objc_getClass("NSObject"),sel_registerName("new"));
 }
+// -[NSWindow colorSpace] is an "unimplemented" stub in Darling returning nil;
+// Qt and the renderer ask for it every frame. Answer sRGB, as macOS does.
+extern IMP class_replaceMethod(Class, SEL, IMP, const char*);
+static id studio_window_color_space(id self,SEL cmd) {
+    (void)self;(void)cmd;Class space=objc_getClass("NSColorSpace");
+    return space ? ((id(*)(id,SEL))objc_msgSend)((id)space,sel_registerName("sRGBColorSpace")) : 0;
+}
 static void studio_add_missing_methods(void) {
     Class input=objc_getMetaClass("NSTextInputContext");
     if(input)class_addMethod(input,sel_registerName("currentInputContext"),(IMP)studio_no_input_context,"@@:");
@@ -258,6 +265,8 @@ static void studio_add_missing_methods(void) {
         class_addMethod(event,sel_registerName("keyRepeatDelay"),(IMP)studio_key_repeat_delay,"d@:");
         class_addMethod(event,sel_registerName("keyRepeatInterval"),(IMP)studio_key_repeat_interval,"d@:");
     }
+    Class window_class = objc_getClass("NSWindow");
+    if(window_class)class_replaceMethod(window_class,sel_registerName("colorSpace"),(IMP)studio_window_color_space,"@@:");
     Class workspace_class = objc_getClass("NSWorkspace");
     if(workspace_class)class_addMethod(workspace_class,sel_registerName("frontmostApplication"),(IMP)studio_frontmost_application,"@@:");
     Class view = objc_getClass("NSView");
