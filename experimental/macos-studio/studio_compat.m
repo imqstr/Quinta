@@ -254,6 +254,35 @@ static id studio_window_color_space(id self,SEL cmd) {
     (void)self;(void)cmd;Class space=objc_getClass("NSColorSpace");
     return space ? ((id(*)(id,SEL))objc_msgSend)((id)space,sel_registerName("sRGBColorSpace")) : 0;
 }
+// Qt shows dock and popup windows before giving them a size or title, and
+// Darling maps them as empty 100x100 windows titled "--" (some never get a
+// size). Hide visible windows still at that placeholder; Qt shows them again
+// once laid out. Checked every 50 ms on the main thread.
+typedef struct { double x, y, width, height; } StudioFrame;
+extern void objc_msgSend_stret(void);
+extern double CFAbsoluteTimeGetCurrent(void);
+extern void *CFRunLoopTimerCreate(const void*, double, double, unsigned long, long, void (*)(void*, void*), void*);
+extern void CFRunLoopAddTimer(const void*, void*, const void*);
+extern const void *CFRunLoopGetMain(void);
+extern const void *kCFRunLoopCommonModes;
+static void studio_hide_placeholder_windows(void* timer, void* info) {
+    (void)timer; (void)info;
+    id app = ((id (*)(id, SEL))objc_msgSend)((id)objc_getClass("NSApplication"), sel_registerName("sharedApplication"));
+    id windows = app ? ((id (*)(id, SEL))objc_msgSend)(app, sel_registerName("windows")) : 0;
+    unsigned long count = windows ? ((unsigned long (*)(id, SEL))objc_msgSend)(windows, sel_registerName("count")) : 0;
+    for (unsigned long i = 0; i < count; i++) {
+        id window = ((id (*)(id, SEL, unsigned long))objc_msgSend)(windows, sel_registerName("objectAtIndex:"), i);
+        if (!((signed char (*)(id, SEL))objc_msgSend)(window, sel_registerName("isVisible"))) continue;
+        StudioFrame frame;
+        ((void (*)(StudioFrame*, id, SEL))objc_msgSend_stret)(&frame, window, sel_registerName("frame"));
+        if (frame.width != 100 || frame.height < 100 || frame.height > 140) continue;
+        id title = ((id (*)(id, SEL))objc_msgSend)(window, sel_registerName("title"));
+        const char* text = title ? ((const char* (*)(id, SEL))objc_msgSend)(title, sel_registerName("UTF8String")) : 0;
+        int placeholder = 1; // no title, or only "--"
+        for (const char* c = text; c && *c; c++) if (*c != '-' && *c != ' ') { placeholder = 0; break; }
+        if (placeholder) ((void (*)(id, SEL, id))objc_msgSend)(window, sel_registerName("orderOut:"), 0);
+    }
+}
 static void studio_add_missing_methods(void) {
     Class input=objc_getMetaClass("NSTextInputContext");
     if(input)class_addMethod(input,sel_registerName("currentInputContext"),(IMP)studio_no_input_context,"@@:");
@@ -266,7 +295,11 @@ static void studio_add_missing_methods(void) {
         class_addMethod(event,sel_registerName("keyRepeatInterval"),(IMP)studio_key_repeat_interval,"d@:");
     }
     Class window_class = objc_getClass("NSWindow");
-    if(window_class)class_replaceMethod(window_class,sel_registerName("colorSpace"),(IMP)studio_window_color_space,"@@:");
+    if(window_class) {
+        class_replaceMethod(window_class,sel_registerName("colorSpace"),(IMP)studio_window_color_space,"@@:");
+        void* hide_timer = CFRunLoopTimerCreate(0, CFAbsoluteTimeGetCurrent() + 0.05, 0.05, 0, 0, studio_hide_placeholder_windows, 0);
+        if (hide_timer) CFRunLoopAddTimer(CFRunLoopGetMain(), hide_timer, kCFRunLoopCommonModes);
+    }
     Class workspace_class = objc_getClass("NSWorkspace");
     if(workspace_class)class_addMethod(workspace_class,sel_registerName("frontmostApplication"),(IMP)studio_frontmost_application,"@@:");
     Class view = objc_getClass("NSView");
