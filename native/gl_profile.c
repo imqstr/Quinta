@@ -299,7 +299,7 @@ static void forget_configured_surface(void *surface);
  * surface was destroyed are orphans; libQuintaShims.m unmaps them while they
  * are still children of a live app window. */
 #define QUINTA_GL_SURFACES 512
-static struct { void *surface; unsigned long window; } gl_surfaces[QUINTA_GL_SURFACES];
+static struct { void *surface; unsigned long window; int presented; } gl_surfaces[QUINTA_GL_SURFACES];
 static unsigned long gl_orphans[QUINTA_GL_SURFACES];
 static int gl_orphan_count;
 static volatile int gl_surface_lock;
@@ -308,7 +308,7 @@ static void note_window_surface(void *surface, unsigned long window) {
     for (int i = 0; i < gl_orphan_count; i++) /* a window reused by a new surface is live again */
         if (gl_orphans[i] == window) gl_orphans[i] = gl_orphans[--gl_orphan_count];
     for (int i = 0; i < QUINTA_GL_SURFACES; i++)
-        if (!gl_surfaces[i].surface) { gl_surfaces[i].surface = surface; gl_surfaces[i].window = window; break; }
+        if (!gl_surfaces[i].surface) { gl_surfaces[i].surface = surface; gl_surfaces[i].window = window; gl_surfaces[i].presented = 0; break; }
     __sync_lock_release(&gl_surface_lock);
 }
 static void forget_window_surface(void *surface) {
@@ -330,6 +330,20 @@ int quinta_gl_window_orphaned(unsigned long window) {
     for (int i = 0; i < gl_orphan_count && !orphaned; i++) orphaned = gl_orphans[i] == window;
     __sync_lock_release(&gl_surface_lock);
     return orphaned;
+}
+/* A window whose surface never presented shows uninitialised memory
+ * (Studio's striped bars). */
+static void note_surface_presented(void *surface) {
+    for (int i = 0; i < QUINTA_GL_SURFACES; i++)
+        if (gl_surfaces[i].surface == surface) { gl_surfaces[i].presented = 1; return; }
+}
+int quinta_gl_window_presented(unsigned long window) {
+    int presented = 0;
+    while (__sync_lock_test_and_set(&gl_surface_lock, 1)) {}
+    for (int i = 0; i < QUINTA_GL_SURFACES && !presented; i++)
+        presented = gl_surfaces[i].surface && gl_surfaces[i].window == window && gl_surfaces[i].presented;
+    __sync_lock_release(&gl_surface_lock);
+    return presented;
 }
 int quinta_gl_window_known(unsigned long window) {
     int known = 0;
@@ -616,6 +630,7 @@ void quinta_frame_presented(void *display, void *surface, unsigned int succeeded
     static int fps_log = -1;
     if (!succeeded || !surface)
         return;
+    note_surface_presented(surface); /* single writer per surface; flag only goes 0 -> 1 */
     int verbose = environment_flag("QUINTA_FPS_LOG", &fps_log);
     unsigned long long now = mach_absolute_time();
     double fps = 0;

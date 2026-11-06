@@ -5806,6 +5806,7 @@ static int quinta_gl_subwindow_mode(void) { // 0 off, 1 follow, 2 hide, 3 visibi
 }
 extern int quinta_gl_window_orphaned(unsigned long window);
 extern int quinta_gl_window_known(unsigned long window);
+extern int quinta_gl_window_presented(unsigned long window);
 static unsigned long quinta_gl_parked[QUINTA_GL_VIEWS * 4]; // windows unmapped for still being unsized
 static int quinta_gl_parked_count;
 static void quinta_note_gl_present(id context) {
@@ -5924,7 +5925,8 @@ static void quinta_sync_gl_subwindows(void* timer, void* info) {
             int mapped = *(int*)(attributes + 92) != 0;
             // Darling creates each GL window at 100x100 and sizes it once the
             // view is laid out; one still unsized belongs to no visible view.
-            int unsized = *(int*)(attributes + 8) == 100 && *(int*)(attributes + 12) == 100;
+            int unsized = (*(int*)(attributes + 8) == 100 && *(int*)(attributes + 12) == 100) ||
+                !quinta_gl_window_presented(child); // nothing drawn yet: garbage on screen
             int parked = -1;
             for (int q = 0; q < quinta_gl_parked_count; q++) if (quinta_gl_parked[q] == child) parked = q;
             if ((quinta_gl_window_orphaned(child) || unsized) && mapped) {

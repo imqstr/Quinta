@@ -50,6 +50,8 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  let audio=Audio::start(&state.paths.cache).unwrap_or(None);
  // Roblox waits on its web view host at startup; without it the window stays black.
  let web=crate::web::WebBridge::start_host(&state.paths.root,studio).or_else(|e|{let _=writeln!(log,"Embedded pages unavailable: {e}");crate::web::WebBridge::start()}).map_err(|e|{let _=writeln!(log,"Web bridge unavailable: {e}");e}).ok();
+ // Per client: the game and Studio can run side by side.
+ let sentinel=state.paths.cache.join(format!("{kind}-closing"));let _=std::fs::remove_file(&sentinel);
  let mut variables=graphics;
  variables.extend([
   ("QUINTA_SESSION_DIRECTORY".into(),"Library/Quinta".into()),
@@ -62,7 +64,7 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
   ("MESA_GLSL_CACHE_DIR".into(),state.paths.cache.join("mesa-shader-cache").display().to_string()),
   ("QUINTA_PENDING_URI_FILE".into(),guest(&state.paths.cache.join("pending-uri"))),
   ("__GL_SHADER_DISK_CACHE_PATH".into(),state.paths.cache.join("nvidia-shader-cache").display().to_string()),
-  ("QUINTA_QUIT_SENTINEL".into(),guest(&state.paths.cache.join("game-closing"))),
+  ("QUINTA_QUIT_SENTINEL".into(),guest(&sentinel)),
   ("QUINTA_RAW_MOUSE".into(),if settings["raw_mouse"].as_bool().unwrap_or(true){"1"}else{"0"}.into()),
  ]);
  // 0 means "Roblox default": never write FramerateCap=0, which Roblox reads as 0 FPS.
@@ -108,13 +110,25 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  progress(app,"Starting client",0.8);
  let child=command.spawn().map_err(|e|format!("Could not start the selected runtime: {e}"))?;
  *state.last_log.lock().unwrap()=Some(log_path.clone());
- let pid=child.id();
+ let pid=child.id();let sentinel_watch=sentinel.clone();let kind_watch=kind.to_string();let mut closing:Option<Instant>=None;
  state.session.lock().unwrap().push(Session{child,kind:kind.into(),log:log_path,started:Instant::now(),_dns:dns,_audio:audio,_web:web});
  if settings["hide_launcher_on_launch"].as_bool().unwrap_or(false){if let Some(window)=app.get_webview_window("main"){let _=window.hide();}}
  progress(app,"Client started",1.0);
  let state=state.clone();let app=app.clone();
  thread::spawn(move||loop{
   thread::sleep(Duration::from_millis(750));
+  // Closing the window must end the client. Roblox and its crash handler
+  // can linger in Darling after their window is gone, which kept the
+  // session (and Quinta's Stop/Play state) alive in the background.
+  let started=state.session.lock().unwrap().iter().find(|s|s.child.id()==pid).map(|s|s.started);
+  if let Some(started)=started{
+   let main_gone=started.elapsed()>Duration::from_secs(20)&&guest_processes(&kind_watch,true).is_empty();
+   if closing.is_none()&&(sentinel_watch.exists()||main_gone){closing=Some(Instant::now());}
+   if closing.is_some_and(|t|t.elapsed()>Duration::from_secs(3)){
+    for leftover in guest_processes(&kind_watch,false){unsafe{libc::kill(leftover,libc::SIGKILL);}}
+    unsafe{libc::kill(-(pid as i32),libc::SIGKILL);}
+   }
+  }
   let ended={let mut lock=state.session.lock().unwrap();let Some(index)=lock.iter().position(|s|s.child.id()==pid) else{return};let session=&mut lock[index];
    match session.child.try_wait(){Ok(Some(status))=>Some((index,status.success(),session.started.elapsed().as_secs(),session.kind.clone())),Err(_)=>Some((index,false,0,session.kind.clone())),_=>None}};
   if let Some((index,success,seconds,kind))=ended{
@@ -125,6 +139,19 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
   }
  });
  Ok(())
+}
+/// Host PIDs of a client's guest processes: its main executable only, or
+/// everything from its app bundle (crash handler included).
+fn guest_processes(kind:&str,main_only:bool)->Vec<i32>{
+ let (main,bundle)=if kind=="studio"{("./RobloxStudio","/RobloxStudio.app/Contents/MacOS/")}else{("./RobloxPlayer","/RobloxPlayer.app/Contents/MacOS/")};
+ let Ok(entries)=std::fs::read_dir("/proc") else{return Vec::new()};
+ entries.filter_map(|e|e.ok()).filter_map(|e|{
+  let pid:i32=e.file_name().to_str()?.parse().ok()?;
+  let raw=std::fs::read(e.path().join("cmdline")).ok()?;
+  let first=raw.split(|b|*b==0).next().unwrap_or_default();
+  let command=String::from_utf8_lossy(first);
+  (command==main||(!main_only&&command.contains(bundle))).then_some(pid)
+ }).collect()
 }
 const STUDIO_SCRIPT:&str=r#"cd "$1" || exit 1
 compat=$2; shim=$3; shift 3
