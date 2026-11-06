@@ -229,11 +229,37 @@ static unsigned long studio_pressed_mouse_buttons(id self,SEL cmd) {
 static char studio_clips_key;
 static signed char studio_clips_to_bounds(id self,SEL cmd) {(void)cmd;id value=objc_getAssociatedObject(self,&studio_clips_key);return value?((signed char(*)(id,SEL))objc_msgSend)(value,sel_registerName("boolValue")):1;}
 static void studio_set_clips_to_bounds(id self,SEL cmd,signed char clips) {(void)cmd;objc_setAssociatedObject(self,&studio_clips_key,((id(*)(id,SEL,signed char))objc_msgSend)((id)objc_getClass("NSNumber"),sel_registerName("numberWithBool:"),clips),1);}
+// NSEvent timing class methods and NSWorkspace.frontmostApplication, missing
+// in Darling; Studio queries them once a place is open. macOS defaults.
+static double studio_double_click_interval(id self,SEL cmd) {(void)self;(void)cmd;return 0.5;}
+static double studio_key_repeat_delay(id self,SEL cmd) {(void)self;(void)cmd;return 0.5;}
+static double studio_key_repeat_interval(id self,SEL cmd) {(void)self;(void)cmd;return 0.033;}
+static id studio_frontmost_application(id self,SEL cmd) {
+    (void)self;(void)cmd;Class running=objc_getClass("NSRunningApplication");
+    return running && ((signed char(*)(id,SEL,SEL))objc_msgSend)((id)running,sel_registerName("respondsToSelector:"),sel_registerName("currentApplication"))
+        ? ((id(*)(id,SEL))objc_msgSend)((id)running,sel_registerName("currentApplication")) : 0;
+}
+// +[NSEvent addGlobalMonitorForEventsMatchingMask:handler:] is missing; the
+// stub forwarding for its 4 arguments corrupted Qt's registers as Studio
+// showed a window. Global monitors only see other apps' events, which a
+// Darling app never receives: return an inert monitor token.
+static id studio_add_global_monitor(id self,SEL cmd,unsigned long long mask,id handler) {
+    (void)self;(void)cmd;(void)mask;(void)handler;
+    return ((id(*)(id,SEL))objc_msgSend)((id)objc_getClass("NSObject"),sel_registerName("new"));
+}
 static void studio_add_missing_methods(void) {
     Class input=objc_getMetaClass("NSTextInputContext");
     if(input)class_addMethod(input,sel_registerName("currentInputContext"),(IMP)studio_no_input_context,"@@:");
     Class event = objc_getMetaClass("NSEvent");
-    if(event)class_addMethod(event,sel_registerName("pressedMouseButtons"),(IMP)studio_pressed_mouse_buttons,"Q@:");
+    if(event) {
+        class_addMethod(event,sel_registerName("pressedMouseButtons"),(IMP)studio_pressed_mouse_buttons,"Q@:");
+        class_addMethod(event,sel_registerName("doubleClickInterval"),(IMP)studio_double_click_interval,"d@:");
+        class_addMethod(event,sel_registerName("addGlobalMonitorForEventsMatchingMask:handler:"),(IMP)studio_add_global_monitor,"@@:Q@?");
+        class_addMethod(event,sel_registerName("keyRepeatDelay"),(IMP)studio_key_repeat_delay,"d@:");
+        class_addMethod(event,sel_registerName("keyRepeatInterval"),(IMP)studio_key_repeat_interval,"d@:");
+    }
+    Class workspace_class = objc_getClass("NSWorkspace");
+    if(workspace_class)class_addMethod(workspace_class,sel_registerName("frontmostApplication"),(IMP)studio_frontmost_application,"@@:");
     Class view = objc_getClass("NSView");
     if(view){class_addMethod(view,sel_registerName("clipsToBounds"),(IMP)studio_clips_to_bounds,"c@:");class_addMethod(view,sel_registerName("setClipsToBounds:"),(IMP)studio_set_clips_to_bounds,"v@:c");}
     Class item = objc_getClass("NSMenuItem");
