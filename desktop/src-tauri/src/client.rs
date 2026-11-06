@@ -3,7 +3,7 @@ use serde_json::{json,Value};
 use std::{fs::{self,File,OpenOptions},io::{Read,Write},os::unix::{fs::PermissionsExt,process::CommandExt},path::{Path,Component},process::{Command,Stdio},sync::atomic::Ordering,time::{Duration,Instant},thread};
 use tauri::{AppHandle,Emitter,Manager};
 
-fn is_host_graphics(key:&str)->bool{matches!(key,"EGL_PLATFORM"|"DRI_PRIME"|"GALLIUM_DRIVER"|"MESA_LOADER_DRIVER_OVERRIDE"|"__EGL_VENDOR_LIBRARY_FILENAMES"|"__NV_PRIME_RENDER_OFFLOAD"|"__GLX_VENDOR_LIBRARY_NAME"|"__VK_LAYER_NV_optimus"|"MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE"|"VK_ADD_DRIVER_FILES"|"VK_DRIVER_FILES"|"VK_ICD_FILENAMES"|"VK_LOADER_DRIVERS_SELECT"|"VK_LOADER_DRIVERS_DISABLE"|"QUINTA_WAYLAND"|"QUINTA_WAYLAND_HELPER"|"XDG_CONFIG_HOME"|"MACOBLOX_METAL")}
+fn is_host_graphics(key:&str)->bool{matches!(key,"LIBGL_ALWAYS_SOFTWARE"|"EGL_PLATFORM"|"DRI_PRIME"|"GALLIUM_DRIVER"|"MESA_LOADER_DRIVER_OVERRIDE"|"__EGL_VENDOR_LIBRARY_FILENAMES"|"__NV_PRIME_RENDER_OFFLOAD"|"__GLX_VENDOR_LIBRARY_NAME"|"__VK_LAYER_NV_optimus"|"MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE"|"VK_ADD_DRIVER_FILES"|"VK_DRIVER_FILES"|"VK_ICD_FILENAMES"|"VK_LOADER_DRIVERS_SELECT"|"VK_LOADER_DRIVERS_DISABLE"|"QUINTA_WAYLAND"|"QUINTA_WAYLAND_HELPER"|"XDG_CONFIG_HOME"|"MACOBLOX_METAL")}
 fn progress(app:&AppHandle,label:&str,percent:f64){let _=app.emit("task-progress",json!({"label":label,"percent":percent}));}
 fn guest(path:&Path)->String{format!("/Volumes/SystemRoot{}",path.display())}
 
@@ -27,9 +27,14 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
   graphics_settings["display_backend"]=json!("x11");
   // Studio's GL child windows on X11: the driver's own OpenGL presents to
   // them; zink's Vulkan swapchain did not reach the screen (black window).
-  graphics_settings["renderer"]=json!(std::env::var("QUINTA_STUDIO_RENDERER").unwrap_or_else(|_|"opengl".into()));
+  graphics_settings["renderer"]=json!(std::env::var("QUINTA_STUDIO_RENDERER").ok().filter(|r|r!="software").unwrap_or_else(||"opengl".into()));
  }
- let inventory=state.gpus.lock().unwrap().clone();let graphics=runtime::graphics(&graphics_settings,&inventory,&state.paths.root)?;
+ let inventory=state.gpus.lock().unwrap().clone();let mut graphics=runtime::graphics(&graphics_settings,&inventory,&state.paths.root)?;
+ // Testing on a headless X server (Xvfb): Mesa's software OpenGL.
+ if studio&&std::env::var("QUINTA_STUDIO_RENDERER").as_deref()==Ok("software"){
+  graphics.retain(|(k,_)|!matches!(k.as_str(),"__GLX_VENDOR_LIBRARY_NAME"|"__EGL_VENDOR_LIBRARY_FILENAMES"|"__NV_PRIME_RENDER_OFFLOAD"|"DRI_PRIME"|"__VK_LAYER_NV_optimus"));
+  graphics.extend([("__GLX_VENDOR_LIBRARY_NAME".into(),"mesa".into()),("__EGL_VENDOR_LIBRARY_FILENAMES".into(),"/usr/share/glvnd/egl_vendor.d/50_mesa.json".into()),("LIBGL_ALWAYS_SOFTWARE".into(),"1".into())]);
+ }
  let shim=state.paths.root.join("build");if !shim.join("libQuintaShims.dylib").is_file(){return Err("Native compatibility shims are missing. Run scripts/build-native.sh first.".into());}
  let bundle=if studio{state.paths.root.join("experimental/macos-studio/RobloxStudio.app")}else{state.paths.bundle()};
  let executable=bundle.join(if studio{"Contents/MacOS/RobloxStudio"}else{"Contents/MacOS/RobloxPlayer"});
@@ -90,7 +95,14 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  if !wayland{for key in ["DISPLAY","XAUTHORITY"]{if let Ok(value)=std::env::var(key){variables.push((key.into(),value));}}}
  for key in std::env::vars_os().filter_map(|(k,_)|k.to_str().filter(|s|s.starts_with("DSERVER_LOG_")).map(str::to_string)){command.env_remove(key);}
  // Qt logs through os_log, which crashes in Darling: keep Studio on stderr.
- if studio{variables.push(("QT_FORCE_STDERR_LOGGING".into(),"1".into()));}
+ if studio{
+  variables.push(("QT_FORCE_STDERR_LOGGING".into(),"1".into()));
+  // `quinta --studio place.rbxl` opens that place in Studio.
+  if let Some(place)=uri.as_deref().filter(|u|u.ends_with(".rbxl")||u.ends_with(".rbxlx")).map(Path::new).filter(|p|p.is_file()){
+   let place=place.canonicalize().map_err(|e|e.to_string())?;
+   variables.push(("QUINTA_STUDIO_ARGS".into(),format!("-task EditFile -localPlaceFile {}",guest(&place))));
+  }
+ }
  if studio{
   let compat=state.paths.root.join("experimental/macos-studio/libStudioCompat.dylib");
   if !compat.is_file(){return Err("The Studio experiment shim must be built before testing this client".into());}

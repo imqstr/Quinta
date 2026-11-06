@@ -45,16 +45,24 @@ const routeIcons: Record<Route, string> = { play: 'play', settings: 'settings', 
 const titles: Record<Route, string> = { play: 'Play', settings: 'Settings', studio: 'Studio', mods: 'Mods', logs: 'Logs', info: 'Info' };
 const app = document.querySelector<HTMLDivElement>('#app')!;
 app.innerHTML = `
-<div class="window-shell">
-  <aside class="sidebar" data-drag>
-    <div class="traffic-lights"><button class="light close" data-window="close" aria-label="Close"></button><button class="light minimize" data-window="minimize" aria-label="Minimize"></button><button class="light zoom" data-window="maximize" aria-label="Zoom"></button></div>
-    <label class="sidebar-search">${icon('search')}<input id="sidebar-search" type="search" placeholder="Search" aria-label="Search sections"></label>
-    <div class="sidebar-account"><img class="brand-mark" src="/quinta-mark.png" alt="" aria-hidden="true"><div><strong>Quinta</strong><small id="sidebar-version">0.1.0</small></div></div>
-    <nav aria-label="Main navigation">${(['play', 'settings', 'studio', 'mods', 'logs', 'info'] as Route[]).map(name => `<button class="nav-item${name === 'settings' || name === 'logs' ? ' section-start' : ''}" data-route="${name}"><span class="squircle" style="--tint:${tints[name]}">${icon(routeIcons[name])}</span><span>${titles[name]}</span></button>`).join('')}</nav>
-  </aside>
-  <div class="workspace">
-    <header class="toolbar" data-drag><div class="history"><button class="history-button" data-history="back" aria-label="Back">${icon('back')}</button><button class="history-button" data-history="forward" aria-label="Forward">${icon('chevron')}</button></div><h1 id="page-title">Play</h1></header>
-    <div class="scroll-area"><main id="content" tabindex="-1"></main></div>
+<div class="p-window p-window-split quinta-window">
+  <nav class="p-sidebar quinta-sidebar" aria-label="Main navigation">
+    <div class="p-sidebar-titlebar" data-drag>
+      <div class="p-traffic-lights"><button class="p-traffic-light p-traffic-light-close" data-window="close" aria-label="Close"></button><button class="p-traffic-light p-traffic-light-min" data-window="minimize" aria-label="Minimize"></button><button class="p-traffic-light p-traffic-light-zoom" data-window="maximize" aria-label="Zoom"></button></div>
+    </div>
+    <input class="p-field quinta-search" id="sidebar-search" type="search" placeholder="Search" aria-label="Search settings">
+    ${(['play', 'settings', 'studio', 'mods', 'logs', 'info'] as Route[]).map(name => `${name === 'settings' ? '<div class="p-sidebar-header">Configure</div>' : name === 'logs' ? '<div class="p-sidebar-header">Support</div>' : ''}<div class="p-sidebar-row nav-item" tabindex="0" role="button" data-route="${name}"><span class="p-sidebar-icon squircle" style="--tint:${tints[name]}">${icon(routeIcons[name])}</span><span>${titles[name]}</span></div>`).join('')}
+    <div class="quinta-account"><img class="brand-mark" src="/quinta-mark.png" alt="" aria-hidden="true"><span><strong>Quinta</strong><small id="sidebar-version">v0.1.0</small></span></div>
+  </nav>
+  <div class="p-window-main">
+    <div class="p-window-titlebar p-window-titlebar-unified" data-drag>
+      <div class="p-window-titlebar-row" data-drag>
+        <div class="p-toolbar-group" role="toolbar" aria-label="History"><button class="p-toolbar-btn" data-history="back" aria-label="Back">${icon('back')}</button><button class="p-toolbar-btn" data-history="forward" aria-label="Forward">${icon('chevron')}</button></div>
+        <span class="p-window-title" id="page-title" data-drag>Play</span>
+        <div class="p-window-spacer" data-drag></div>
+      </div>
+    </div>
+    <div class="p-window-content scroll-area"><main id="content" tabindex="-1"></main></div>
     <div id="progress" class="task-progress" hidden><span id="progress-label"></span><span id="progress-value"></span><div class="progress-track"><div id="progress-fill"></div></div></div>
   </div>
 </div>
@@ -67,12 +75,12 @@ function hours(seconds: number) { if (seconds < 3600) return `${Math.floor(secon
 function renderer() { return ({ opengl: 'OpenGL', vulkan: 'Vulkan / Zink', metal: 'Metal' } as Record<string, string>)[String(setting('renderer'))] || 'OpenGL'; }
 function dnsName() { return ({ quad9: 'Quad9', cloudflare: 'Cloudflare', google: 'Google', system: 'System DNS', custom: String(setting('dns_custom') || 'Custom') } as Record<string, string>)[String(setting('dns'))] || 'Quad9'; }
 function activeGpu() { return state?.gpus.find(g => g.id === setting('gpu'))?.name || (setting('gpu') === 'auto' ? 'Automatic' : 'Dedicated graphics'); }
-function button(action: string, label: string, glyph?: string, cls = '') { return `<button data-action="${action}" class="${cls}" ${operation ? 'disabled' : ''}>${glyph ? icon(glyph) : ''}<span>${label}</span></button>`; }
+function button(action: string, label: string, glyph?: string, cls = '') { return `<button data-action="${action}" class="p-button${/primary/.test(cls) ? ' p-button-colored' : ''} ${cls}" ${operation ? 'disabled' : ''}>${glyph ? icon(glyph) : ''}<span>${label}</span></button>`; }
 function select(key: string, label: string, options: [string, string][], description = '') {
-  return `<label class="setting-row" for="${key}"><span class="setting-copy"><strong>${label}</strong>${description ? `<small>${description}</small>` : ''}</span><select id="${key}" data-setting="${key}">${options.map(([value, text]) => `<option value="${escape(value)}" ${String(setting(key)) === value ? 'selected' : ''}>${escape(text)}</option>`).join('')}</select></label>`;
+  return `<label class="setting-row" for="${key}"><span class="setting-copy"><strong>${label}</strong>${description ? `<small>${description}</small>` : ''}</span><span class="p-select"><select id="${key}" data-setting="${key}">${options.map(([value, text]) => `<option value="${escape(value)}" ${String(setting(key)) === value ? 'selected' : ''}>${escape(text)}</option>`).join('')}</select></span></label>`;
 }
-function toggle(key: string, label: string, description = '') { return `<label class="setting-row" for="${key}"><span class="setting-copy"><strong>${label}</strong>${description ? `<small>${description}</small>` : ''}</span><input id="${key}" data-setting="${key}" class="switch" type="checkbox" role="switch" ${setting(key) ? 'checked' : ''}></label>`; }
-function numberField(key: string, label: string, min: number, max: number, step: number, suffix = '') { return `<label class="setting-row" for="${key}"><span class="setting-copy"><strong>${label}</strong></span><span class="number-control"><input id="${key}" data-setting="${key}" type="number" min="${min}" max="${max}" step="${step}" value="${escape(setting(key))}">${suffix ? `<span>${suffix}</span>` : ''}</span></label>`; }
+function toggle(key: string, label: string, description = '') { return `<div class="setting-row"><label class="setting-copy" for="${key}"><strong>${label}</strong>${description ? `<small>${description}</small>` : ''}</label><label class="p-switch"><input id="${key}" data-setting="${key}" type="checkbox" role="switch" ${setting(key) ? 'checked' : ''}><span></span></label></div>`; }
+function numberField(key: string, label: string, min: number, max: number, step: number, suffix = '') { return `<label class="setting-row" for="${key}"><span class="setting-copy"><strong>${label}</strong></span><span class="number-control"><input class="p-field" id="${key}" data-setting="${key}" type="number" min="${min}" max="${max}" step="${step}" value="${escape(setting(key))}">${suffix ? `<span>${suffix}</span>` : ''}</span></label>`; }
 function group(title: string, rows: string, description = '') { return `<section class="settings-group"><div class="section-heading"><h2>${title}</h2>${description ? `<p>${description}</p>` : ''}</div><div class="settings-list">${rows}</div></section>`; }
 // Tahoe panes carry no header: the toolbar shows the title. Actions sit above the first group.
 function heading(_title: string, _subtitle = '', actions = '') { return actions ? `<div class="pane-actions">${actions}</div>` : ''; }
@@ -125,7 +133,7 @@ function render() {
   const focusedId = focused?.id;
   document.title = `${titles[route]} · Quinta`;
   document.querySelector('#page-title')!.textContent = route === 'info' ? 'About' : titles[route];
-  document.querySelectorAll<HTMLButtonElement>('[data-route]').forEach(button => { const selected = button.dataset.route === route; button.classList.toggle('selected', selected); if (selected) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); });
+  document.querySelectorAll<HTMLButtonElement>('[data-route]').forEach(button => { const selected = button.dataset.route === route; button.classList.toggle('p-selected', button.dataset.route === route), button.classList.toggle('selected', selected); if (selected) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); });
   document.querySelector('#sidebar-version')!.textContent = `v${state?.version || '0.1.0'}`;
   if (!state) content.innerHTML = `${heading('Quinta')}<div class="loading-state"><span class="spinner"></span>Connecting to the desktop backend…</div>`;
   else content.innerHTML = ({ play: playPage, settings: settingsPage, studio: studioPage, mods: modsPage, logs: logsPage, info: infoPage })[route]();
@@ -216,7 +224,7 @@ const actions: Record<string, () => unknown> = {
   'cancel-quit': () => (document.querySelector('#quit-dialog') as HTMLDialogElement).close(), 'confirm-quit': () => request('quit_app'),
 };
 app.addEventListener('click', event => {
-  const target = (event.target as HTMLElement).closest<HTMLElement>('button'); if (!target || target.matches(':disabled')) return;
+  const target = (event.target as HTMLElement).closest<HTMLElement>('button, [data-route]'); if (!target || target.matches(':disabled')) return;
   if (target.dataset.hitRoute) {
     (document.querySelector('#sidebar-search') as HTMLInputElement).value = '';
     if (target.dataset.hitTab) tab = target.dataset.hitTab;
@@ -237,7 +245,7 @@ app.addEventListener('click', event => {
   else if (target.dataset.window) void request('window_action', { action: target.dataset.window }).catch(e => toast(String(e), true));
   else if (target.dataset.action && actions[target.dataset.action]) Promise.resolve(actions[target.dataset.action]()).catch(e => toast(String(e), true));
 });
-app.addEventListener('pointerdown', event => { const target = event.target as HTMLElement; if (event.button === 0 && target.closest('[data-drag]') && !target.closest('button')) void request('window_action', { action: 'drag' }); });
+app.addEventListener('pointerdown', event => { const target = event.target as HTMLElement; if (event.button === 0 && target.closest('[data-drag]') && !target.closest('button, input')) void request('window_action', { action: 'drag' }); });
 app.addEventListener('change', event => {
   const target = event.target as HTMLInputElement | HTMLSelectElement;
   if (target.dataset.setting) { const value = target.type === 'checkbox' ? (target as HTMLInputElement).checked : target.type === 'number' ? Number(target.value) : target.value; void save({ [target.dataset.setting]: value }); }
@@ -251,7 +259,7 @@ document.addEventListener('contextmenu', event => { if (!(event.target as HTMLEl
 document.querySelector<HTMLInputElement>('#sidebar-search')!.addEventListener('input', event => {
   const query = (event.target as HTMLInputElement).value.trim();
   document.querySelector('#page-title')!.textContent = query ? 'Search' : (route === 'info' ? 'About' : titles[route]);
-  document.querySelectorAll<HTMLElement>('.nav-item').forEach(item => item.classList.toggle('selected', !query && item.dataset.route === route));
+  document.querySelectorAll<HTMLElement>('.nav-item').forEach(item => item.classList.toggle('p-selected', !query && item.dataset.route === route));
   if (query) { content.innerHTML = searchResults(query); content.classList.remove('page-enter'); void content.offsetWidth; content.classList.add('page-enter'); }
   else render();
 });

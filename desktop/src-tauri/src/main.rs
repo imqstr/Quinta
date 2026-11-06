@@ -24,7 +24,7 @@ fn main(){
     // `quinta --launch` / `quinta --studio` while Quinta is open starts that client here.
     if let Some(kind)=args.iter().find_map(|a|match a.as_str(){"--launch"=>Some("player"),"--studio"=>Some("studio"),_=>None}){
       let state=app.state::<AppState>().inner().clone();let handle=app.clone();
-      let uri=args.iter().find(|a|a.starts_with("roblox:")||a.starts_with("roblox-player:")).cloned();
+      let uri=args.iter().find(|a|a.starts_with("roblox:")||a.starts_with("roblox-player:")||a.ends_with(".rbxl")||a.ends_with(".rbxlx")).cloned();
       std::thread::spawn(move||{if let Err(error)=client::launch(state,handle.clone(),kind.into(),uri){let _=handle.emit("toast",error);}});
     }
   }))
@@ -37,7 +37,7 @@ fn main(){
     let autostart=std::env::args().find_map(|a|match a.as_str(){"--launch"=>Some("player"),"--studio"=>Some("studio"),_=>None});
     std::thread::spawn(move||{
       *state.gpus.lock().unwrap()=runtime::gpus();let _=handle.emit("hardware-ready",());
-      let uri=std::env::args().find(|a|a.starts_with("roblox:")||a.starts_with("roblox-player:"));
+      let uri=std::env::args().find(|a|a.starts_with("roblox:")||a.starts_with("roblox-player:")||a.ends_with(".rbxl")||a.ends_with(".rbxlx"));
       if let Some(kind)=autostart{if let Err(error)=client::launch(state,handle.clone(),kind.into(),uri){eprintln!("Quinta: {error}");}}
     });
     Ok(())
