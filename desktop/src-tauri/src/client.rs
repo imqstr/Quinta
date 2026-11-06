@@ -32,8 +32,8 @@ fn launch_inner(state:&AppState,app:&AppHandle,kind:&str,uri:Option<String>)->Re
  let inventory=state.gpus.lock().unwrap().clone();let mut graphics=runtime::graphics(&graphics_settings,&inventory,&state.paths.root)?;
  // Testing on a headless X server (Xvfb): Mesa's software OpenGL.
  if studio&&std::env::var("QUINTA_STUDIO_RENDERER").as_deref()==Ok("software"){
-  graphics.retain(|(k,_)|!matches!(k.as_str(),"__GLX_VENDOR_LIBRARY_NAME"|"__EGL_VENDOR_LIBRARY_FILENAMES"|"__NV_PRIME_RENDER_OFFLOAD"|"DRI_PRIME"|"__VK_LAYER_NV_optimus"));
-  graphics.extend([("__GLX_VENDOR_LIBRARY_NAME".into(),"mesa".into()),("__EGL_VENDOR_LIBRARY_FILENAMES".into(),"/usr/share/glvnd/egl_vendor.d/50_mesa.json".into()),("LIBGL_ALWAYS_SOFTWARE".into(),"1".into())]);
+  graphics.retain(|(k,_)|!matches!(k.as_str(),"__GLX_VENDOR_LIBRARY_NAME"|"__EGL_VENDOR_LIBRARY_FILENAMES"|"__NV_PRIME_RENDER_OFFLOAD"|"DRI_PRIME"|"__VK_LAYER_NV_optimus"|"MESA_LOADER_DRIVER_OVERRIDE"|"GALLIUM_DRIVER"));
+  graphics.extend([("GALLIUM_DRIVER".into(),"llvmpipe".into()),("__GLX_VENDOR_LIBRARY_NAME".into(),"mesa".into()),("__EGL_VENDOR_LIBRARY_FILENAMES".into(),"/usr/share/glvnd/egl_vendor.d/50_mesa.json".into()),("LIBGL_ALWAYS_SOFTWARE".into(),"1".into())]);
  }
  let shim=state.paths.root.join("build");if !shim.join("libQuintaShims.dylib").is_file(){return Err("Native compatibility shims are missing. Run scripts/build-native.sh first.".into());}
  let bundle=if studio{state.paths.root.join("experimental/macos-studio/RobloxStudio.app")}else{state.paths.bundle()};
