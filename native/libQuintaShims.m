@@ -5949,6 +5949,25 @@ static void quinta_sync_gl_subwindows(void* timer, void* info) {
                 flush(displays[j]);
             }
         }
+        // Translucent GL overlays (Studio's device bar over the viewport)
+        // expect macOS layer compositing; an X11 child cannot blend over a
+        // sibling, so their transparent pixels showed garbage stripes. Hide
+        // a 32-bit GL strip lying inside another GL view.
+        for (unsigned int c = 0; c < count; c++) {
+            unsigned char a[136], b[136];
+            if (!quinta_gl_window_known(children[c]) || !get_attributes(displays[j], children[c], a)) continue;
+            int ax = *(int*)a, ay = *(int*)(a + 4), aw = *(int*)(a + 8), ah = *(int*)(a + 12);
+            if (*(int*)(a + 20) != 32 || ah > 48 || *(int*)(a + 92) == 0) continue;
+            for (unsigned int o = 0; o < count; o++) {
+                if (o == c || !quinta_gl_window_known(children[o]) || !get_attributes(displays[j], children[o], b)) continue;
+                int bx = *(int*)b, by = *(int*)(b + 4), bw = *(int*)(b + 8), bh = *(int*)(b + 12);
+                if (bh >= 200 && ax >= bx - 4 && ay >= by - 4 && ax + aw <= bx + bw + 4 && ay + ah <= by + bh + 4) {
+                    unmap(displays[j], children[c]);
+                    flush(displays[j]);
+                    break;
+                }
+            }
+        }
         if (children) x_free(children);
     }
 }
