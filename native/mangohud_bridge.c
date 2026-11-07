@@ -55,6 +55,24 @@ static void quinta_bind_presented_surface(void *display, void *surface) {
 
 static unsigned int quinta_hud_swap(void *display, void *surface) {
     quinta_bind_presented_surface(display, surface);
+    {   /* QUINTA_TRACE_SWAP=1: sample the centre pixel of big surfaces before presenting. */
+        static volatile long sampled;
+        const char *t = getenv("QUINTA_TRACE_SWAP");
+        if (t && t[0] == '1' && (__sync_add_and_fetch(&sampled, 1) % 200) == 1) {
+            extern unsigned int eglQuerySurface(void *, void *, int, int *);
+            extern void *dlsym(void *, const char *);
+            int w = 0, h = 0; eglQuerySurface(display, surface, 0x3057, &w); eglQuerySurface(display, surface, 0x3056, &h);
+            void (*read_pixels)(int, int, int, int, unsigned, unsigned, void *) = dlsym((void *)-1, "glReadPixels");
+            void (*get_integer)(unsigned, int *) = dlsym((void *)-1, "glGetIntegerv");
+            unsigned char px[4] = {0}; int fb = -1;
+            if (w > 400 && h > 400 && read_pixels && get_integer) {
+                get_integer(0x8CAA /* READ_FRAMEBUFFER_BINDING */, &fb);
+                read_pixels(w / 2, h / 2, 1, 1, 0x1908 /* RGBA */, 0x1401 /* UNSIGNED_BYTE */, px);
+                char line[160]; int n = snprintf(line, sizeof line, "[Quinta Pixel] %dx%d fb=%d centre=%u,%u,%u,%u\n", w, h, fb, px[0], px[1], px[2], px[3]);
+                if (n > 0) write(2, line, (unsigned long)n);
+            }
+        }
+    }
     if (!__atomic_load_n(&initialized, __ATOMIC_ACQUIRE) &&
         __sync_bool_compare_and_swap(&initialized, 0, 1)) {
         initialize_overlay();

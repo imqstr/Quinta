@@ -2747,6 +2747,15 @@ static void quinta_note_gl_present(id context);
 static void hooked_gl_context_flush(id self, SEL cmd) {
     long count = __sync_add_and_fetch(&quinta_gl_flush_count, 1);
     quinta_note_gl_present(self);
+    static volatile int trace_fb = -1;
+    if (quinta_env_cached("QUINTA_TRACE_FB", &trace_fb) && (count <= 30 || count % 500 == 0)) {
+        void (*get_integer)(unsigned int, int*) = (void (*)(unsigned int, int*))dlsym(RTLD_NEXT, "glGetIntegerv");
+        int draw = -1, read = -1, view[4] = {0};
+        if (get_integer) { get_integer(0x8CA6U, &draw); get_integer(0x8CAAU, &read); get_integer(0x0BA2U, view); }
+        write_str("[Quinta FB] flush #"); print_num(count); write_str(" ctx="); print_hex((unsigned long long)self);
+        write_str(" draw-fb="); print_num(draw); write_str(" read-fb="); print_num(read);
+        write_str(" viewport="); print_num(view[2]); write_str("x"); print_num(view[3]); write_str("\n");
+    }
     static volatile int test_clear = -1;
     if (quinta_env_cached("QUINTA_GL_TEST_CLEAR", &test_clear)) {
         void (*disable)(unsigned int) =
